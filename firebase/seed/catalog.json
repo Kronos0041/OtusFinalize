@@ -1,0 +1,261 @@
+{
+  "categories": [
+    {
+      "id": "glasses",
+      "title": "Очки",
+      "order": 1
+    },
+    {
+      "id": "luggage",
+      "title": "Багаж",
+      "order": 2
+    },
+    {
+      "id": "pens",
+      "title": "Ручки",
+      "order": 3
+    },
+    {
+      "id": "watches",
+      "title": "Часы",
+      "order": 4
+    }
+  ],
+  "products": [
+    {
+      "id": "glasses-navigator",
+      "categoryId": "glasses",
+      "title": "Авиаторы Navigator",
+      "shortDescription": "Графитовые линзы, двойной мост",
+      "description": "Прямоугольные авиаторы в тонкой чёрной металлической оправе. Графитовые линзы с полной защитой от UV-лучей, двойной мост и синие наконечники заушников.",
+      "price": 32900,
+      "order": 1,
+      "imageURL": "https://test-6d334.web.app/products/glasses-navigator.png?v=48d43a195b88"
+    },
+    {
+      "id": "glasses-panto-rose",
+      "categoryId": "glasses",
+      "title": "Панто Rose",
+      "shortDescription": "Светлая оправа, голубые линзы",
+      "description": "Круглая оправа панто цвета розового золота с прозрачными ободками. Голубые линзы с лёгким зеркальным эффектом подходят для города и отпуска.",
+      "price": 28500,
+      "order": 2,
+      "imageURL": "https://test-6d334.web.app/products/glasses-panto-rose.png?v=86197f3ff8d1"
+    },
+    {
+      "id": "glasses-browline-tortoise",
+      "categoryId": "glasses",
+      "title": "Браулайн Tortoise",
+      "shortDescription": "Черепаховый верх, коричневые линзы",
+      "description": "Классическая оправа браулайн: верх из ацетата под черепаху, нижняя часть из золотистого металла. Тёплые коричневые линзы повышают контраст.",
+      "price": 26900,
+      "order": 3,
+      "imageURL": "https://test-6d334.web.app/products/glasses-browline-tortoise.png?v=f024771dbf7d"
+    },
+    {
+      "id": "glasses-slim-black",
+      "categoryId": "glasses",
+      "title": "Прямоугольные Slim",
+      "shortDescription": "Тонкая чёрная оправа",
+      "description": "Лёгкая прямоугольная оправа из матового чёрного металла с тёмно-серыми линзами. Минималистичная модель на каждый день.",
+      "price": 24900,
+      "order": 4,
+      "imageURL": "https://test-6d334.web.app/products/glasses-slim-black.png?v=31558f80e808"
+    },
+    {
+      "id": "glasses-titanium-round",
+      "categoryId": "glasses",
+      "title": "Круглые Titanium",
+      "shortDescription": "Серебристый титан, серо-голубые линзы",
+      "description": "Облегчённая титановая оправа с серо-голубыми линзами. Не давит на переносицу при долгой носке.",
+      "price": 29900,
+      "order": 5,
+      "imageURL": "https://test-6d334.web.app/products/glasses-titanium-round.png?v=47cbc397e8f8"
+    },
+    {
+      "id": "glasses-pilot-gold",
+      "categoryId": "glasses",
+      "title": "Пилот Gold",
+      "shortDescription": "Золотистая оправа, зелёные линзы",
+      "description": "Пилотская модель с двойным мостом в золотистой оправе. Классические зелёные линзы передают цвета без искажений.",
+      "price": 34500,
+      "order": 6,
+      "imageURL": "https://test-6d334.web.app/products/glasses-pilot-gold.png?v=48a8d479f148"
+    },
+    {
+      "id": "glasses-aviator-silver",
+      "categoryId": "glasses",
+      "title": "Авиаторы Silver",
+      "shortDescription": "Серебристая оправа, серые линзы",
+      "description": "Каплевидные авиаторы в серебристой металлической оправе с серыми градиентными линзами.",
+      "price": 31900,
+      "order": 7,
+      "imageURL": "https://test-6d334.web.app/products/glasses-aviator-silver.png?v=95ad4504dc0f"
+    },
+    {
+      "id": "luggage-cabin-black",
+      "categoryId": "luggage",
+      "title": "Чемодан-кабина Black",
+      "shortDescription": "Ручная кладь, поликарбонат",
+      "description": "Компактный чемодан для ручной клади из ударопрочного поликарбоната. Четыре колеса с поворотом на 360°, телескопическая ручка и кодовый замок.",
+      "price": 89000,
+      "order": 8,
+      "imageURL": "https://test-6d334.web.app/products/luggage-cabin-black.png?v=104396fbe5cd"
+    },
+    {
+      "id": "luggage-medium-black",
+      "categoryId": "luggage",
+      "title": "Чемодан Medium Black",
+      "shortDescription": "Средний размер для поездки на неделю",
+      "description": "Чемодан среднего размера в чёрном рифлёном корпусе. Внутри два отделения с компрессионными ремнями.",
+      "price": 99000,
+      "order": 9,
+      "imageURL": "https://test-6d334.web.app/products/luggage-medium-black.png?v=83f17879befd"
+    },
+    {
+      "id": "luggage-cabin-aluminium",
+      "categoryId": "luggage",
+      "title": "Чемодан-кабина Aluminium",
+      "shortDescription": "Алюминиевый корпус, ручная кладь",
+      "description": "Чемодан-кабина из анодированного алюминия с рифлёной поверхностью. Прочный корпус защищает вещи в дороге.",
+      "price": 105000,
+      "order": 10,
+      "imageURL": "https://test-6d334.web.app/products/luggage-cabin-aluminium.png?v=b4adf261f502"
+    },
+    {
+      "id": "luggage-trunk-aluminium",
+      "categoryId": "luggage",
+      "title": "Чемодан Trunk Aluminium",
+      "shortDescription": "Вместительная алюминиевая модель",
+      "description": "Алюминиевый чемодан увеличенной глубины для длительных поездок. Усиленные углы и два кодовых замка.",
+      "price": 119000,
+      "order": 11,
+      "imageURL": "https://test-6d334.web.app/products/luggage-trunk-aluminium.png?v=6a49df35bb76"
+    },
+    {
+      "id": "luggage-cabin-red-line",
+      "categoryId": "luggage",
+      "title": "Чемодан-кабина Red Line",
+      "shortDescription": "Чёрный корпус с красной полосой",
+      "description": "Чемодан для ручной клади с узнаваемой красной полосой — легко заметить на ленте выдачи багажа.",
+      "price": 92000,
+      "order": 12,
+      "imageURL": "https://test-6d334.web.app/products/luggage-cabin-red-line.png?v=de44b5c2c0a9"
+    },
+    {
+      "id": "pen-blue-resin",
+      "categoryId": "pens",
+      "title": "Перьевая ручка Blue Resin",
+      "shortDescription": "Синий корпус, серебристый колпачок",
+      "description": "Перьевая ручка с корпусом из синей смолы и колпачком с платиновым покрытием. Перо из нержавеющей стали, заправка картриджами.",
+      "price": 54000,
+      "order": 13,
+      "imageURL": "https://test-6d334.web.app/products/pen-blue-resin.png?v=9ef55a827b55"
+    },
+    {
+      "id": "pen-classic-black",
+      "categoryId": "pens",
+      "title": "Перьевая ручка Classic Black",
+      "shortDescription": "Чёрная смола, золотое перо",
+      "description": "Классическая перьевая ручка из чёрной смолы с позолоченной отделкой. Перо из золота 585 пробы, поршневая заправка.",
+      "price": 79000,
+      "order": 14,
+      "imageURL": "https://test-6d334.web.app/products/pen-classic-black.png?v=9d0c4d363d09"
+    },
+    {
+      "id": "pen-night-star",
+      "categoryId": "pens",
+      "title": "Перьевая ручка Night Star",
+      "shortDescription": "Чёрный лак, синий купол",
+      "description": "Перьевая ручка в чёрном лаке с синим прозрачным куполом на колпачке. Сбалансирована для длинных записей.",
+      "price": 49000,
+      "order": 15,
+      "imageURL": "https://test-6d334.web.app/products/pen-night-star.png?v=85738d6e1a2a"
+    },
+    {
+      "id": "pen-limited-gold",
+      "categoryId": "pens",
+      "title": "Перьевая ручка Limited Gold",
+      "shortDescription": "Лимитированная серия с гравировкой",
+      "description": "Коллекционная перьевая ручка с золотистым гравированным декором на корпусе. Поставляется в подарочном футляре.",
+      "price": 189000,
+      "order": 16,
+      "imageURL": "https://test-6d334.web.app/products/pen-limited-gold.png?v=ae0b324225ea"
+    },
+    {
+      "id": "watch-moonphase-rose",
+      "categoryId": "watches",
+      "title": "Moonphase Rose",
+      "shortDescription": "Розовое золото, фаза луны",
+      "description": "Часы с индикатором фазы луны в корпусе цвета розового золота. Белый циферблат и бежевый кожаный ремешок.",
+      "price": 245000,
+      "order": 17,
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ],
+      "imageURL": "https://test-6d334.web.app/products/watch-moonphase-rose.png?v=c762e51f76c9"
+    },
+    {
+      "id": "watch-bronze-green",
+      "categoryId": "watches",
+      "title": "Хронограф Bronze Green",
+      "shortDescription": "Бронзовый корпус, зелёный ремешок",
+      "description": "Хронограф в бронзовом корпусе с синим циферблатом и текстильным ремешком оливкового цвета.",
+      "price": 198000,
+      "order": 18,
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ],
+      "imageURL": "https://test-6d334.web.app/products/watch-bronze-green.png?v=aaded53fadfd"
+    },
+    {
+      "id": "watch-night-pattern",
+      "categoryId": "watches",
+      "title": "Смарт-часы Night Pattern",
+      "shortDescription": "Чёрный корпус, ремешок с принтом",
+      "description": "Смарт-часы в чёрном корпусе: уведомления, пульсометр и трекер активности. Силиконовый ремешок с графичным синим принтом.",
+      "price": 89000,
+      "order": 19,
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ],
+      "imageURL": "https://test-6d334.web.app/products/watch-night-pattern.png?v=379c77f2378d"
+    },
+    {
+      "id": "watch-steel-black",
+      "categoryId": "watches",
+      "title": "Хронограф Steel Black",
+      "shortDescription": "Сталь, чёрный кожаный ремешок",
+      "description": "Хронограф из полированной стали с чёрным циферблатом и контрастными арабскими цифрами.",
+      "price": 176000,
+      "order": 20,
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ],
+      "imageURL": "https://test-6d334.web.app/products/watch-steel-black.png?v=00cfe6d952ec"
+    },
+    {
+      "id": "watch-blue-brown",
+      "categoryId": "watches",
+      "title": "Хронограф Blue Brown",
+      "shortDescription": "Синий циферблат, коричневая кожа",
+      "description": "Хронограф в тёмном стальном корпусе с синим циферблатом на коричневом кожаном ремешке.",
+      "price": 169000,
+      "order": 21,
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ],
+      "imageURL": "https://test-6d334.web.app/products/watch-blue-brown.png?v=82f5baf11b1c"
+    }
+  ]
+}

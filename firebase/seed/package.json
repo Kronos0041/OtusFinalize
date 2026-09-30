@@ -1,0 +1,18 @@
+{
+  "name": "clothesshop-firestore-seed",
+  "private": true,
+  "type": "module",
+  "description": "Загружает демо-данные ClothesShop в Firestore проекта test-6d334",
+  "scripts": {
+    "seed": "node seed.mjs",
+    "seed:dry": "node seed.mjs --dry-run",
+    "seed:cli": "node seed-with-cli.mjs",
+    "images:prepare": "node prepare-images.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}
