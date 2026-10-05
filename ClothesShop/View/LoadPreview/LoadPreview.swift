@@ -70,7 +70,7 @@ struct LoadPreview: View {
 
             Text(verbatim: "Montblanc")
                 .font(.babylonica(size: 54))
-            Text("Old money style")
+            Text(SwiftGen.Welcome.subtitle)
                 .font(.system(size: 24, design: .serif))
         }
     }
@@ -88,5 +88,6 @@ struct LoadPreview: View {
 struct LoadPreview_Previews: PreviewProvider {
     static var previews: some View {
         LoadPreview()
+            .previewThemes()
     }
 }

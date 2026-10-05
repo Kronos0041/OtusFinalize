@@ -99,9 +99,9 @@ extension AuthVM {
             self?.isSubmitting = false
             switch result {
             case .success:
-                self?.verificationMessage = String(localized: "Письмо отправлено повторно. Проверьте также папку «Спам».")
+                self?.verificationMessage = SwiftGen.Auth.Verification.resent
             case .failure(let error):
-                self?.verificationMessage = error.localizedDescription
+                self?.verificationMessage = AuthenticationService.accountErrorMessage(error, verifyingCurrentPassword: false)
             }
         }
     }
@@ -117,9 +117,9 @@ extension AuthVM {
             case .success(true):
                 self.setSessionState(.verified)
             case .success(false):
-                self.verificationMessage = String(localized: "Адрес ещё не подтверждён. Откройте ссылку из письма и попробуйте снова.")
+                self.verificationMessage = SwiftGen.Auth.Verification.notConfirmed
             case .failure(let error):
-                self.verificationMessage = error.localizedDescription
+                self.verificationMessage = AuthenticationService.accountErrorMessage(error, verifyingCurrentPassword: false)
             }
         }
     }
@@ -129,7 +129,7 @@ extension AuthVM {
             try AuthenticationService.signOut()
             setSessionState(.signedOut)
         } catch {
-            verificationMessage = error.localizedDescription
+            verificationMessage = AuthenticationService.accountErrorMessage(error, verifyingCurrentPassword: false)
         }
     }
 
@@ -140,14 +140,14 @@ extension AuthVM {
             setSessionState(AuthenticationService.sessionState)
             if pendingEmail != nil {
                 verificationMessage = mode == .reg
-                    ? String(localized: "Письмо отправлено. Подтвердите адрес по ссылке из письма.")
-                    : String(localized: "Подтвердите адрес по ссылке из письма. При необходимости отправьте письмо ещё раз.")
+                    ? SwiftGen.Auth.Verification.sent
+                    : SwiftGen.Auth.Verification.required
             }
         case .failure(let error):
             if pendingEmail != nil {
-                verificationMessage = String(localized: "Не удалось отправить письмо: \(error.localizedDescription)")
+                verificationMessage = SwiftGen.Auth.Verification.sendFailed(AuthenticationService.accountErrorMessage(error, verifyingCurrentPassword: false))
             } else {
-                banner = .error(error.localizedDescription)
+                banner = .error(AuthenticationService.accountErrorMessage(error, verifyingCurrentPassword: false))
             }
         }
     }
@@ -179,7 +179,7 @@ extension AuthVM {
         }
         guard !isEditing else { return }
 
-        banner = isValidEmail(email) ? .hidden : .error(String(localized: "Неправильная почта"))
+        banner = isValidEmail(email) ? .hidden : .error(SwiftGen.Auth.Error.invalidEmail)
     }
 
     func isValidEmail(_ email: String) -> Bool {
@@ -189,13 +189,13 @@ extension AuthVM {
     /// Текст первой найденной ошибки формы или `nil`, если всё корректно.
     /// Порядок проверок совпадает с прежним.
     private func validationError(for mode: AuthState) -> String? {
-        guard isValidEmail(email) else { return String(localized: "Неправильная почта") }
-        guard !password.isEmpty else { return String(localized: "Введите пароль") }
+        guard isValidEmail(email) else { return SwiftGen.Auth.Error.invalidEmail }
+        guard !password.isEmpty else { return SwiftGen.Auth.Error.passwordRequired }
         guard mode == .reg else { return nil }
         guard password.count >= Self.minPasswordLength else {
-            return String(localized: "Пароль должен содержать не менее \(Self.minPasswordLength) символов")
+            return SwiftGen.Auth.Error.passwordTooShort(Self.minPasswordLength)
         }
-        guard password == repeatPassword else { return String(localized: "Пароли не совпадают") }
+        guard password == repeatPassword else { return SwiftGen.Auth.Error.passwordMismatch }
         return nil
     }
 }

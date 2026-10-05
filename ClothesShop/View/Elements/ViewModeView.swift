@@ -8,22 +8,29 @@
 import SwiftUI
 
 /// Показывает контент или заглушку в зависимости от `ViewMode`.
+/// Общая оболочка области данных: навигация и постоянные действия остаются снаружи.
 ///
 ///     ViewModeView(viewModel.viewMode, emptyTitle: "Каталог пока пуст", retry: { viewModel.reload() }) { sections in
 ///         CatalogView(sections: sections)
 ///     }
 struct ViewModeView<Value, Content: View>: View {
     private let mode: ViewMode<Value>
-    private let emptyTitle: LocalizedStringKey
-    private let retry: () -> Void
+    private let emptyTitle: String
+    private let emptySystemImage: String
+    private let emptyMessage: String?
+    private let retry: (() -> Void)?
     private let content: (Value) -> Content
 
     init(_ mode: ViewMode<Value>,
-         emptyTitle: LocalizedStringKey,
-         retry: @escaping () -> Void,
+         emptyTitle: String = SwiftGen.Common.empty,
+         emptySystemImage: String = "tray",
+         emptyMessage: String? = nil,
+         retry: (() -> Void)? = nil,
          @ViewBuilder content: @escaping (Value) -> Content) {
         self.mode = mode
         self.emptyTitle = emptyTitle
+        self.emptySystemImage = emptySystemImage
+        self.emptyMessage = emptyMessage
         self.retry = retry
         self.content = content
     }
@@ -36,17 +43,18 @@ struct ViewModeView<Value, Content: View>: View {
         case .content(let value):
             content(value)
         case .empty:
-            StatePlaceholder(systemImage: "tray",
+            StatePlaceholder(systemImage: emptySystemImage,
                              title: emptyTitle,
+                             message: emptyMessage.map { Text($0) },
                              retry: retry)
         case .noInternet:
             StatePlaceholder(systemImage: "wifi.slash",
-                             title: "Нет подключения к интернету",
-                             message: Text("Данные загрузятся автоматически, когда появится сеть."),
+                             title: SwiftGen.Network.offline,
+                             message: Text(SwiftGen.Network.reconnect),
                              retry: retry)
         case .error(let message):
             StatePlaceholder(systemImage: "exclamationmark.triangle",
-                             title: "Не удалось загрузить данные",
+                             title: SwiftGen.Network.loadFailed,
                              message: Text(verbatim: message),
                              retry: retry)
         }
@@ -56,7 +64,7 @@ struct ViewModeView<Value, Content: View>: View {
 /// Заглушка «пусто / нет сети / ошибка» с кнопкой повтора.
 struct StatePlaceholder: View {
     let systemImage: String
-    let title: LocalizedStringKey
+    let title: String
     var message: Text? = nil
     var retry: (() -> Void)? = nil
 
@@ -78,7 +86,7 @@ struct StatePlaceholder: View {
             }
 
             if let retry {
-                Button("Повторить", action: retry)
+                Button(SwiftGen.Common.retry, action: retry)
                     .padding(.top, 4)
             }
         }
@@ -90,9 +98,14 @@ struct StatePlaceholder: View {
 struct ViewModeView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ViewModeView(ViewMode<Int>.noInternet, emptyTitle: "Пусто", retry: {}) { Text("\($0)") }
-            ViewModeView(ViewMode<Int>.error("Сервер недоступен"), emptyTitle: "Пусто", retry: {}) { Text("\($0)") }
-            ViewModeView(ViewMode<Int>.empty, emptyTitle: "Уведомлений пока нет", retry: {}) { Text("\($0)") }
+            ViewModeView(ViewMode<Int>.loading) { Text("\($0)") }
+                .previewDisplayName("Loading")
+            ViewModeView(ViewMode<Int>.content(42)) { Text("\($0)") }
+                .previewDisplayName("Content")
+            ViewModeView(ViewMode<Int>.noInternet, emptyTitle: SwiftGen.Common.empty, retry: {}) { Text("\($0)") }
+            ViewModeView(ViewMode<Int>.error("Сервер недоступен"), emptyTitle: SwiftGen.Common.empty, retry: {}) { Text("\($0)") }
+            ViewModeView(ViewMode<Int>.empty, emptyTitle: SwiftGen.Notifications.empty, retry: {}) { Text("\($0)") }
         }
+        .previewThemes()
     }
 }

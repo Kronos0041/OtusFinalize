@@ -13,12 +13,12 @@ struct NotificationView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            TopBarDescriptionView(title: "Уведомления",
+            TopBarDescriptionView(title: SwiftGen.Notifications.title,
                                   backButton: $backButton,
                                   frame: (width: getWidth() - 20, height: 50))
 
             ViewModeView(notifications.viewMode,
-                         emptyTitle: "Уведомлений пока нет",
+                         emptyTitle: SwiftGen.Notifications.empty,
                          retry: { notifications.reload() }) { items in
                 List(items) { item in
                     Button {
@@ -63,13 +63,21 @@ private struct NotificationRow: View {
         .padding(.vertical, 4)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
-        .accessibilityHint(isUnread ? Text("Нажмите, чтобы отметить прочитанным") : Text(verbatim: ""))
+        .accessibilityHint(isUnread ? Text(SwiftGen.Notifications.markRead) : Text(verbatim: ""))
     }
 }
 
+#if DEBUG
 struct NotificationView_Previews: PreviewProvider {
     static var previews: some View {
         NotificationView(backButton: .constant(false))
-            .environmentObject(NotificationsVM())
+            .environmentObject(NotificationsVM(previewItems: [
+                NotificationItem(id: "new-collection", remoteId: 1,
+                                 title: "Новая коллекция", description: "Часы и аксессуары уже в каталоге."),
+                NotificationItem(id: "favorites", remoteId: 2,
+                                 title: "Ваши избранные товары", description: "Сохранённые товары всегда под рукой.")
+            ], readIDs: ["favorites"]))
+            .previewThemes()
     }
 }
+#endif

@@ -15,10 +15,108 @@ import FirebaseAuth
 enum AuthenticationService {
     typealias Completion = (Result<Void, Error>) -> Void
 
+    static var currentUserID: String? { Auth.auth().currentUser?.uid }
+
+    static var profile: ProfileViewState {
+        ProfileViewState(email: Auth.auth().currentUser?.email ?? "")
+    }
+
+    /// Обновляет email после подтверждения смены адреса в браузере.
+    static func refreshProfile(completion: @escaping (Result<ProfileViewState, Error>) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            completion(.failure(missingUserError))
+            return
+        }
+        user.reload { error in
+            if let error {
+                completion(.failure(error))
+                return
+            }
+            user.getIDTokenForcingRefresh(true) { _, error in
+                completion(error.map(Result.failure) ?? .success(profile))
+            }
+        }
+    }
+
+    static func changePassword(currentPassword: String, newPassword: String,
+                               completion: @escaping Completion) {
+        reauthenticate(password: currentPassword) { result in
+            switch result {
+            case .success(let user):
+                user.updatePassword(to: newPassword) { error in
+                    completion(error.map(Result.failure) ?? .success(()))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    /// Firebase применит новый адрес только после перехода по ссылке из письма.
+    static func changeEmail(to email: String, currentPassword: String,
+                            completion: @escaping Completion) {
+        reauthenticate(password: currentPassword) { result in
+            switch result {
+            case .success(let user):
+                Auth.auth().languageCode = Bundle.main.preferredLocalizations.first ?? "en"
+                user.sendEmailVerification(beforeUpdatingEmail: email) { error in
+                    completion(error.map(Result.failure) ?? .success(()))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    static func accountErrorMessage(_ error: Error, verifyingCurrentPassword: Bool = true) -> String {
+        let error = error as NSError
+        guard error.domain == AuthErrorDomain else { return error.localizedDescription }
+        switch AuthErrorCode(rawValue: error.code) {
+        case .wrongPassword, .invalidCredential:
+            return verifyingCurrentPassword ? SwiftGen.Auth.Error.wrongPassword : SwiftGen.Auth.Error.invalidCredentials
+        case .userNotFound:
+            return SwiftGen.Auth.Error.invalidCredentials
+        case .userDisabled:
+            return SwiftGen.Auth.Error.accountDisabled
+        case .emailAlreadyInUse:
+            return SwiftGen.Auth.Error.emailInUse
+        case .invalidEmail:
+            return SwiftGen.Auth.Error.invalidEmail
+        case .weakPassword:
+            return SwiftGen.Auth.Error.weakPassword
+        case .networkError:
+            return SwiftGen.Network.offline
+        case .tooManyRequests:
+            return SwiftGen.Auth.Error.tooManyRequests
+        case .requiresRecentLogin, .invalidUserToken, .userTokenExpired:
+            return SwiftGen.Auth.Error.sessionExpired
+        default:
+            return SwiftGen.Auth.Error.unexpected
+        }
+    }
+
+    private static func reauthenticate(password: String,
+                                       completion: @escaping (Result<User, Error>) -> Void) {
+        guard let user = Auth.auth().currentUser, let email = user.email else {
+            completion(.failure(missingUserError))
+            return
+        }
+        let credential = EmailAuthProvider.credential(withEmail: email, password: password)
+        user.reauthenticate(with: credential) { result, error in
+            if let error {
+                completion(.failure(error))
+            } else if let user = result?.user {
+                completion(.success(user))
+            } else {
+                completion(.failure(missingUserError))
+            }
+        }
+    }
+
     /// После создания аккаунта Firebase сразу открывает сессию. Отправляем письмо,
     /// а доступ к приложению до подтверждения блокирует `AuthSessionState`.
     static func register(email: String, password: String, completion: @escaping Completion) {
-        Auth.auth().languageCode = "ru"
+        Auth.auth().languageCode = Bundle.main.preferredLocalizations.first ?? "en"
         Auth.auth().createUser(withEmail: email, password: password) { result, error in
             if let error {
                 completion(.failure(error))
@@ -52,7 +150,7 @@ enum AuthenticationService {
             completion(.failure(missingUserError))
             return
         }
-        Auth.auth().languageCode = "ru"
+        Auth.auth().languageCode = Bundle.main.preferredLocalizations.first ?? "en"
         user.sendEmailVerification { error in
             completion(error.map(Result.failure) ?? .success(()))
         }
@@ -99,7 +197,7 @@ enum AuthenticationService {
 
     private static var missingUserError: Error {
         NSError(domain: "ClothesShop.Auth", code: 1,
-                userInfo: [NSLocalizedDescriptionKey: String(localized: "Сессия завершилась. Войдите снова.")])
+                userInfo: [NSLocalizedDescriptionKey: SwiftGen.Auth.Error.sessionEnded])
     }
 
     private static func deliver(result: AuthDataResult?, error: Error?, to completion: @escaping Completion) {

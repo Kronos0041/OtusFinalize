@@ -84,6 +84,13 @@ struct NotificationItem: Identifiable {
     let title: String
     let description: String
 
+    init(id: String, remoteId: Int, title: String, description: String) {
+        self.id = id
+        self.remoteId = remoteId
+        self.title = title
+        self.description = description
+    }
+
     init(document: QueryDocumentSnapshot) {
         let data = document.data()
         id = document.documentID

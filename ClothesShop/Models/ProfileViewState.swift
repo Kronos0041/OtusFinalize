@@ -7,13 +7,7 @@
 
 import Foundation
 
-/// Изменяемое состояние, которое отображает экран профиля.
-///
-/// Это UI-модель, а не документ Firestore: сервис преобразует удалённый профиль
-/// в эти поля, а экран может локально редактировать имя пользователя.
+/// Профиль текущего пользователя Firebase Auth.
 struct ProfileViewState {
-    var id: Int
-    var name: String
-    var age: Int
-    var image: String?
+    var email: String
 }

@@ -25,6 +25,16 @@ final class NotificationsVM: ObservableObject {
     private var isRequestInFlight = false
     private var cancellables = Set<AnyCancellable>()
     private static let readIdsKey = "notifications.seenIds"
+    #if DEBUG
+    private var isPreview = false
+
+    convenience init(previewItems: [NotificationItem], readIDs: Set<String> = []) {
+        self.init()
+        isPreview = true
+        readIds = readIDs
+        viewMode = previewItems.isEmpty ? .empty : .content(previewItems)
+    }
+    #endif
 
     init(defaults: UserDefaults = .standard, network: NetworkMonitor = .shared) {
         self.defaults = defaults
@@ -43,6 +53,12 @@ final class NotificationsVM: ObservableObject {
 
     /// Загружает список. Уже показанный список обновляется тихо, без спиннера.
     func reload(completion: (() -> Void)? = nil) {
+        #if DEBUG
+        if isPreview {
+            completion?()
+            return
+        }
+        #endif
         guard !isRequestInFlight else {
             completion?()
             return
@@ -79,6 +95,9 @@ final class NotificationsVM: ObservableObject {
     func markRead(_ item: NotificationItem) {
         guard isUnread(item) else { return }
         readIds.insert(item.id)
+        #if DEBUG
+        if isPreview { return }
+        #endif
         defaults.set(Array(readIds), forKey: Self.readIdsKey)
     }
 
