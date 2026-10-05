@@ -29,5 +29,6 @@ struct BlurredWallpaperBackground: View {
 struct BlurredWallpaperBackground_Previews: PreviewProvider {
     static var previews: some View {
         BlurredWallpaperBackground()
+            .previewThemes()
     }
 }

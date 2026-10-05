@@ -52,5 +52,6 @@ struct ButtonView_Previews: PreviewProvider {
                    frame: (340, 50),
                    imageLeft: AppImage.Icon.next,
                    imageRight: AppImage.Icon.next)
+            .previewThemes()
     }
 }

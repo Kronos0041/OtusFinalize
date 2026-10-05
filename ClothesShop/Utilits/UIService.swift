@@ -22,6 +22,21 @@ enum AppLayout {
 }
 
 extension View {
+    func previewThemes() -> some View {
+        Group {
+            self
+                .foregroundColor(.appBlack)
+                .background(Color.appWhite)
+                .preferredColorScheme(.light)
+                .previewDisplayName("Light")
+            self
+                .foregroundColor(.appBlack)
+                .background(Color.appWhite)
+                .preferredColorScheme(.dark)
+                .previewDisplayName("Dark")
+        }
+    }
+
     func getWidth() -> CGFloat { AppLayout.screenWidth }
     func getHeight() -> CGFloat { AppLayout.screenHeight }
 
