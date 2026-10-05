@@ -1,0 +1,8 @@
+strings:
+  inputs:
+    - ClothesShop/Resources/en.lproj/Localizable.strings
+  outputs:
+    - templateName: structured-swift5
+      output: ClothesShop/Generated/SwiftGen.swift
+      params:
+        enumName: SwiftGen
