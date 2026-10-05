@@ -35,5 +35,6 @@ struct CategoryCollectionView_Previews: PreviewProvider {
     static var previews: some View {
         CategoryCollectionView()
             .environmentObject(MainGrideVM())
+            .previewThemes()
     }
 }

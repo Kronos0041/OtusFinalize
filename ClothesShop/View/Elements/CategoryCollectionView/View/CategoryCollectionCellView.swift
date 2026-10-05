@@ -32,5 +32,6 @@ struct CategoryCollectionCellView: View {
 struct CategoryCollectionCellView_Previews: PreviewProvider {
     static var previews: some View {
         CategoryCollectionCellView(item: ShopItemModel.allCategory, isSelected: true) {}
+            .previewThemes()
     }
 }

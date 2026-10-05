@@ -12,12 +12,16 @@ struct CategoryCollectionTab: View {
     @EnvironmentObject var products: MainGrideVM
 
     var body: some View {
+        let sections = products.filteredList
         VStack(spacing: 0) {
             Divider()
 
             TabView(selection: $products.selected) {
-                ForEach(products.list.indices, id: \.self) { index in
-                    MainGridView(section: products.list[index])
+                ForEach(sections.indices, id: \.self) { index in
+                    MainGridView(section: sections[index],
+                                 emptyTitle: products.isSearching ? SwiftGen.Catalog.Search.empty : nil,
+                                 emptySystemImage: "magnifyingglass",
+                                 emptyMessage: SwiftGen.Catalog.Search.changeQuery)
                         .tag(index)
                 }
             }
@@ -31,5 +35,6 @@ struct CategoryCollectionTab_Previews: PreviewProvider {
     static var previews: some View {
         CategoryCollectionTab()
             .environmentObject(MainGrideVM())
+            .previewThemes()
     }
 }

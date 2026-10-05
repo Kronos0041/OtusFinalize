@@ -7,11 +7,12 @@
 
 import SwiftUI
 
-/// Сейчас нигде не используется (поиск на главном экране закомментирован).
+/// Поле поиска каталога с очисткой введённого запроса.
 struct SearchTextFiled: View {
     let frame: (width: CGFloat, height: CGFloat)
     let placeholder: String
     @Binding var text: String
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         HStack {
@@ -20,6 +21,23 @@ struct SearchTextFiled: View {
                 .frame(width: 20, height: 20)
                 .foregroundColor(Color.appBlack)
             TextField(placeholder, text: $text)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .submitLabel(.search)
+                .focused($isFocused)
+                .onSubmit { isFocused = false }
+            Button {
+                text = ""
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundColor(.appGray)
+                    .frame(width: 28, height: 28)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(SwiftGen.Catalog.Search.clear))
+            .opacity(text.isEmpty ? 0 : 1)
+            .disabled(text.isEmpty)
+            .accessibilityHidden(text.isEmpty)
         }
         .padding()
         .frame(width: frame.width, height: frame.height)
@@ -30,6 +48,7 @@ struct SearchTextFiled: View {
 
 struct SearchTextFiled_Previews: PreviewProvider {
     static var previews: some View {
-        SearchTextFiled(frame: (340, 50), placeholder: "Поиск", text: .constant(""))
+        SearchTextFiled(frame: (340, 50), placeholder: SwiftGen.Common.search, text: .constant(""))
+            .previewThemes()
     }
 }

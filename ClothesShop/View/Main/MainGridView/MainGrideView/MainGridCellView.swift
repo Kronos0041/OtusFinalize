@@ -79,7 +79,8 @@ struct MainGridCellView: View {
     }
 
     private var likeButton: some View {
-        Image(systemName: "heart.fill")
+        Button(action: topLike) {
+            Image(systemName: isLiked ? "heart.fill" : "heart")
             .resizable()
             .scaledToFit()
             .foregroundColor(isLiked ? Color.appRed : Color.appGray)
@@ -90,7 +91,9 @@ struct MainGridCellView: View {
             .padding()
             .offset(x: frame.w / 2 - 35, y: -frame.w / 2 + 35)
             .shadow(color: Color.appGray.opacity(0.3), radius: 10)
-            .onTapGesture(perform: topLike)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(isLiked ? Text(SwiftGen.Favorites.remove) : Text(SwiftGen.Favorites.add))
     }
 }
 
@@ -108,5 +111,6 @@ struct MainGridCellView_Previews: PreviewProvider {
                          frame: ((UIScreen.main.bounds.width - 20) / 2, UIScreen.main.bounds.width / 2 + 90),
                          topLike: {},
                          topDescription: {})
+            .previewThemes()
     }
 }

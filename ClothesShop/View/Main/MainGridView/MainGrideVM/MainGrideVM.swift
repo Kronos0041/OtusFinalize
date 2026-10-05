@@ -15,17 +15,46 @@ import Combine
 final class MainGrideVM: ObservableObject {
     @Published private(set) var viewMode: ViewMode<[ShopItemModel]> = .loading
     @Published var selected: Int = 0
+    @Published var searchText = ""
     @Published private(set) var likedProductIds: Set<String> = []
 
     /// Разделы каталога: 0 — «Все», далее категории. Пусто, пока нет контента.
     var list: [ShopItemModel] { viewMode.content ?? [] }
+    var isSearching: Bool { !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    var filteredList: [ShopItemModel] {
+        list.map { $0.filtered(by: searchText) }
+    }
+    var favoriteProducts: [MainGrideDateModel] {
+        (list.first?.product ?? []).filter { likedProductIds.contains($0.id) }
+    }
+    var favoritesViewMode: ViewMode<[MainGrideDateModel]> {
+        switch viewMode {
+        case .loading: return .loading
+        case .content: return favoriteProducts.isEmpty ? .empty : .content(favoriteProducts)
+        case .empty: return .empty
+        case .noInternet: return .noInternet
+        case .error(let message): return .error(message)
+        }
+    }
 
     private let network: NetworkMonitor
+    private let defaults: UserDefaults
+    private let favoritesKey: String?
     private var isRequestInFlight = false
     private var cancellables = Set<AnyCancellable>()
+    #if DEBUG
+    private var isPreview = false
+    #endif
 
-    init(network: NetworkMonitor = .shared) {
+    init(network: NetworkMonitor = .shared,
+         favoritesOwnerID: String? = AuthenticationService.currentUserID,
+         defaults: UserDefaults = .standard) {
         self.network = network
+        self.defaults = defaults
+        favoritesKey = favoritesOwnerID.map { "favorites.\($0)" }
+        if let favoritesKey {
+            likedProductIds = Set(defaults.stringArray(forKey: favoritesKey) ?? [])
+        }
         network.$isConnected
             .removeDuplicates()
             .dropFirst()
@@ -36,6 +65,17 @@ final class MainGrideVM: ObservableObject {
 
     // MARK: - Загрузка
 
+    #if DEBUG
+    convenience init(previewProducts: [MainGrideDateModel], likedProductIDs: Set<String> = []) {
+        self.init(favoritesOwnerID: nil)
+        isPreview = true
+        likedProductIds = likedProductIDs
+        viewMode = .content([ShopItemModel(id: ShopItemModel.allCategory.id,
+                                          categoryName: ShopItemModel.allCategory,
+                                          product: previewProducts)])
+    }
+    #endif
+
     /// Первая загрузка. Если каталог уже показан — ничего не делает.
     func loadIfNeeded() {
         guard viewMode.content == nil else { return }
@@ -44,6 +84,12 @@ final class MainGrideVM: ObservableObject {
 
     /// Запрос каталога. Уже показанный каталог не заменяется спиннером или заглушкой ошибки.
     func reload(completion: (() -> Void)? = nil) {
+        #if DEBUG
+        if isPreview {
+            completion?()
+            return
+        }
+        #endif
         guard !isRequestInFlight else {
             completion?()
             return
@@ -74,6 +120,17 @@ final class MainGrideVM: ObservableObject {
         list.first?.product.first { $0.id == id }
     }
 
+    func productViewMode(id: String) -> ViewMode<MainGrideDateModel> {
+        switch viewMode {
+        case .loading: return .loading
+        case .content:
+            return product(id: id).map { .content($0) } ?? .empty
+        case .empty: return .empty
+        case .noInternet: return .noInternet
+        case .error(let message): return .error(message)
+        }
+    }
+
     // MARK: - Выбор и лайки
 
     func isSelected(_ index: Int) -> Bool {
@@ -89,6 +146,9 @@ final class MainGrideVM: ObservableObject {
             likedProductIds.remove(product.id)
         } else {
             likedProductIds.insert(product.id)
+        }
+        if let favoritesKey {
+            defaults.set(likedProductIds.sorted(), forKey: favoritesKey)
         }
     }
 

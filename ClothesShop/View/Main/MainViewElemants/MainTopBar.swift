@@ -13,13 +13,14 @@ struct MainTopBar: View {
 
     var body: some View {
         HStack {
-            Text("Montblanc")
+            Text(verbatim: "Montblanc")
                 .bold()
                 .font(.system(size: 34, design: .serif))
 
             Spacer()
 
             BellView(notificationCount: notificationCount)
+                .accessibilityLabel(Text(SwiftGen.Notifications.title))
                 .onTapGesture(perform: clickBell)
         }
         .frame(width: getWidth() - AppLayout.sideInset, height: 50)
@@ -29,5 +30,6 @@ struct MainTopBar: View {
 struct MainTopBar_Previews: PreviewProvider {
     static var previews: some View {
         MainTopBar(notificationCount: 0) {}
+            .previewThemes()
     }
 }

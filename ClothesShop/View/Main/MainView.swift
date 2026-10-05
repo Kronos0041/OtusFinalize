@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Вкладка «Товары»: шапка с колокольчиком и каталог.
 struct MainView: View {
-    @StateObject private var products = MainGrideVM()
+    @EnvironmentObject private var products: MainGrideVM
     @StateObject private var notifications = NotificationsVM()
     @State private var showNotification = false
 
@@ -28,8 +28,12 @@ struct MainView: View {
                         showNotification.toggle()
                     }
 
+                    SearchTextFiled(frame: (getWidth() - AppLayout.sideInset, 50),
+                                    placeholder: SwiftGen.Common.search,
+                                    text: $products.searchText)
+
                     ViewModeView(products.viewMode,
-                                 emptyTitle: "Каталог пока пуст",
+                                 emptyTitle: SwiftGen.Catalog.empty,
                                  retry: { products.reload() }) { _ in
                         MainTabView()
                             .environmentObject(products)
@@ -37,6 +41,7 @@ struct MainView: View {
                 }
                 .frame(width: getWidth())
             }
+            .navigationBarHidden(true)
         }
         .onAppear {
             products.loadIfNeeded()
@@ -48,5 +53,7 @@ struct MainView: View {
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         MainView()
+            .environmentObject(MainGrideVM())
+            .previewThemes()
     }
 }

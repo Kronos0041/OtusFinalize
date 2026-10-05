@@ -10,6 +10,9 @@ import SwiftUI
 /// Сетка товаров одного раздела.
 struct MainGridView: View {
     let section: ShopItemModel
+    var emptyTitle: String? = nil
+    var emptySystemImage = "heart"
+    var emptyMessage = SwiftGen.Favorites.instructions
     @EnvironmentObject var products: MainGrideVM
 
     @State private var showDescription = false
@@ -34,6 +37,11 @@ struct MainGridView: View {
                 EmptyView()
             }
 
+            if section.product.isEmpty, let emptyTitle {
+                StatePlaceholder(systemImage: emptySystemImage, title: emptyTitle,
+                                 message: Text(emptyMessage))
+            }
+
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVGrid(columns: columns, alignment: .center, spacing: 0) {
                     ForEach(section.product) { product in
@@ -49,6 +57,7 @@ struct MainGridView: View {
             // На iOS 15 ScrollView не поддерживает pull-to-refresh — модификатор просто
             // ничего не делает; с iOS 16 работает. На карточке товара (List) — с iOS 15.
             .refreshable { await products.refresh() }
+            .allowsHitTesting(!section.product.isEmpty)
         }
         .frame(width: gridWidth)
     }
@@ -67,5 +76,6 @@ struct MainGridView_Previews: PreviewProvider {
         let viewModel = MainGrideVM()
         MainGridView(section: section)
             .environmentObject(viewModel)
+            .previewThemes()
     }
 }

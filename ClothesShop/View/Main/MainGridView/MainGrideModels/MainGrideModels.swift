@@ -37,7 +37,7 @@ struct ProductDTO: Decodable {
 // MARK: - Модели экрана
 
 /// Товар. Фото загружается по HTTPS URL из Firestore.
-struct MainGrideDateModel: Identifiable, Equatable {
+struct MainGrideDateModel: Identifiable, Equatable, Codable {
     let id: String
     let categoryId: String
     var imageURL: URL?
@@ -71,7 +71,18 @@ struct ShopItemModel: Identifiable {
 }
 
 extension ShopItemModel {
-    static let allCategory = CategoryCollectionButtonModel(id: "all", title: String(localized: "Все"))
+    func filtered(by query: String) -> ShopItemModel {
+        let terms = query.split(whereSeparator: { $0.isWhitespace }).map(String.init)
+        guard !terms.isEmpty else { return self }
+        var section = self
+        section.product = product.filter { item in
+            let text = [item.title, item.shortDescription, item.description].joined(separator: " ")
+            return terms.allSatisfy { text.localizedStandardContains($0) }
+        }
+        return section
+    }
+
+    static let allCategory = CategoryCollectionButtonModel(id: "all", title: SwiftGen.Catalog.all)
 
     /// Раздел «Все» + категории по `order`. Категории без товаров не показываются.
     static func sections(from catalog: CatalogDTO) -> [ShopItemModel] {
