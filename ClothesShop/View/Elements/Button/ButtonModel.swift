@@ -15,14 +15,14 @@ enum ButtonModel {
     case auth
     case reg
 
-    var title: LocalizedStringKey {
+    var title: String {
         switch self {
-        case .ok: return "Ok"
-        case .back: return "Назад"
-        case .next: return "Далее"
-        case .magazin: return "Добавить"
-        case .auth: return "Авторизация"
-        case .reg: return "Регистрация"
+        case .ok: return SwiftGen.Common.ok
+        case .back: return SwiftGen.Common.back
+        case .next: return SwiftGen.Common.next
+        case .magazin: return SwiftGen.Common.add
+        case .auth: return SwiftGen.Auth.authorization
+        case .reg: return SwiftGen.Auth.signUp
         }
     }
 }

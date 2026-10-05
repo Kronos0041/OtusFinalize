@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TopBarDescriptionView: View {
-    let title: LocalizedStringKey
+    let title: String
     @Binding var backButton: Bool
     let frame: (width: CGFloat, height: CGFloat)
 
@@ -21,6 +21,7 @@ struct TopBarDescriptionView: View {
                     .frame(width: 25, height: 25)
                     .padding()
                     .foregroundColor(Color.appBlack)
+                    .accessibilityLabel(Text(SwiftGen.Common.back))
                     .onTapGesture { backButton.toggle() }
                 Spacer()
             }
@@ -36,6 +37,7 @@ struct TopBarDescriptionView: View {
 
 struct TopBarDescriptionView_Previews: PreviewProvider {
     static var previews: some View {
-        TopBarDescriptionView(title: "О товаре", backButton: .constant(false), frame: (width: 300, height: 50))
+        TopBarDescriptionView(title: SwiftGen.Product.title, backButton: .constant(false), frame: (width: 300, height: 50))
+            .previewThemes()
     }
 }
