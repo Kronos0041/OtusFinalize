@@ -34,7 +34,7 @@ struct ShopDescriptionView: View {
         let quantity = cart.items.first { $0.product.id == current.id && $0.size == selectedSize }?.quantity ?? 0
         return validSize && quantity < CartVM.maximumQuantity
     }
-    
+
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {

@@ -4,13 +4,13 @@ struct CartView: View {
     @EnvironmentObject private var cart: CartVM
     @EnvironmentObject private var products: MainGrideVM
     let continueShopping: () -> Void
-    
+
     @State private var showCheckout = false
     @State private var showSuccess = false
     @State private var didCompleteCheckout = false
 
     private var items: [CartItem] { cart.resolvedItems(in: products.list.first?.product ?? []) }
-    
+
     private var total: Int { items.reduce(0) { $0 + $1.product.price * $1.quantity } }
 
     var body: some View {

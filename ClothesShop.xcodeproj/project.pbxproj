@@ -14,7 +14,22 @@
 		A1C0DE0000000000000000A2 /* ViewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000A1 /* ViewMode.swift */; };
 		A1C0DE0000000000000000A4 /* ViewModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000A3 /* ViewModeView.swift */; };
 		A1C0DE0000000000000000A6 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000A5 /* NetworkMonitor.swift */; };
-		A1C0DE0000000000000000A9 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000A8 /* Localizable.xcstrings */; };
+		A1C0DE0000000000000000A9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000A8 /* Localizable.strings */; };
+		A1C0DE0000000000000000B2 /* FavoritesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000B1 /* FavoritesView.swift */; };
+		A1C0DE0000000000000000C2 /* SwiftGen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000C1 /* SwiftGen.swift */; };
+		A1C0DE0000000000000000D2 /* CartVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000D1 /* CartVM.swift */; };
+		A1C0DE0000000000000000D4 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000D3 /* CartView.swift */; };
+		A1C0DE000000000000000102 /* CartItemsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE000000000000000101 /* CartItemsListView.swift */; };
+		A1C0DE000000000000000104 /* CartRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE000000000000000103 /* CartRowView.swift */; };
+		A1C0DE000000000000000108 /* CartActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE000000000000000107 /* CartActionsView.swift */; };
+		A1C0DE00000000000000010A /* CartCheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE000000000000000109 /* CartCheckoutView.swift */; };
+		A1C0DE00000000000000010C /* CartPreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE00000000000000010B /* CartPreviewData.swift */; };
+		A1C0DE000000000000000121 /* AuthFieldsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE000000000000000120 /* AuthFieldsView.swift */; };
+		A1C0DE000000000000000123 /* EmailVerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE000000000000000122 /* EmailVerificationView.swift */; };
+		A1C0DE000000000000000125 /* ProfileContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE000000000000000124 /* ProfileContentView.swift */; };
+		A1C0DE000000000000000127 /* AccountChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE000000000000000126 /* AccountChangeView.swift */; };
+		A1C0DE000000000000000129 /* ProductDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE000000000000000128 /* ProductDetailsView.swift */; };
+		A1C0DE00000000000000012B /* ProductPurchaseBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE00000000000000012A /* ProductPurchaseBar.swift */; };
 		C41B2ACC29C0EC9A00ED2E65 /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41B2ACB29C0EC9A00ED2E65 /* AuthenticationService.swift */; };
 		C41E61B829B79A510066847A /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41E61B729B79A510066847A /* MainTabView.swift */; };
 		C41E61BA29B7A1F90066847A /* CategoryCollectionCellTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41E61B929B7A1F90066847A /* CategoryCollectionCellTab.swift */; };
@@ -62,7 +77,23 @@
 		A1C0DE0000000000000000A1 /* ViewMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewMode.swift; sourceTree = "<group>"; };
 		A1C0DE0000000000000000A3 /* ViewModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModeView.swift; sourceTree = "<group>"; };
 		A1C0DE0000000000000000A5 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
-		A1C0DE0000000000000000A8 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		A1C0DE0000000000000000B1 /* FavoritesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesView.swift; sourceTree = "<group>"; };
+		A1C0DE0000000000000000C1 /* SwiftGen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftGen.swift; sourceTree = "<group>"; };
+		A1C0DE0000000000000000C3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Resources/en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A1C0DE0000000000000000C4 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = Resources/ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A1C0DE0000000000000000D1 /* CartVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartVM.swift; sourceTree = "<group>"; };
+		A1C0DE0000000000000000D3 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
+		A1C0DE000000000000000101 /* CartItemsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartItemsListView.swift; sourceTree = "<group>"; };
+		A1C0DE000000000000000103 /* CartRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartRowView.swift; sourceTree = "<group>"; };
+		A1C0DE000000000000000107 /* CartActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartActionsView.swift; sourceTree = "<group>"; };
+		A1C0DE000000000000000109 /* CartCheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartCheckoutView.swift; sourceTree = "<group>"; };
+		A1C0DE00000000000000010B /* CartPreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartPreviewData.swift; sourceTree = "<group>"; };
+		A1C0DE000000000000000120 /* AuthFieldsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFieldsView.swift; sourceTree = "<group>"; };
+		A1C0DE000000000000000122 /* EmailVerificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailVerificationView.swift; sourceTree = "<group>"; };
+		A1C0DE000000000000000124 /* ProfileContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileContentView.swift; sourceTree = "<group>"; };
+		A1C0DE000000000000000126 /* AccountChangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountChangeView.swift; sourceTree = "<group>"; };
+		A1C0DE000000000000000128 /* ProductDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailsView.swift; sourceTree = "<group>"; };
+		A1C0DE00000000000000012A /* ProductPurchaseBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductPurchaseBar.swift; sourceTree = "<group>"; };
 		C41B2ACB29C0EC9A00ED2E65 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
 		C41E61B729B79A510066847A /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		C41E61B929B7A1F90066847A /* CategoryCollectionCellTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionCellTab.swift; sourceTree = "<group>"; };
@@ -148,6 +179,26 @@
 			path = Network;
 			sourceTree = "<group>";
 		};
+		A1C0DE0000000000000000E1 /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				A1C0DE0000000000000000C1 /* SwiftGen.swift */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
+		A1C0DE000000000000000100 /* CartViewElements */ = {
+			isa = PBXGroup;
+			children = (
+				A1C0DE000000000000000101 /* CartItemsListView.swift */,
+				A1C0DE000000000000000103 /* CartRowView.swift */,
+				A1C0DE000000000000000107 /* CartActionsView.swift */,
+				A1C0DE000000000000000109 /* CartCheckoutView.swift */,
+				A1C0DE00000000000000010B /* CartPreviewData.swift */,
+			);
+			path = CartViewElements;
+			sourceTree = "<group>";
+		};
 		C41E61B629B79A440066847A /* MainTabView */ = {
 			isa = PBXGroup;
 			children = (
@@ -159,7 +210,10 @@
 		C42FCFEE29BA3F01000121CC /* ShopDescription */ = {
 			isa = PBXGroup;
 			children = (
+				FA129B8F30737CF300A4F015 /* viewElements */,
 				C42FCFEF29BA3F1C000121CC /* ShopDescriptionView.swift */,
+				A1C0DE000000000000000128 /* ProductDetailsView.swift */,
+				A1C0DE00000000000000012A /* ProductPurchaseBar.swift */,
 			);
 			path = ShopDescription;
 			sourceTree = "<group>";
@@ -187,6 +241,7 @@
 			isa = PBXGroup;
 			children = (
 				C4A8BE3A29A13D18009FE143 /* MainView.swift */,
+				A1C0DE0000000000000000B1 /* FavoritesView.swift */,
 				C41E61B629B79A440066847A /* MainTabView */,
 				C4B9729A29B111BA003BCECC /* MainGridView */,
 				C4B9728C29B10187003BCECC /* MainViewElemants */,
@@ -198,6 +253,8 @@
 			isa = PBXGroup;
 			children = (
 				C4A1E4BF29A532DB003BD411 /* ProfileView.swift */,
+				A1C0DE000000000000000124 /* ProfileContentView.swift */,
+				A1C0DE000000000000000126 /* AccountChangeView.swift */,
 				C4F5EABD29A543D100A28F13 /* UserProfileCell.swift */,
 			);
 			path = Profil;
@@ -281,6 +338,7 @@
 		C4A1E4C129A53C96003BD411 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				FA129B7D3073777900A4F015 /* Cart */,
 				C4D351E729C0D4AE007568CA /* Auth */,
 				C431054929A7C73100B89493 /* Elements */,
 				C47CE44729C37DBC0007C96C /* NotificationView */,
@@ -321,7 +379,8 @@
 		C4A8BE2B29A13C2D009FE143 /* ClothesShop */ = {
 			isa = PBXGroup;
 			children = (
-				A1C0DE0000000000000000A8 /* Localizable.xcstrings */,
+				A1C0DE0000000000000000A8 /* Localizable.strings */,
+				A1C0DE0000000000000000E1 /* Generated */,
 				C4A8BE2C29A13C2D009FE143 /* ClothesShopApp.swift */,
 				C431055529A7D17700B89493 /* Info.plist */,
 				C4D351F029C0E533007568CA /* Documents */,
@@ -410,6 +469,8 @@
 			isa = PBXGroup;
 			children = (
 				C4D351E829C0D4E3007568CA /* AuthView.swift */,
+				A1C0DE000000000000000120 /* AuthFieldsView.swift */,
+				A1C0DE000000000000000122 /* EmailVerificationView.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -441,11 +502,36 @@
 		C4F5EABA29A540CB00A28F13 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				FA129B7E3073778500A4F015 /* CartVM */,
 				C4D351EB29C0D969007568CA /* AuthVM */,
 				C4D351EA29C0D960007568CA /* MainVM */,
 				A1C0DE000000000000000007 /* NotificationsVM */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		FA129B7D3073777900A4F015 /* Cart */ = {
+			isa = PBXGroup;
+			children = (
+				A1C0DE0000000000000000D3 /* CartView.swift */,
+				A1C0DE000000000000000100 /* CartViewElements */,
+			);
+			path = Cart;
+			sourceTree = "<group>";
+		};
+		FA129B7E3073778500A4F015 /* CartVM */ = {
+			isa = PBXGroup;
+			children = (
+				A1C0DE0000000000000000D1 /* CartVM.swift */,
+			);
+			path = CartVM;
+			sourceTree = "<group>";
+		};
+		FA129B8F30737CF300A4F015 /* viewElements */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = viewElements;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -455,6 +541,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C4A8BE3729A13C2E009FE143 /* Build configuration list for PBXNativeTarget "ClothesShop" */;
 			buildPhases = (
+				A1C0DE0000000000000000C5 /* SwiftGen */,
 				C4A8BE2529A13C2D009FE143 /* Sources */,
 				C4A8BE2629A13C2D009FE143 /* Frameworks */,
 				C4A8BE2729A13C2D009FE143 /* Resources */,
@@ -518,7 +605,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1C0DE0000000000000000A9 /* Localizable.xcstrings in Resources */,
+				A1C0DE0000000000000000A9 /* Localizable.strings in Resources */,
 				C4A8BE3129A13C2E009FE143 /* Assets.xcassets in Resources */,
 				C4D351F229C0E545007568CA /* GoogleService-Info.plist in Resources */,
 				C431056529A7D4C400B89493 /* Babylonica-Regular.ttf in Resources */,
@@ -528,11 +615,46 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		A1C0DE0000000000000000C5 /* SwiftGen */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/swiftgen.yml",
+				"$(SRCROOT)/ClothesShop/Resources/en.lproj/Localizable.strings",
+			);
+			name = SwiftGen;
+			outputPaths = (
+				"$(SRCROOT)/ClothesShop/Generated/SwiftGen.swift",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\"\nif command -v swiftgen >/dev/null 2>&1; then\n  cd \"$SRCROOT\"\n  swiftgen config run --config swiftgen.yml\nelse\n  echo \"warning: SwiftGen is unavailable. Using checked-in Generated/SwiftGen.swift. Install with brew install swiftgen to regenerate strings.\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		C4A8BE2529A13C2D009FE143 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1C0DE0000000000000000C2 /* SwiftGen.swift in Sources */,
+				A1C0DE0000000000000000D2 /* CartVM.swift in Sources */,
+				A1C0DE0000000000000000D4 /* CartView.swift in Sources */,
+				A1C0DE000000000000000102 /* CartItemsListView.swift in Sources */,
+				A1C0DE000000000000000104 /* CartRowView.swift in Sources */,
+				A1C0DE000000000000000108 /* CartActionsView.swift in Sources */,
+				A1C0DE00000000000000010A /* CartCheckoutView.swift in Sources */,
+				A1C0DE00000000000000010C /* CartPreviewData.swift in Sources */,
+				A1C0DE000000000000000121 /* AuthFieldsView.swift in Sources */,
+				A1C0DE000000000000000123 /* EmailVerificationView.swift in Sources */,
+				A1C0DE000000000000000125 /* ProfileContentView.swift in Sources */,
+				A1C0DE000000000000000127 /* AccountChangeView.swift in Sources */,
+				A1C0DE000000000000000129 /* ProductDetailsView.swift in Sources */,
+				A1C0DE00000000000000012B /* ProductPurchaseBar.swift in Sources */,
+				A1C0DE0000000000000000B2 /* FavoritesView.swift in Sources */,
 				A1C0DE0000000000000000A6 /* NetworkMonitor.swift in Sources */,
 				A1C0DE0000000000000000A4 /* ViewModeView.swift in Sources */,
 				A1C0DE0000000000000000A2 /* ViewMode.swift in Sources */,
@@ -576,6 +698,18 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		A1C0DE0000000000000000A8 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A1C0DE0000000000000000C3 /* en */,
+				A1C0DE0000000000000000C4 /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		C4A8BE3529A13C2E009FE143 /* Debug */ = {
