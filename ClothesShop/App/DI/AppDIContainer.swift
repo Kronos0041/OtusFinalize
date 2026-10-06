@@ -1,5 +1,8 @@
 import FirebaseFirestore
 
+/// Composition root: единственное место, где Domain-протоколы связываются с реализациями
+/// из Data и Infrastructure. Работает в главном потоке, как и создаваемые им ViewModel.
+@MainActor
 final class AppDIContainer {
     static let shared = AppDIContainer()
 
@@ -11,13 +14,20 @@ final class AppDIContainer {
     private let favoritesRepository: FavoritesRepositoryProtocol
     private let notificationsRepository: NotificationsRepositoryProtocol
     private let connectivityRepository: ConnectivityRepositoryProtocol
+    private let imageCacheRepository: ImageCacheRepositoryProtocol
 
     /// - Parameter firestore: экземпляр базы; `nil` — стандартный `Firestore.firestore()`.
     ///   Создаётся только после `FirebaseConfigurator.configure()`, поэтому не задан значением по умолчанию.
     init(firestore: Firestore? = nil,
          authRemoteDataSource: AuthRemoteDataSourceProtocol = FirebaseAuthDataSourceImpl(),
-         connectivityRepository: ConnectivityRepositoryProtocol = NetworkMonitor.shared) {
+         connectivityRepository: ConnectivityRepositoryProtocol = NetworkMonitor()) {
         FirebaseConfigurator.configure()
+        // Кэш ставится до первых экранов со значениями по умолчанию:
+        // `settings/store` доступен только после входа и применяется после загрузки магазина.
+        imageCacheRepository = URLCacheImageCacheRepositoryImpl(
+            memoryCapacityMB: StoreSettings.default.imageMemoryCacheCapacityMB,
+            diskCapacityMB: StoreSettings.default.imageDiskCacheCapacityMB
+        )
         let database = firestore ?? Firestore.firestore()
 
         let catalogDataSource = FirestoreCatalogDataSourceImpl(database: database)
@@ -55,6 +65,7 @@ final class AppDIContainer {
                               automaticallyReloads: Bool = true) -> CatalogViewModel {
         CatalogViewModel(
             getCatalogUseCase: GetCatalogUseCase(repository: catalogRepository),
+            searchProductsUseCase: SearchProductsUseCase(),
             getFavoritesUseCase: GetFavoritesUseCase(repository: favoritesRepository),
             toggleFavoriteUseCase: ToggleFavoriteUseCase(repository: favoritesRepository),
             connectivityUseCase: ObserveConnectivityUseCase(repository: connectivityRepository),
@@ -100,11 +111,12 @@ final class AppDIContainer {
             catalog: catalog,
             cart: cart,
             loadStorefrontUseCase: LoadStorefrontUseCase(
-                catalogRepository: catalogRepository,
-                cartRepository: cartRepository,
-                settingsRepository: settingsRepository
+                getCatalogUseCase: GetCatalogUseCase(repository: catalogRepository),
+                getCartUseCase: GetCartUseCase(repository: cartRepository),
+                getStoreSettingsUseCase: GetStoreSettingsUseCase(repository: settingsRepository)
             ),
-            authRepository: authRepository,
+            getCurrentUserIDUseCase: GetCurrentUserIDUseCase(repository: authRepository),
+            configureImageCacheUseCase: ConfigureImageCacheUseCase(repository: imageCacheRepository),
             connectivityUseCase: ObserveConnectivityUseCase(repository: connectivityRepository)
         )
     }

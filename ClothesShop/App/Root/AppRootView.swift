@@ -2,11 +2,11 @@ import SwiftUI
 
 struct AppRootView: View {
     private let container: AppDIContainer
-    @StateObject private var authViewModel: AuthViewModel
+    @State private var authViewModel: AuthViewModel
 
     init(container: AppDIContainer) {
         self.container = container
-        _authViewModel = StateObject(wrappedValue: container.makeAuthViewModel())
+        _authViewModel = State(initialValue: container.makeAuthViewModel())
     }
 
     var body: some View {

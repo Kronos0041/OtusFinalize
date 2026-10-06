@@ -1,10 +1,11 @@
-
-import Combine
 import Foundation
+import Observation
 
-final class NotificationsViewModel: ObservableObject {
-    @Published private(set) var mode: ViewMode<[Notification]> = .loading
-    @Published private(set) var readIDs: Set<String>
+@MainActor
+@Observable
+final class NotificationsViewModel {
+    private(set) var mode: ViewMode<[Notification]> = .loading
+    private(set) var readIDs: Set<String>
 
     var unreadCount: Int { (mode.content ?? []).filter(isUnread).count }
 
@@ -12,10 +13,10 @@ final class NotificationsViewModel: ObservableObject {
     private let getReadIDsUseCase: GetReadNotificationIDsUseCase
     private let markReadUseCase: MarkNotificationReadUseCase
     private let connectivityUseCase: ObserveConnectivityUseCase
-    private var requestInFlight = false
-    private var observation: ObservationToken?
+    @ObservationIgnored private var requestInFlight = false
+    @ObservationIgnored private var connectivityTask: Task<Void, Never>?
     #if DEBUG
-    private var isPreview = false
+    @ObservationIgnored private var isPreview = false
     #endif
 
     init(getNotificationsUseCase: GetNotificationsUseCase,
@@ -27,49 +28,68 @@ final class NotificationsViewModel: ObservableObject {
         self.markReadUseCase = markReadUseCase
         self.connectivityUseCase = connectivityUseCase
         readIDs = getReadIDsUseCase.execute()
-        observation = connectivityUseCase.execute { [weak self] connected in
-            if connected { self?.reloadAfterReconnect() }
+        connectivityTask = Task { [weak self, updates = connectivityUseCase.execute()] in
+            for await connected in updates where connected {
+                self?.reloadAfterReconnect()
+            }
         }
+    }
+
+    deinit {
+        connectivityTask?.cancel()
     }
 
     #if DEBUG
     func applyPreview(items: [Notification], readIDs: Set<String> = []) {
-        isPreview = true; self.readIDs = readIDs
+        isPreview = true
+        self.readIDs = readIDs
         mode = items.isEmpty ? .empty : .content(items)
     }
     #endif
 
-    func reload(completion: (() -> Void)? = nil) {
-        #if DEBUG
-        if isPreview { completion?(); return }
-        #endif
-        guard !requestInFlight else { completion?(); return }
-        guard connectivityUseCase.isConnected else {
-            if mode.content == nil { mode = .noInternet }; completion?(); return
-        }
-        if mode.content == nil { mode = .loading }
-        requestInFlight = true
-        getNotificationsUseCase.execute { [weak self] result in
-            self?.requestInFlight = false
-            if case .failure = result, self?.mode.content != nil { completion?(); return }
-            let sorted = result.map { $0.sorted { $0.remoteID < $1.remoteID } }
-            self?.mode = .make(from: sorted) { $0.isEmpty }
-            completion?()
-        }
+    func reload() {
+        Task { [weak self] in await self?.load() }
     }
 
+    /// Для pull-to-refresh: завершается вместе с загрузкой.
     func refresh() async {
-        await withCheckedContinuation { continuation in reload { continuation.resume() } }
+        await load()
     }
 
-    func isUnread(_ item: Notification) -> Bool { !readIDs.contains(item.id) }
+    func isUnread(_ item: Notification) -> Bool {
+        !readIDs.contains(item.id)
+    }
 
     func markRead(_ item: Notification) {
         guard isUnread(item) else { return }
         #if DEBUG
-        if isPreview { readIDs.insert(item.id); return }
+        if isPreview {
+            readIDs.insert(item.id)
+            return
+        }
         #endif
         readIDs = markReadUseCase.execute(notificationID: item.id, currentIDs: readIDs)
+    }
+
+    private func load() async {
+        #if DEBUG
+        if isPreview { return }
+        #endif
+        guard !requestInFlight else { return }
+        guard connectivityUseCase.isConnected else {
+            if mode.content == nil { mode = .noInternet }
+            return
+        }
+        if mode.content == nil { mode = .loading }
+        requestInFlight = true
+        defer { requestInFlight = false }
+        do {
+            let items = try await getNotificationsUseCase.execute()
+            mode = .make(from: .success(items.sorted { $0.remoteID < $1.remoteID })) { $0.isEmpty }
+        } catch {
+            // Ошибка повторной загрузки не стирает уже показанный список.
+            if mode.content == nil { mode = .make(from: .failure(error)) { $0.isEmpty } }
+        }
     }
 
     private func reloadAfterReconnect() {

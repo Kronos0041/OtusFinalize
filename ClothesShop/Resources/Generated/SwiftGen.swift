@@ -121,6 +121,12 @@ internal enum SwiftGen {
     internal static let total = SwiftGen.tr("Localizable", "cart.total", fallback: "Total amount")
     /// Couldn't update your bag. Please try again.
     internal static let updateFailed = SwiftGen.tr("Localizable", "cart.updateFailed", fallback: "Couldn't update your bag. Please try again.")
+    internal enum Error {
+      /// Store settings are invalid: the bag limit must be between 1 and 999.
+      internal static let invalidSettings = SwiftGen.tr("Localizable", "cart.error.invalidSettings", fallback: "Store settings are invalid: the bag limit must be between 1 and 999.")
+      /// Store settings are unavailable. Please try again later.
+      internal static let missingSettings = SwiftGen.tr("Localizable", "cart.error.missingSettings", fallback: "Store settings are unavailable. Please try again later.")
+    }
   }
   internal enum Catalog {
     /// All
@@ -149,8 +155,6 @@ internal enum SwiftGen {
     internal static let email = SwiftGen.tr("Localizable", "common.email", fallback: "Email")
     /// Nothing here yet
     internal static let empty = SwiftGen.tr("Localizable", "common.empty", fallback: "Nothing here yet")
-    /// Next
-    internal static let next = SwiftGen.tr("Localizable", "common.next", fallback: "Next")
     /// OK
     internal static let ok = SwiftGen.tr("Localizable", "common.ok", fallback: "OK")
     /// Try again

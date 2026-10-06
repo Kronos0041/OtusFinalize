@@ -1,51 +1,62 @@
-
-
-import Combine
 import Foundation
+import Observation
 
-final class ProfileViewModel: ObservableObject {
-    @Published private(set) var mode: ViewMode<UserProfile> = .loading
-    @Published private(set) var user: UserProfile
-    @Published var currentPassword = ""
-    @Published var newPassword = ""
-    @Published var repeatPassword = ""
-    @Published var newEmail = ""
-    @Published private(set) var isSubmitting = false
-    @Published private(set) var isRefreshing = false
-    @Published private(set) var formError: String?
-    @Published private(set) var profileError: String?
-    @Published private(set) var signOutError: String?
-    @Published var successMessage: String?
+@MainActor
+@Observable
+final class ProfileViewModel {
+    private(set) var mode: ViewMode<UserProfile> = .loading
+    private(set) var user: UserProfile
+    var currentPassword = ""
+    var newPassword = ""
+    var repeatPassword = ""
+    var newEmail = ""
+    private(set) var isSubmitting = false
+    private(set) var isRefreshing = false
+    private(set) var formError: String?
+    private(set) var profileError: String?
+    private(set) var signOutError: String?
+    var successMessage: String?
 
     private let getProfileUseCase: GetProfileUseCase
     private let changePasswordUseCase: ChangePasswordUseCase
     private let changeEmailUseCase: ChangeEmailUseCase
     private let signOutUseCase: SignOutUseCase
     private let connectivityUseCase: ObserveConnectivityUseCase
-    private var observation: ObservationToken?
+    private let validator: AuthInputValidator
+    @ObservationIgnored private var connectivityTask: Task<Void, Never>?
     #if DEBUG
-    private var isPreview = false
+    @ObservationIgnored private var isPreview = false
     #endif
 
     init(getProfileUseCase: GetProfileUseCase,
          changePasswordUseCase: ChangePasswordUseCase,
          changeEmailUseCase: ChangeEmailUseCase,
          signOutUseCase: SignOutUseCase,
-         connectivityUseCase: ObserveConnectivityUseCase) {
+         connectivityUseCase: ObserveConnectivityUseCase,
+         validator: AuthInputValidator = AuthInputValidator()) {
         self.getProfileUseCase = getProfileUseCase
         self.changePasswordUseCase = changePasswordUseCase
         self.changeEmailUseCase = changeEmailUseCase
         self.signOutUseCase = signOutUseCase
         self.connectivityUseCase = connectivityUseCase
+        self.validator = validator
         user = getProfileUseCase.currentProfile
-        observation = connectivityUseCase.execute { [weak self] connected in
-            if connected, case .noInternet = self?.mode { self?.loadProfile() }
+        connectivityTask = Task { [weak self, updates = connectivityUseCase.execute()] in
+            for await connected in updates where connected {
+                if case .noInternet = self?.mode { self?.loadProfile() }
+            }
         }
+    }
+
+    deinit {
+        connectivityTask?.cancel()
     }
 
     #if DEBUG
     func applyPreview(profile: UserProfile) {
-        isPreview = true; user = profile; mode = .content(profile)
+        isPreview = true
+        user = profile
+        mode = .content(profile)
     }
     #endif
 
@@ -62,55 +73,50 @@ final class ProfileViewModel: ObservableObject {
         user = getProfileUseCase.currentProfile
         if mode.content == nil { mode = .loading }
         isRefreshing = true
-        getProfileUseCase.execute { [weak self] result in
-            guard let self else { return }
-            self.isRefreshing = false
-            switch result {
-            case .success(let profile):
-                self.user = profile; self.profileError = nil
-                self.mode = profile.email.isEmpty ? .empty : .content(profile)
-            case .failure(let error):
-                let message = AuthErrorMessageMapper.message(for: error)
-                self.profileError = message
-                if self.mode.content == nil {
-                    self.mode = error is ConnectivityError ? .noInternet : .error(message)
-                }
-            }
-        }
+        Task { [weak self] in await self?.performLoadProfile() }
     }
 
     func resetForm() {
-        currentPassword = ""; newPassword = ""; repeatPassword = ""; newEmail = ""; formError = nil
+        currentPassword = ""
+        newPassword = ""
+        repeatPassword = ""
+        newEmail = ""
+        formError = nil
     }
 
-    func submit(_ change: AccountChangeType, completion: @escaping () -> Void) {
-        guard !isSubmitting, !isRefreshing else { return }
+    /// Отправляет изменение аккаунта. Возвращает `true` при успехе — экран можно закрыть.
+    func submit(_ change: AccountChangeType) async -> Bool {
+        guard !isSubmitting, !isRefreshing else { return false }
         newEmail = newEmail.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let error = validationError(for: change) { formError = error; return }
+        if let error = validationError(for: change) {
+            formError = error
+            return false
+        }
         formError = nil
         #if DEBUG
-        if isPreview { resetForm(); completion(); return }
+        if isPreview {
+            resetForm()
+            return true
+        }
         #endif
         isSubmitting = true
+        defer { isSubmitting = false }
         let submittedEmail = newEmail
-        let resultHandler: (Result<Void, Error>) -> Void = { [weak self] result in
-            guard let self else { return }
-            self.isSubmitting = false
-            switch result {
-            case .success:
-                self.resetForm(); completion()
-                self.successMessage = change == .password
-                    ? SwiftGen.Profile.passwordChanged : SwiftGen.Profile.confirmNewEmail(submittedEmail)
-            case .failure(let error): self.formError = AuthErrorMessageMapper.message(for: error)
+        do {
+            switch change {
+            case .password:
+                try await changePasswordUseCase.execute(currentPassword: currentPassword, newPassword: newPassword)
+            case .email:
+                try await changeEmailUseCase.execute(email: submittedEmail, currentPassword: currentPassword)
             }
-        }
-        switch change {
-        case .password:
-            changePasswordUseCase.execute(currentPassword: currentPassword,
-                                          newPassword: newPassword, completion: resultHandler)
-        case .email:
-            changeEmailUseCase.execute(email: submittedEmail,
-                                       currentPassword: currentPassword, completion: resultHandler)
+            resetForm()
+            successMessage = change == .password
+                ? SwiftGen.Profile.passwordChanged
+                : SwiftGen.Profile.confirmNewEmail(submittedEmail)
+            return true
+        } catch {
+            formError = AuthErrorMessageMapper.message(for: error)
+            return false
         }
     }
 
@@ -119,8 +125,31 @@ final class ProfileViewModel: ObservableObject {
         if isPreview { return }
         #endif
         guard !isSubmitting else { return }
-        do { try signOutUseCase.execute(); resetForm(); signOutError = nil }
-        catch { signOutError = AuthErrorMessageMapper.message(for: error) }
+        do {
+            try signOutUseCase.execute()
+            resetForm()
+            signOutError = nil
+        } catch {
+            signOutError = AuthErrorMessageMapper.message(for: error)
+        }
+    }
+
+    // MARK: - Асинхронные сценарии
+
+    private func performLoadProfile() async {
+        defer { isRefreshing = false }
+        do {
+            let profile = try await getProfileUseCase.execute()
+            user = profile
+            profileError = nil
+            mode = profile.email.isEmpty ? .empty : .content(profile)
+        } catch {
+            let message = AuthErrorMessageMapper.message(for: error)
+            profileError = message
+            if mode.content == nil {
+                mode = error is ConnectivityError ? .noInternet : .error(message)
+            }
+        }
     }
 
     private func validationError(for change: AccountChangeType) -> String? {
@@ -131,9 +160,7 @@ final class ProfileViewModel: ObservableObject {
             guard newPassword == repeatPassword else { return SwiftGen.Auth.Error.passwordMismatch }
             guard newPassword != currentPassword else { return SwiftGen.Profile.Error.samePassword }
         case .email:
-            let predicate = NSPredicate(format: "SELF MATCHES %@",
-                                        "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}")
-            guard predicate.evaluate(with: newEmail) else { return SwiftGen.Auth.Error.invalidEmail }
+            guard validator.isValidEmail(newEmail) else { return SwiftGen.Auth.Error.invalidEmail }
             guard newEmail.caseInsensitiveCompare(user.email) != .orderedSame else {
                 return SwiftGen.Profile.Error.sameEmail
             }

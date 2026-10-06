@@ -1,7 +1,6 @@
 "common.email" = "Email";
 "common.ok" = "OK";
 "common.back" = "Back";
-"common.next" = "Next";
 "common.add" = "Add";
 "common.cancel" = "Cancel";
 "common.retry" = "Try again";
@@ -54,6 +53,8 @@
 "cart.confirmDemo" = "Confirm demo order";
 "cart.demoHint" = "This is a demo. No payment will be charged and no order will be sent to the store.";
 "cart.demoSuccess" = "Demo order completed";
+"cart.error.missingSettings" = "Store settings are unavailable. Please try again later.";
+"cart.error.invalidSettings" = "Store settings are invalid: the bag limit must be between 1 and 999.";
 "catalog.all" = "All";
 "catalog.empty" = "The catalog is empty";
 "catalog.search.clear" = "Clear search";

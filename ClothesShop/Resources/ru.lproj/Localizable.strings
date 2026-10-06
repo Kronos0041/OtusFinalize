@@ -1,7 +1,6 @@
 "common.email" = "Email";
 "common.ok" = "Ok";
 "common.back" = "Назад";
-"common.next" = "Далее";
 "common.add" = "Добавить";
 "common.cancel" = "Отмена";
 "common.retry" = "Повторить";
@@ -54,6 +53,8 @@
 "cart.confirmDemo" = "Подтвердить демо-заказ";
 "cart.demoHint" = "Это демонстрация. Оплата не списывается, заказ не отправляется в магазин.";
 "cart.demoSuccess" = "Демо-заказ оформлен";
+"cart.error.missingSettings" = "Настройки магазина недоступны. Попробуйте позже.";
+"cart.error.invalidSettings" = "Настройки магазина некорректны: лимит корзины должен быть от 1 до 999.";
 "catalog.all" = "Все";
 "catalog.empty" = "Каталог пока пуст";
 "catalog.search.clear" = "Очистить поиск";

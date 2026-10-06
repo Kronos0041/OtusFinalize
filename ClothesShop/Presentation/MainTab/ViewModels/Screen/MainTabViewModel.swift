@@ -1,54 +1,95 @@
-
-import Combine
 import Foundation
+import Observation
 
-final class MainTabViewModel: ObservableObject {
-    @Published private(set) var state: MainTabViewState = .idle
+/// Владеет общими для вкладок ViewModel каталога и корзины и их стартовой загрузкой.
+@MainActor
+@Observable
+final class MainTabViewModel {
+    @ObservationIgnored private var state: MainTabViewState = .idle
+    /// Число повторов загрузки картинок из `settings/store`; до загрузки — значение по умолчанию.
+    private(set) var imageLoadMaxAttempts = StoreSettings.default.imageLoadMaxAttempts
 
     let catalog: CatalogViewModel
     let cart: CartViewModel
 
     private let loadStorefrontUseCase: LoadStorefrontUseCase
-    private let authRepository: AuthRepositoryProtocol
+    private let getCurrentUserIDUseCase: GetCurrentUserIDUseCase
+    private let configureImageCacheUseCase: ConfigureImageCacheUseCase
     private let connectivityUseCase: ObserveConnectivityUseCase
-    private var didStartInitialLoad = false
-    private var observation: ObservationToken?
+    @ObservationIgnored private var didStartInitialLoad = false
+    @ObservationIgnored private var connectivityTask: Task<Void, Never>?
 
-    init(catalog: CatalogViewModel, cart: CartViewModel,
+    init(catalog: CatalogViewModel,
+         cart: CartViewModel,
          loadStorefrontUseCase: LoadStorefrontUseCase,
-         authRepository: AuthRepositoryProtocol,
+         getCurrentUserIDUseCase: GetCurrentUserIDUseCase,
+         configureImageCacheUseCase: ConfigureImageCacheUseCase,
          connectivityUseCase: ObserveConnectivityUseCase) {
-        self.catalog = catalog; self.cart = cart
+        self.catalog = catalog
+        self.cart = cart
         self.loadStorefrontUseCase = loadStorefrontUseCase
-        self.authRepository = authRepository
+        self.getCurrentUserIDUseCase = getCurrentUserIDUseCase
+        self.configureImageCacheUseCase = configureImageCacheUseCase
         self.connectivityUseCase = connectivityUseCase
-        observation = connectivityUseCase.execute { [weak self] connected in
-            if connected { self?.loadIfNeeded() }
+
+        // Корзина берёт названия и цены из каталога: любое обновление каталога
+        // (стартовое, pull-to-refresh, после восстановления сети) сразу попадает в неё.
+        catalog.onProductsUpdate = { [weak cart] products in cart?.updateCatalog(products) }
+
+        connectivityTask = Task { [weak self, updates = connectivityUseCase.execute()] in
+            for await connected in updates where connected {
+                self?.loadIfNeeded()
+            }
         }
+    }
+
+    deinit {
+        connectivityTask?.cancel()
     }
 
     func loadIfNeeded() {
         guard !didStartInitialLoad, state != .loading,
-              let ownerID = authRepository.currentUserID else { return }
+              let ownerID = getCurrentUserIDUseCase.execute() else { return }
         guard connectivityUseCase.isConnected else {
-            let error = ConnectivityError.offline
-            catalog.applyCatalog(.failure(error)); cart.applySettings(.failure(error)); return
+            catalog.applyCatalog(.failure(ConnectivityError.offline))
+            cart.applySettings(.failure(ConnectivityError.offline))
+            return
         }
-        didStartInitialLoad = true; state = .loading
-        loadStorefrontUseCase.execute(ownerID: ownerID) { [weak self] result in
+        didStartInitialLoad = true
+        state = .loading
+        Task { [weak self] in await self?.loadStorefront(ownerID: ownerID) }
+    }
+
+    /// Повтор загрузки корзины: если каталога ещё нет, сначала загружается он.
+    func reloadCart() {
+        Task { [weak self] in
             guard let self else { return }
-            self.state = .loaded
-            if case .failure = result.catalog { self.didStartInitialLoad = false }
-            if case .failure = result.cart { self.didStartInitialLoad = false }
-            if case .failure = result.settings { self.didStartInitialLoad = false }
-            self.catalog.applyCatalog(result.catalog)
-            switch (result.catalog, result.settings) {
-            case (.success, .success):
-                guard self.cart.applySettings(result.settings) else { return }
-                self.cart.apply(result.cart, catalog: self.catalog.sections.first?.products ?? [])
-            case (.failure(let error), _): self.cart.apply(.failure(error), catalog: [])
-            case (_, .failure): _ = self.cart.applySettings(result.settings)
-            }
+            if self.catalog.mode.content == nil { await self.catalog.load() }
+            await self.cart.load()
+        }
+    }
+
+    private func loadStorefront(ownerID: String) async {
+        let result = await loadStorefrontUseCase.execute(ownerID: ownerID)
+        state = .loaded
+        if case .failure = result.catalog { didStartInitialLoad = false }
+        if case .failure = result.cart { didStartInitialLoad = false }
+        if case .failure = result.settings { didStartInitialLoad = false }
+
+        if case .success(let settings) = result.settings {
+            imageLoadMaxAttempts = settings.imageLoadMaxAttempts
+            configureImageCacheUseCase.execute(settings: settings)
+        }
+
+        catalog.applyCatalog(result.catalog)
+        switch (result.catalog, result.settings) {
+        case (.success, .success):
+            guard cart.applySettings(result.settings) else { return }
+            cart.apply(result.cart)
+        case (.failure(let error), _):
+            cart.apply(.failure(error))
+        case (_, .failure):
+            cart.applySettings(result.settings)
         }
     }
 }

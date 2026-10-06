@@ -9,14 +9,8 @@ import SwiftUI
 
 @main
 struct ClothesShopApp: App {
-    /// Контейнер сам настраивает Firebase до создания `Firestore` и первых экранов.
+    /// Контейнер сам настраивает Firebase и кэш картинок до создания первых экранов.
     private let container = AppDIContainer.shared
-
-    init() {
-        URLCache.shared = URLCache(memoryCapacity: 32 * 1024 * 1024,
-                                   diskCapacity: 128 * 1024 * 1024,
-                                   diskPath: "product-images")
-    }
 
     var body: some Scene {
         WindowGroup {
