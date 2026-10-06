@@ -89,6 +89,9 @@ function validate(catalog, notifications, settings) {
       errors.push(`Товар ${p.id}: imageURL должен быть корректным HTTPS URL`);
     }
     if ('imageName' in p) errors.push(`Товар ${p.id}: устаревшее поле imageName`);
+    if ('badge' in p && (typeof p.badge !== 'string' || !p.badge.trim())) {
+      errors.push(`Товар ${p.id}: badge должен быть непустой строкой`);
+    }
     if (!Number.isInteger(p.price) || p.price <= 0) errors.push(`Товар ${p.id}: price должен быть целым числом рублей`);
     if (!categoryIds.has(p.categoryId)) errors.push(`Товар ${p.id}: неизвестная категория ${p.categoryId}`);
     if (productIds.has(p.id)) errors.push(`Дубликат id товара: ${p.id}`);

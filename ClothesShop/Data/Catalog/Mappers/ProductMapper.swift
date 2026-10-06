@@ -8,6 +8,7 @@ enum ProductMapper {
                 description: dto.description,
                 price: dto.price,
                 sizes: dto.sizes ?? [],
+                badge: dto.badge,
                 order: dto.order)
     }
 }

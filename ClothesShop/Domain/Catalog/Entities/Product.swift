@@ -9,5 +9,6 @@ struct Product: Identifiable, Equatable, Codable {
     let description: String
     let price: Int
     let sizes: [String]
+    let badge: String?
     let order: Int?
 }
