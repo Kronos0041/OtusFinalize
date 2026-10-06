@@ -79,8 +79,8 @@ internal enum SwiftGen {
     }
   }
   internal enum Cart {
-    /// Added to your bag
-    internal static let added = SwiftGen.tr("Localizable", "cart.added", fallback: "Added to your bag")
+    /// Added
+    internal static let added = SwiftGen.tr("Localizable", "cart.added", fallback: "Added")
     /// Check out
     internal static let checkout = SwiftGen.tr("Localizable", "cart.checkout", fallback: "Check out")
     /// Select a size to add this product to your bag.
@@ -107,8 +107,10 @@ internal enum SwiftGen {
     internal static func lineTotal(_ p1: Int, _ p2: Any) -> String {
       return SwiftGen.tr("Localizable", "cart.lineTotal", p1, String(describing: p2), fallback: "%lld pcs · %@")
     }
-    /// You can add up to 99 of each item.
-    internal static let quantityLimit = SwiftGen.tr("Localizable", "cart.quantityLimit", fallback: "You can add up to 99 of each item.")
+    /// You can add up to %lld of each item.
+    internal static func quantityLimit(_ p1: Int) -> String {
+      return SwiftGen.tr("Localizable", "cart.quantityLimit", p1, fallback: "You can add up to %lld of each item.")
+    }
     /// Size: %@
     internal static func size(_ p1: Any) -> String {
       return SwiftGen.tr("Localizable", "cart.size", String(describing: p1), fallback: "Size: %@")
@@ -117,6 +119,8 @@ internal enum SwiftGen {
     internal static let title = SwiftGen.tr("Localizable", "cart.title", fallback: "My Bag")
     /// Total amount
     internal static let total = SwiftGen.tr("Localizable", "cart.total", fallback: "Total amount")
+    /// Couldn't update your bag. Please try again.
+    internal static let updateFailed = SwiftGen.tr("Localizable", "cart.updateFailed", fallback: "Couldn't update your bag. Please try again.")
   }
   internal enum Catalog {
     /// All
