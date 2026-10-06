@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AccountChangeView: View {
     let change: AccountChangeType
-    @ObservedObject var viewModel: ProfileViewModel
+    @Bindable var viewModel: ProfileViewModel
     let close: () -> Void
 
     private var title: String {
@@ -10,7 +10,7 @@ struct AccountChangeView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section(SwiftGen.Profile.currentPassword) {
                     SecureField(SwiftGen.Profile.currentPassword, text: $viewModel.currentPassword)
@@ -50,7 +50,7 @@ struct AccountChangeView: View {
 
                 Section {
                     Button {
-                        viewModel.submit(change, completion: close)
+                        Task { if await viewModel.submit(change) { close() } }
                     } label: {
                         HStack {
                             Text(change == .password ? SwiftGen.Profile.savePassword : SwiftGen.Profile.sendConfirmation)
@@ -82,9 +82,10 @@ struct AccountChangeView_Previews: PreviewProvider {
         viewModel.applyPreview(profile: UserProfile(email: "alex@example.com"))
         return Group {
             AccountChangeView(change: .password, viewModel: viewModel, close: {})
+                .previewThemes("Смена пароля")
             AccountChangeView(change: .email, viewModel: viewModel, close: {})
+                .previewThemes("Смена email")
         }
-        .previewThemes()
     }
 }
 #endif

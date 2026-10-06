@@ -10,9 +10,8 @@ import SwiftUI
 /// Стартовый экран: логотип и выбор «вход / регистрация».
 /// Если пользователь уже авторизован, сразу открывается `MainTabView`.
 struct WelcomeView: View {
-    @ObservedObject private var auth: AuthViewModel
+    @Bindable private var auth: AuthViewModel
     private let container: AppDIContainer
-    @State private var mode: AuthMode = .registration
 
     @State private var logoRotation: Double = 0
     /// Пока экран перекрыт другими, таймер не перерисовывает его впустую.
@@ -20,7 +19,7 @@ struct WelcomeView: View {
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     init(viewModel: AuthViewModel, container: AppDIContainer) {
-        auth = viewModel
+        _auth = Bindable(viewModel)
         self.container = container
     }
 
@@ -30,17 +29,10 @@ struct WelcomeView: View {
                 MainTabView(container: container)
             } else if let email = auth.pendingEmail {
                 EmailVerificationView(email: email)
-                    .environmentObject(auth)
+                    .environment(auth)
             } else {
-                NavigationView {
+                NavigationStack(path: $auth.path) {
                     ZStack {
-                        NavigationLink(isActive: $auth.showsAuthForm) {
-                            AuthView(backButton: $auth.showsAuthForm, mode: mode)
-                                .environmentObject(auth)
-                        } label: {
-                            EmptyView()
-                        }
-
                         BlurredWallpaperBackground()
 
                         logo
@@ -53,7 +45,14 @@ struct WelcomeView: View {
                     }
                     .onAppear { isVisible = true }
                     .onDisappear { isVisible = false }
+                    .navigationDestination(for: AuthRoute.self) { route in
+                        switch route {
+                        case .form(let mode):
+                            AuthView(mode: mode)
+                        }
+                    }
                 }
+                .environment(auth)
             }
         }
         .onAppear(perform: auth.observeSession)
@@ -83,8 +82,7 @@ struct WelcomeView: View {
 
     private func openAuthButton(mode: AuthMode, model: ButtonModel, state: ButtonState) -> some View {
         Button {
-            self.mode = mode
-            auth.openAuthForm()
+            auth.openAuthForm(mode: mode)
         } label: {
             ButtonView(model: model, state: state)
         }

@@ -48,7 +48,7 @@ struct CartItemsListView: View {
 struct CartItemsListView_Previews: PreviewProvider {
     static var previews: some View {
         CartItemsListView(items: CartPreviewData.items, total: CartPreviewData.total,
-                          maximumQuantity: StoreSettings.preview.maximumCartItemQuantity,
+                          maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
                           changeQuantity: { _, _ in }, remove: { _ in })
             .background(Color.appWhite)
             .previewThemes()

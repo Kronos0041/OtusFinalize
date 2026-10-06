@@ -10,49 +10,27 @@ import SwiftUI
 /// Карточка товара с описанием, размерами и ценой.
 /// Свайп вниз перезагружает каталог из Firestore; экран сразу показывает свежие данные товара.
 struct ProductDetailsScreen: View {
-    @EnvironmentObject var products: CatalogViewModel
-    @EnvironmentObject private var cart: CartViewModel
+    @Environment(CatalogViewModel.self) private var products
+    @Environment(CartViewModel.self) private var cart
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedSize: String?
-    let product: CatalogItemViewModel
-    @Binding var backButton: Bool
+    let productID: String
 
-    init(product: CatalogItemViewModel, backButton: Binding<Bool>, selectedSize: String? = nil) {
-        self.product = product
-        _backButton = backButton
+    init(productID: String, selectedSize: String? = nil) {
+        self.productID = productID
         _selectedSize = State(initialValue: selectedSize)
     }
 
-    private var mode: ViewMode<CatalogItemViewModel> { products.productMode(id: product.id) }
+    private var mode: ViewMode<CatalogItemViewModel> { products.productMode(id: productID) }
 
     /// Актуальная версия товара после обновления каталога.
-    private var current: CatalogItemViewModel { products.product(id: product.id) ?? product }
-
-    private var cartItem: CartItemViewModel? {
-        cart.items.first { $0.product.id == current.id && $0.size == selectedSize }
-    }
-
-    private var canModifyCart: Bool {
-        guard cart.isLoaded else { return false }
-        if cartItem != nil { return true }
-        let validSize = current.sizes.isEmpty
-            ? selectedSize == nil
-            : current.sizes.contains(selectedSize ?? "")
-        return validSize
-    }
-
-    private func toggleCart() {
-        if let cartItem {
-            cart.remove(cartItem.id)
-        } else {
-            cart.add(current, size: selectedSize)
-        }
-    }
+    private var current: CatalogItemViewModel? { products.product(id: productID) }
 
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
                 TopBarDescriptionView(title: SwiftGen.Product.title,
-                                      backButton: $backButton,
+                                      onBack: { dismiss() },
                                       frame: (width: geometry.size.width, height: 50))
 
                 ViewModeView(mode,
@@ -71,21 +49,21 @@ struct ProductDetailsScreen: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                if mode.content != nil {
+                if let current {
                     ProductPurchaseBar(width: geometry.size.width,
-                                       isInCart: cartItem != nil,
-                                       canModifyCart: canModifyCart,
+                                       isInCart: cart.item(productID: current.id, size: selectedSize) != nil,
+                                       canModifyCart: cart.canToggle(current, size: selectedSize),
                                        isLiked: products.isFavorite(current),
-                                       toggleCart: toggleCart,
+                                       toggleCart: { cart.toggle(current, size: selectedSize) },
                                        toggleLike: { products.toggleFavorite(current) })
                 }
             }
             .background(Color.appWhite)
             .foregroundColor(.appBlack)
         }
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .onAppear { products.loadIfNeeded() }
-        .onChange(of: current.sizes) { sizes in
+        .onChange(of: current?.sizes ?? []) { _, sizes in
             if let selectedSize, !sizes.contains(selectedSize) { self.selectedSize = nil }
         }
     }
@@ -96,10 +74,9 @@ struct ProductDetailsScreen_Previews: PreviewProvider {
     static var previews: some View {
         let catalog = AppDIContainer.shared.makeCatalogViewModel()
         catalog.applyPreview(products: CartPreviewData.items.map(\.product))
-        return ProductDetailsScreen(product: CartPreviewData.items[0].product,
-                            backButton: .constant(false), selectedSize: "M")
-            .environmentObject(catalog)
-            .environmentObject(CartPreviewData.makeCart(isEmpty: true))
+        return ProductDetailsScreen(productID: CartPreviewData.items[0].product.id, selectedSize: "M")
+            .environment(catalog)
+            .environment(CartPreviewData.makeCart(isEmpty: true))
             .previewThemes()
     }
 }

@@ -9,17 +9,17 @@ import SwiftUI
 
 /// Размытые обои — общий фон стартового экрана и экрана авторизации.
 struct BlurredWallpaperBackground: View {
-    var imageName: String = AppImage.Wallpaper.background
+    private let imageName = AppImage.Wallpaper.background
 
     var body: some View {
         Image(imageName)
             .resizable()
-            .edgesIgnoringSafeArea(.all)
+            .ignoresSafeArea()
             .overlay(
                 ZStack {
                     Rectangle()
                         .foregroundColor(Color.appWhite.opacity(0.1))
-                        .edgesIgnoringSafeArea(.all)
+                        .ignoresSafeArea()
                 }
                 .background(.ultraThinMaterial)
             )

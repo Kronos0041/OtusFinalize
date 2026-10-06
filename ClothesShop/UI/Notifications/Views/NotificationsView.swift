@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct NotificationsView: View {
-    @EnvironmentObject var notifications: NotificationsViewModel
-    @Binding var backButton: Bool
+    let notifications: NotificationsViewModel
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 0) {
             TopBarDescriptionView(title: SwiftGen.Notifications.title,
-                                  backButton: $backButton,
+                                  onBack: { dismiss() },
                                   frame: (width: getWidth() - 20, height: 50))
 
             ViewModeView(notifications.mode,
@@ -31,7 +31,7 @@ struct NotificationsView: View {
                 .refreshable { await notifications.refresh() }
             }
         }
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .onAppear { notifications.reload() }
     }
 }
@@ -46,8 +46,7 @@ struct NotificationsView_Previews: PreviewProvider {
                 Notification(id: "favorites", remoteID: 2,
                                  title: "Ваши избранные товары", description: "Сохранённые товары всегда под рукой.")
             ], readIDs: ["favorites"])
-        return NotificationsView(backButton: .constant(false))
-            .environmentObject(viewModel)
+        return NotificationsView(notifications: viewModel)
             .previewThemes()
     }
 }

@@ -9,8 +9,8 @@ import SwiftUI
 
 /// Экран входа / регистрации. Вся логика — в `AuthViewModel`, здесь только разметка.
 struct AuthView: View {
-    @EnvironmentObject private var auth: AuthViewModel
-    @Binding var backButton: Bool
+    @Environment(AuthViewModel.self) private var auth
+    @Environment(\.dismiss) private var dismiss
     let mode: AuthMode
 
     private var fieldsWidth: CGFloat { getWidth() - AppLayout.sideInset }
@@ -40,14 +40,14 @@ struct AuthView: View {
                 }
 
                 Button {
-                    backButton.toggle()
+                    dismiss()
                 } label: {
                     ButtonView(model: .back, state: .activeWhite)
                 }
             }
         }
         .animation(.easeInOut(duration: 1), value: auth.banner.isVisible)
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     // MARK: - Вложенные view
@@ -68,18 +68,14 @@ struct AuthView: View {
     }
 }
 
-struct AuthViewReg_Previews: PreviewProvider {
+struct AuthView_Previews: PreviewProvider {
     static var previews: some View {
-        AuthView(backButton: .constant(false), mode: .registration)
-            .environmentObject(AppDIContainer.shared.makeAuthViewModel())
-            .previewThemes()
-    }
-}
-
-struct AuthViewAuth_Previews: PreviewProvider {
-    static var previews: some View {
-        AuthView(backButton: .constant(false), mode: .signIn)
-            .environmentObject(AppDIContainer.shared.makeAuthViewModel())
-            .previewThemes()
+        Group {
+            AuthView(mode: .signIn)
+                .previewThemes("Вход")
+            AuthView(mode: .registration)
+                .previewThemes("Регистрация")
+        }
+        .environment(AppDIContainer.shared.makeAuthViewModel())
     }
 }

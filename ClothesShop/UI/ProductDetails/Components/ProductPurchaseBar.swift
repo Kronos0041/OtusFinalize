@@ -49,10 +49,16 @@ struct ProductPurchaseBar_Previews: PreviewProvider {
         Group {
             ProductPurchaseBar(width: 390, isInCart: false, canModifyCart: true,
                                isLiked: false, toggleCart: {}, toggleLike: {})
+                .previewLayout(.sizeThatFits)
+                .previewThemes("Не в корзине")
             ProductPurchaseBar(width: 390, isInCart: true, canModifyCart: true,
                                isLiked: true, toggleCart: {}, toggleLike: {})
+                .previewLayout(.sizeThatFits)
+                .previewThemes("В корзине, в избранном")
+            ProductPurchaseBar(width: 390, isInCart: false, canModifyCart: false,
+                               isLiked: false, toggleCart: {}, toggleLike: {})
+                .previewLayout(.sizeThatFits)
+                .previewThemes("Размер не выбран")
         }
-        .previewLayout(.sizeThatFits)
-        .previewThemes()
     }
 }

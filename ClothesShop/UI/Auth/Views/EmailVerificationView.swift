@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Новый аккаунт уже создан в Firebase Auth, но каталог откроется только после проверки адреса.
 struct EmailVerificationView: View {
-    @EnvironmentObject private var auth: AuthViewModel
+    @Environment(AuthViewModel.self) private var auth
     let email: String
 
     var body: some View {
@@ -48,7 +48,7 @@ struct EmailVerificationView: View {
 struct EmailVerificationView_Previews: PreviewProvider {
     static var previews: some View {
         EmailVerificationView(email: "alex@example.com")
-            .environmentObject(AppDIContainer.shared.makeAuthViewModel())
+            .environment(AppDIContainer.shared.makeAuthViewModel())
             .previewThemes()
     }
 }

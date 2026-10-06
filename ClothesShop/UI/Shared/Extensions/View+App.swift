@@ -1,16 +1,17 @@
 import SwiftUI
 
 extension View {
-    func previewThemes() -> some View {
-        Group {
+    /// Показывает превью в светлой и тёмной теме.
+    /// - Parameter name: название варианта; в группе превью нужно, чтобы отличать варианты в Canvas.
+    func previewThemes(_ name: String? = nil) -> some View {
+        let prefix = name.map { "\($0) · " } ?? ""
+        return Group {
             self.foregroundColor(.appBlack).background(Color.appWhite)
-                .preferredColorScheme(.light).previewDisplayName("Light")
+                .preferredColorScheme(.light).previewDisplayName(prefix + "Light")
             self.foregroundColor(.appBlack).background(Color.appWhite)
-                .preferredColorScheme(.dark).previewDisplayName("Dark")
+                .preferredColorScheme(.dark).previewDisplayName(prefix + "Dark")
         }
     }
 
     func getWidth() -> CGFloat { AppLayout.screenWidth }
-    func getHeight() -> CGFloat { AppLayout.screenHeight }
-    func saveSize(in size: Binding<CGSize>) -> some View { modifier(SizeCalculator(size: size)) }
 }

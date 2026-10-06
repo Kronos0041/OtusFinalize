@@ -7,7 +7,7 @@ struct CartCheckoutView: View {
     let cancel: () -> Void
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 Section {
                     ForEach(items) { item in

@@ -43,7 +43,7 @@ struct BellView: View {
     }
 }
 
-struct BellBellView_Previews: PreviewProvider {
+struct BellView_Previews: PreviewProvider {
     static var previews: some View {
         BellView(notificationCount: 1)
             .previewThemes()

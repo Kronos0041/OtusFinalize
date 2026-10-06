@@ -1,10 +1,11 @@
 import SwiftUI
 
 struct FavoritesView: View {
-    @EnvironmentObject private var products: CatalogViewModel
+    @Environment(CatalogViewModel.self) private var products
+    @State private var router = Router<CatalogRoute>()
 
     var body: some View {
-        NavigationView {
+        NavigationStack(path: $router.path) {
             ViewModeView(products.favoritesMode,
                          emptyTitle: SwiftGen.Favorites.empty,
                          emptySystemImage: "heart",
@@ -17,7 +18,9 @@ struct FavoritesView: View {
             }
             .navigationTitle(SwiftGen.Favorites.title)
             .navigationBarTitleDisplayMode(.inline)
+            .catalogDestinations()
         }
+        .environment(router)
     }
 }
 
@@ -28,7 +31,8 @@ struct FavoritesView_Previews: PreviewProvider {
         viewModel.applyPreview(products: CartPreviewData.items.map(\.product),
                                favoriteIDs: Set(CartPreviewData.items.map { $0.product.id }))
         return FavoritesView()
-            .environmentObject(viewModel)
+            .environment(viewModel)
+            .environment(CartPreviewData.makeCart())
             .previewThemes()
     }
 }

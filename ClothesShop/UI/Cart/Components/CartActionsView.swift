@@ -31,14 +31,12 @@ struct CartActionsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             CartActionsView(isEmpty: false, checkout: {}, continueShopping: {})
-                .previewDisplayName("Filled cart")
+                .previewLayout(.sizeThatFits)
+                .previewThemes("Корзина с товарами")
             CartActionsView(isEmpty: true, checkout: {}, continueShopping: {})
-                .previewDisplayName("Empty cart")
+                .previewLayout(.sizeThatFits)
+                .previewThemes("Пустая корзина")
         }
-        .foregroundColor(.appBlack)
-        .background(Color.appWhite)
-        .previewLayout(.sizeThatFits)
-        .previewThemes()
     }
 }
 #endif

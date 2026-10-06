@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct ProfileContentView: View {
-    @ObservedObject var viewModel: ProfileViewModel
+    let viewModel: ProfileViewModel
     let selectChange: (AccountChangeType) -> Void
 
     var body: some View {
         List {
             Section(SwiftGen.Profile.title) {
                 UserProfileCell()
-                    .environmentObject(viewModel)
+                    .environment(viewModel)
             }
 
             Section(SwiftGen.Profile.settings) {

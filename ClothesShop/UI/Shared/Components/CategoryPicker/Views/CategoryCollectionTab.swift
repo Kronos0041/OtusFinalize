@@ -9,9 +9,10 @@ import SwiftUI
 
 /// Листаемые страницы каталога — по одной на категорию.
 struct CategoryCollectionTab: View {
-    @EnvironmentObject var products: CatalogViewModel
+    @Environment(CatalogViewModel.self) private var products
 
     var body: some View {
+        @Bindable var products = products
         let sections = products.filteredSections
         VStack(spacing: 0) {
             Divider()
@@ -34,7 +35,8 @@ struct CategoryCollectionTab: View {
 struct CategoryCollectionTab_Previews: PreviewProvider {
     static var previews: some View {
         CategoryCollectionTab()
-            .environmentObject(AppDIContainer.shared.makeCatalogViewModel())
+            .environment(AppDIContainer.shared.makeCatalogViewModel())
+            .environment(Router<CatalogRoute>())
             .previewThemes()
     }
 }

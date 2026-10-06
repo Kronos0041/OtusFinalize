@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AuthFieldsView: View {
-    @ObservedObject var auth: AuthViewModel
+    @Bindable var auth: AuthViewModel
     let mode: AuthMode
     let width: CGFloat
 
@@ -34,9 +34,11 @@ struct AuthFieldsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             AuthFieldsView(auth: AppDIContainer.shared.makeAuthViewModel(), mode: .signIn, width: 340)
+                .previewLayout(.sizeThatFits)
+                .previewThemes("Вход")
             AuthFieldsView(auth: AppDIContainer.shared.makeAuthViewModel(), mode: .registration, width: 340)
+                .previewLayout(.sizeThatFits)
+                .previewThemes("Регистрация")
         }
-        .previewLayout(.sizeThatFits)
-        .previewThemes()
     }
 }

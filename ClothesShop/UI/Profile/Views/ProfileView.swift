@@ -1,16 +1,17 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @StateObject private var viewModel: ProfileViewModel
+    /// Владеет ViewModel `MainTabView`; здесь только наблюдение.
+    let viewModel: ProfileViewModel
     @Environment(\.scenePhase) private var scenePhase
     @State private var accountChange: AccountChangeType?
 
     init(viewModel: ProfileViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        self.viewModel = viewModel
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 ViewModeView(viewModel.mode,
                              emptyTitle: SwiftGen.Common.empty,
@@ -39,7 +40,7 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear(perform: viewModel.loadProfile)
-        .onChange(of: scenePhase) { phase in
+        .onChange(of: scenePhase) { _, phase in
             if phase == .active { viewModel.loadProfile() }
         }
         .sheet(item: $accountChange, onDismiss: viewModel.resetForm) { change in

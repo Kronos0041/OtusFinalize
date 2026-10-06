@@ -1,6 +1,7 @@
 #if DEBUG
 import Foundation
 
+@MainActor
 enum CartPreviewData {
     static let items = [
         CartItemViewModel(id: "preview-watch-m",

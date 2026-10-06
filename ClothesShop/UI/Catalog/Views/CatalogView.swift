@@ -9,44 +9,34 @@ import SwiftUI
 
 /// Вкладка «Товары»: шапка с колокольчиком и каталог.
 struct CatalogView: View {
-    @EnvironmentObject private var products: CatalogViewModel
-    @StateObject private var notifications: NotificationsViewModel
-    @State private var showNotification = false
-
-    init(notificationsViewModel: NotificationsViewModel) {
-        _notifications = StateObject(wrappedValue: notificationsViewModel)
-    }
+    @Environment(CatalogViewModel.self) private var products
+    /// Владеет ViewModel уведомлений `MainTabView`; здесь только наблюдение.
+    let notifications: NotificationsViewModel
+    @State private var router = Router<CatalogRoute>()
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                NavigationLink(isActive: $showNotification) {
-                    NotificationsView(backButton: $showNotification)
-                        .environmentObject(notifications)
-                } label: {
-                    EmptyView()
+        @Bindable var products = products
+        NavigationStack(path: $router.path) {
+            VStack(spacing: 15) {
+                MainTopBar(notificationCount: notifications.unreadCount) {
+                    router.push(.notifications)
                 }
 
-                VStack(spacing: 15) {
-                    MainTopBar(notificationCount: notifications.unreadCount) {
-                        showNotification.toggle()
-                    }
+                SearchTextField(frame: (getWidth() - AppLayout.sideInset, 50),
+                                placeholder: SwiftGen.Common.search,
+                                text: $products.searchText)
 
-                    SearchTextField(frame: (getWidth() - AppLayout.sideInset, 50),
-                                    placeholder: SwiftGen.Common.search,
-                                    text: $products.searchText)
-
-                    ViewModeView(products.mode,
-                                 emptyTitle: SwiftGen.Catalog.empty,
-                                 retry: { products.reload() }) { _ in
-                        CatalogSectionTabsView()
-                            .environmentObject(products)
-                    }
+                ViewModeView(products.mode,
+                             emptyTitle: SwiftGen.Catalog.empty,
+                             retry: { products.reload() }) { _ in
+                    CatalogSectionTabsView()
                 }
-                .frame(width: getWidth())
             }
-            .navigationBarHidden(true)
+            .frame(width: getWidth())
+            .toolbar(.hidden, for: .navigationBar)
+            .catalogDestinations(notifications: notifications)
         }
+        .environment(router)
         .onAppear {
             notifications.reload()
         }
@@ -55,8 +45,9 @@ struct CatalogView: View {
 
 struct CatalogView_Previews: PreviewProvider {
     static var previews: some View {
-        CatalogView(notificationsViewModel: AppDIContainer.shared.makeNotificationsViewModel())
-            .environmentObject(AppDIContainer.shared.makeCatalogViewModel())
+        CatalogView(notifications: AppDIContainer.shared.makeNotificationsViewModel())
+            .environment(AppDIContainer.shared.makeCatalogViewModel())
+            .environment(CartPreviewData.makeCart())
             .previewThemes()
     }
 }

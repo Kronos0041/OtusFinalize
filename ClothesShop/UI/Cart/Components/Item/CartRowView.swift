@@ -31,6 +31,12 @@ struct CartRowView: View {
                     quantityControl
                 }
                 .padding(.top, 8)
+                if item.quantity >= maximumQuantity {
+                    Text(SwiftGen.Cart.quantityLimit(maximumQuantity))
+                        .font(.footnote)
+                        .foregroundColor(.appGray)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
         }
         .foregroundColor(.appBlack)
@@ -72,18 +78,24 @@ struct CartRowView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             CartRowView(item: CartPreviewData.items[0],
-                        maximumQuantity: StoreSettings.preview.maximumCartItemQuantity,
+                        maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
                         decrease: {}, increase: {})
-                .previewDisplayName("With size")
+                .padding(20)
+                .previewLayout(.sizeThatFits)
+                .previewThemes("С размером")
             CartRowView(item: CartPreviewData.items[1],
-                        maximumQuantity: StoreSettings.preview.maximumCartItemQuantity,
+                        maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
                         decrease: {}, increase: {})
-                .previewDisplayName("Without size")
+                .padding(20)
+                .previewLayout(.sizeThatFits)
+                .previewThemes("Без размера")
+            CartRowView(item: CartPreviewData.items[0],
+                        maximumQuantity: CartPreviewData.items[0].quantity,
+                        decrease: {}, increase: {})
+                .padding(20)
+                .previewLayout(.sizeThatFits)
+                .previewThemes("Достигнут лимит")
         }
-        .padding(20)
-        .background(Color.appWhite)
-        .previewLayout(.sizeThatFits)
-        .previewThemes()
     }
 }
 #endif

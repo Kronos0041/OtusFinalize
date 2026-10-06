@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct UserProfileCell: View {
-    @EnvironmentObject var viewModel: ProfileViewModel
+    @Environment(ProfileViewModel.self) private var viewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -23,7 +23,7 @@ struct UserProfileCell_Previews: PreviewProvider {
     static var previews: some View {
         let viewModel = AppDIContainer.shared.makeProfileViewModel()
         viewModel.applyPreview(profile: UserProfile(email: "alex@example.com"))
-        return UserProfileCell().environmentObject(viewModel)
+        return UserProfileCell().environment(viewModel)
             .previewThemes()
     }
 }

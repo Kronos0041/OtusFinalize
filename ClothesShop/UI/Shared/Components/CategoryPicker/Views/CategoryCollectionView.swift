@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Горизонтальная лента категорий над каталогом.
 struct CategoryCollectionView: View {
-    @EnvironmentObject var products: CatalogViewModel
+    @Environment(CatalogViewModel.self) private var products
 
     var body: some View {
         ScrollViewReader { scroll in
@@ -24,7 +24,7 @@ struct CategoryCollectionView: View {
                     }
                 }
             }
-            .onChange(of: products.selectedCategoryIndex) { selected in
+            .onChange(of: products.selectedCategoryIndex) { _, selected in
                 scroll.scrollTo(selected)
             }
         }
@@ -34,7 +34,7 @@ struct CategoryCollectionView: View {
 struct CategoryCollectionView_Previews: PreviewProvider {
     static var previews: some View {
         CategoryCollectionView()
-            .environmentObject(AppDIContainer.shared.makeCatalogViewModel())
+            .environment(AppDIContainer.shared.makeCatalogViewModel())
             .previewThemes()
     }
 }

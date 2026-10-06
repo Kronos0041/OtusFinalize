@@ -65,13 +65,15 @@ struct ViewModeView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             ViewModeView(ViewMode<Int>.loading) { Text("\($0)") }
-                .previewDisplayName("Loading")
+                .previewThemes("Загрузка")
             ViewModeView(ViewMode<Int>.content(42)) { Text("\($0)") }
-                .previewDisplayName("Content")
-            ViewModeView(ViewMode<Int>.noInternet, emptyTitle: SwiftGen.Common.empty, retry: {}) { Text("\($0)") }
-            ViewModeView(ViewMode<Int>.error("Сервер недоступен"), emptyTitle: SwiftGen.Common.empty, retry: {}) { Text("\($0)") }
+                .previewThemes("Контент")
             ViewModeView(ViewMode<Int>.empty, emptyTitle: SwiftGen.Notifications.empty, retry: {}) { Text("\($0)") }
+                .previewThemes("Пусто")
+            ViewModeView(ViewMode<Int>.noInternet, retry: {}) { Text("\($0)") }
+                .previewThemes("Нет сети")
+            ViewModeView(ViewMode<Int>.error("Сервер недоступен"), retry: {}) { Text("\($0)") }
+                .previewThemes("Ошибка")
         }
-        .previewThemes()
     }
 }
