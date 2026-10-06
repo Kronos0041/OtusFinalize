@@ -81,9 +81,19 @@ final class CatalogViewModel {
     func applyPreview(products: [CatalogItemViewModel], favoriteIDs: Set<String> = []) {
         isPreview = true
         favoriteProductIDs = favoriteIDs
-        mode = .content([CatalogSectionViewModel(id: CatalogSectionViewModel.allCategory.id,
-                                                 category: CatalogSectionViewModel.allCategory,
-                                                 products: products)])
+        let section = CatalogSectionViewModel(
+            id: CatalogSectionViewModel.allCategory.id,
+            category: CatalogSectionViewModel.allCategory,
+            products: products
+        )
+        mode = .content([section])
+        updateFilteredSections()
+    }
+
+    /// Фиксирует произвольное состояние экрана (loading / empty / noInternet / error) для превью.
+    func applyPreview(mode: ViewMode<[CatalogSectionViewModel]>) {
+        isPreview = true
+        self.mode = mode
         updateFilteredSections()
     }
     #endif
@@ -156,9 +166,11 @@ final class CatalogViewModel {
 
     func toggleFavorite(_ product: CatalogItemViewModel) {
         guard let ownerID else { return }
-        favoriteProductIDs = toggleFavoriteUseCase.execute(productID: product.id,
-                                                            ownerID: ownerID,
-                                                            currentIDs: favoriteProductIDs)
+        favoriteProductIDs = toggleFavoriteUseCase.execute(
+            productID: product.id,
+            ownerID: ownerID,
+            currentIDs: favoriteProductIDs
+        )
     }
 
     /// Фильтрует товары внутри разделов, сохраняя сами разделы: индексы вкладок не сдвигаются.

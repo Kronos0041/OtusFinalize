@@ -47,16 +47,34 @@ struct ProductPurchaseBar: View {
 struct ProductPurchaseBar_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ProductPurchaseBar(width: 390, isInCart: false, canModifyCart: true,
-                               isLiked: false, toggleCart: {}, toggleLike: {})
+            ProductPurchaseBar(
+                width: 390,
+                isInCart: false,
+                canModifyCart: true,
+                isLiked: false,
+                toggleCart: {},
+                toggleLike: {}
+            )
                 .previewLayout(.sizeThatFits)
                 .previewThemes("Не в корзине")
-            ProductPurchaseBar(width: 390, isInCart: true, canModifyCart: true,
-                               isLiked: true, toggleCart: {}, toggleLike: {})
+            ProductPurchaseBar(
+                width: 390,
+                isInCart: true,
+                canModifyCart: true,
+                isLiked: true,
+                toggleCart: {},
+                toggleLike: {}
+            )
                 .previewLayout(.sizeThatFits)
                 .previewThemes("В корзине, в избранном")
-            ProductPurchaseBar(width: 390, isInCart: false, canModifyCart: false,
-                               isLiked: false, toggleCart: {}, toggleLike: {})
+            ProductPurchaseBar(
+                width: 390,
+                isInCart: false,
+                canModifyCart: false,
+                isLiked: false,
+                toggleCart: {},
+                toggleLike: {}
+            )
                 .previewLayout(.sizeThatFits)
                 .previewThemes("Размер не выбран")
         }

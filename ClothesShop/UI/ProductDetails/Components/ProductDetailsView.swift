@@ -67,10 +67,27 @@ struct ProductDetailsView: View {
 
 #if DEBUG
 struct ProductDetailsView_Previews: PreviewProvider {
+    /// На экране view лежит внутри `List`; в превью нужен свой `ScrollView`, иначе длинный контент обрезается.
+    private static func details(_ product: CatalogItemViewModel, size: String?) -> some View {
+        ScrollView {
+            ProductDetailsView(product: product, selectedSize: .constant(size), imageSize: 340)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
     static var previews: some View {
-        ProductDetailsView(product: CartPreviewData.items[0].product,
-                           selectedSize: .constant("M"), imageSize: 340)
-            .previewThemes()
+        Group {
+            details(CartPreviewData.items[0].product, size: "M")
+                .previewThemes("Размер выбран")
+            details(CartPreviewData.items[0].product, size: nil)
+                .previewThemes("Размер не выбран")
+            details(CartPreviewData.productWithoutSizes, size: nil)
+                .previewThemes("Без размеров (sizes.isEmpty)")
+            details(CartPreviewData.productWithoutImage, size: "M")
+                .previewThemes("Без картинки")
+            details(CartPreviewData.productLongContent, size: "XL")
+                .previewThemes("Длинные тексты, много размеров")
+        }
     }
 }
 #endif
