@@ -21,30 +21,17 @@ final class AuthViewModel {
         return email
     }
 
-    private let signInUseCase: SignInUseCase
-    private let registerUseCase: RegisterUseCase
-    private let observeSessionUseCase: ObserveAuthSessionUseCase
-    private let resendVerificationUseCase: ResendVerificationEmailUseCase
-    private let verifyEmailUseCase: VerifyEmailUseCase
-    private let signOutUseCase: SignOutUseCase
+    private let authUseCases: AuthUseCases
     private let validator: AuthInputValidator
     @ObservationIgnored private var observation: ObservationToken?
 
-    init(signInUseCase: SignInUseCase,
-         registerUseCase: RegisterUseCase,
-         observeSessionUseCase: ObserveAuthSessionUseCase,
-         resendVerificationUseCase: ResendVerificationEmailUseCase,
-         verifyEmailUseCase: VerifyEmailUseCase,
-         signOutUseCase: SignOutUseCase,
-         validator: AuthInputValidator = AuthInputValidator()) {
-        self.signInUseCase = signInUseCase
-        self.registerUseCase = registerUseCase
-        self.observeSessionUseCase = observeSessionUseCase
-        self.resendVerificationUseCase = resendVerificationUseCase
-        self.verifyEmailUseCase = verifyEmailUseCase
-        self.signOutUseCase = signOutUseCase
+    init(
+        authUseCases: AuthUseCases,
+        validator: AuthInputValidator = AuthInputValidator()
+    ) {
+        self.authUseCases = authUseCases
         self.validator = validator
-        session = observeSessionUseCase.currentSession
+        session = authUseCases.observeSession.currentSession
     }
 
     func openAuthForm(mode: AuthMode) {
@@ -55,8 +42,12 @@ final class AuthViewModel {
     func submit(mode: AuthMode) {
         guard !isSubmitting else { return }
         email = email.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let message = validator.validationMessage(email: email, password: password,
-                                                     repeatPassword: repeatPassword, mode: mode) {
+        if let message = validator.validationMessage(
+            email: email,
+            password: password,
+            repeatPassword: repeatPassword,
+            mode: mode
+        ) {
             banner = .error(message)
             return
         }
@@ -67,7 +58,7 @@ final class AuthViewModel {
 
     func observeSession() {
         guard observation == nil else { return }
-        observation = observeSessionUseCase.execute { [weak self] in self?.setSession($0) }
+        observation = authUseCases.observeSession.execute { [weak self] in self?.setSession($0) }
     }
 
     func resendVerificationEmail() {
@@ -86,7 +77,7 @@ final class AuthViewModel {
 
     func signOut() {
         do {
-            try signOutUseCase.execute()
+            try authUseCases.signOut.execute()
             setSession(.signedOut)
         } catch {
             verificationMessage = AuthErrorMessageMapper.message(for: error, verifyingCurrentPassword: false)
@@ -109,11 +100,11 @@ final class AuthViewModel {
         do {
             switch mode {
             case .signIn:
-                try await signInUseCase.execute(email: email, password: password)
+                try await authUseCases.signIn.execute(email: email, password: password)
             case .registration:
-                try await registerUseCase.execute(email: email, password: password)
+                try await authUseCases.register.execute(email: email, password: password)
             }
-            setSession(observeSessionUseCase.currentSession)
+            setSession(authUseCases.observeSession.currentSession)
             if pendingEmail != nil {
                 verificationMessage = mode == .registration
                     ? SwiftGen.Auth.Verification.sent
@@ -132,7 +123,7 @@ final class AuthViewModel {
     private func performResendVerification() async {
         defer { isSubmitting = false }
         do {
-            try await resendVerificationUseCase.execute()
+            try await authUseCases.resendVerification.execute()
             verificationMessage = SwiftGen.Auth.Verification.resent
         } catch {
             verificationMessage = AuthErrorMessageMapper.message(for: error, verifyingCurrentPassword: false)
@@ -142,7 +133,7 @@ final class AuthViewModel {
     private func performRefreshVerification() async {
         defer { isSubmitting = false }
         do {
-            if try await verifyEmailUseCase.execute() {
+            if try await authUseCases.verifyEmail.execute() {
                 setSession(.verified)
             } else {
                 verificationMessage = SwiftGen.Auth.Verification.notConfirmed

@@ -4,6 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class ProfileViewModel {
+
     private(set) var mode: ViewMode<UserProfile> = .loading
     private(set) var user: UserProfile
     var currentPassword = ""
@@ -17,9 +18,7 @@ final class ProfileViewModel {
     private(set) var signOutError: String?
     var successMessage: String?
 
-    private let getProfileUseCase: GetProfileUseCase
-    private let changePasswordUseCase: ChangePasswordUseCase
-    private let changeEmailUseCase: ChangeEmailUseCase
+    private let profileUseCases: ProfileUseCases
     private let signOutUseCase: SignOutUseCase
     private let connectivityUseCase: ObserveConnectivityUseCase
     private let validator: AuthInputValidator
@@ -28,19 +27,15 @@ final class ProfileViewModel {
     @ObservationIgnored private var isPreview = false
     #endif
 
-    init(getProfileUseCase: GetProfileUseCase,
-         changePasswordUseCase: ChangePasswordUseCase,
-         changeEmailUseCase: ChangeEmailUseCase,
+    init(profileUseCases: ProfileUseCases,
          signOutUseCase: SignOutUseCase,
          connectivityUseCase: ObserveConnectivityUseCase,
          validator: AuthInputValidator = AuthInputValidator()) {
-        self.getProfileUseCase = getProfileUseCase
-        self.changePasswordUseCase = changePasswordUseCase
-        self.changeEmailUseCase = changeEmailUseCase
+        self.profileUseCases = profileUseCases
         self.signOutUseCase = signOutUseCase
         self.connectivityUseCase = connectivityUseCase
         self.validator = validator
-        user = getProfileUseCase.currentProfile
+        user = profileUseCases.get.currentProfile
         connectivityTask = Task { [weak self, updates = connectivityUseCase.execute()] in
             for await connected in updates where connected {
                 if case .noInternet = self?.mode { self?.loadProfile() }
@@ -70,7 +65,7 @@ final class ProfileViewModel {
             if mode.content == nil { mode = .noInternet }
             return
         }
-        user = getProfileUseCase.currentProfile
+        user = profileUseCases.get.currentProfile
         if mode.content == nil { mode = .loading }
         isRefreshing = true
         Task { [weak self] in await self?.performLoadProfile() }
@@ -105,9 +100,9 @@ final class ProfileViewModel {
         do {
             switch change {
             case .password:
-                try await changePasswordUseCase.execute(currentPassword: currentPassword, newPassword: newPassword)
+                try await profileUseCases.changePassword.execute(currentPassword: currentPassword, newPassword: newPassword)
             case .email:
-                try await changeEmailUseCase.execute(email: submittedEmail, currentPassword: currentPassword)
+                try await profileUseCases.changeEmail.execute(email: submittedEmail, currentPassword: currentPassword)
             }
             resetForm()
             successMessage = change == .password
@@ -139,7 +134,7 @@ final class ProfileViewModel {
     private func performLoadProfile() async {
         defer { isRefreshing = false }
         do {
-            let profile = try await getProfileUseCase.execute()
+            let profile = try await profileUseCases.get.execute()
             user = profile
             profileError = nil
             mode = profile.email.isEmpty ? .empty : .content(profile)

@@ -18,9 +18,11 @@ final class AppDIContainer {
 
     /// - Parameter firestore: экземпляр базы; `nil` — стандартный `Firestore.firestore()`.
     ///   Создаётся только после `FirebaseConfigurator.configure()`, поэтому не задан значением по умолчанию.
-    init(firestore: Firestore? = nil,
-         authRemoteDataSource: AuthRemoteDataSourceProtocol = FirebaseAuthDataSourceImpl(),
-         connectivityRepository: ConnectivityRepositoryProtocol = NetworkMonitor()) {
+    init(
+        firestore: Firestore? = nil,
+        authRemoteDataSource: AuthRemoteDataSourceProtocol = FirebaseAuthDataSourceImpl(),
+        connectivityRepository: ConnectivityRepositoryProtocol = NetworkMonitor()
+    ) {
         FirebaseConfigurator.configure()
         // Кэш ставится до первых экранов со значениями по умолчанию:
         // `settings/store` доступен только после входа и применяется после загрузки магазина.
@@ -52,17 +54,14 @@ final class AppDIContainer {
 
     func makeAuthViewModel() -> AuthViewModel {
         AuthViewModel(
-            signInUseCase: SignInUseCase(repository: authRepository),
-            registerUseCase: RegisterUseCase(repository: authRepository),
-            observeSessionUseCase: ObserveAuthSessionUseCase(repository: authRepository),
-            resendVerificationUseCase: ResendVerificationEmailUseCase(repository: authRepository),
-            verifyEmailUseCase: VerifyEmailUseCase(repository: authRepository),
-            signOutUseCase: SignOutUseCase(repository: authRepository)
+            authUseCases: AuthUseCases(repository: authRepository)
         )
     }
 
-    func makeCatalogViewModel(ownerID: String? = nil,
-                              automaticallyReloads: Bool = true) -> CatalogViewModel {
+    func makeCatalogViewModel(
+        ownerID: String? = nil,
+        automaticallyReloads: Bool = true
+    ) -> CatalogViewModel {
         CatalogViewModel(
             getCatalogUseCase: GetCatalogUseCase(repository: catalogRepository),
             searchProductsUseCase: SearchProductsUseCase(),
@@ -77,28 +76,21 @@ final class AppDIContainer {
     func makeCartViewModel(ownerID: String? = nil) -> CartViewModel {
         CartViewModel(
             ownerID: ownerID ?? authRepository.currentUserID,
-            getCartUseCase: GetCartUseCase(repository: cartRepository),
-            addCartItemUseCase: AddCartItemUseCase(repository: cartRepository),
-            removeCartItemUseCase: RemoveCartItemUseCase(repository: cartRepository),
-            clearCartUseCase: ClearCartUseCase(repository: cartRepository),
+            cartUseCases: CartUseCases(repository: cartRepository),
             getSettingsUseCase: GetStoreSettingsUseCase(repository: settingsRepository)
         )
     }
 
     func makeNotificationsViewModel() -> NotificationsViewModel {
         NotificationsViewModel(
-            getNotificationsUseCase: GetNotificationsUseCase(repository: notificationsRepository),
-            getReadIDsUseCase: GetReadNotificationIDsUseCase(repository: notificationsRepository),
-            markReadUseCase: MarkNotificationReadUseCase(repository: notificationsRepository),
+            notificationsUseCases: NotificationsUseCases(repository: notificationsRepository),
             connectivityUseCase: ObserveConnectivityUseCase(repository: connectivityRepository)
         )
     }
 
     func makeProfileViewModel() -> ProfileViewModel {
         ProfileViewModel(
-            getProfileUseCase: GetProfileUseCase(repository: profileRepository),
-            changePasswordUseCase: ChangePasswordUseCase(repository: profileRepository),
-            changeEmailUseCase: ChangeEmailUseCase(repository: profileRepository),
+            profileUseCases: ProfileUseCases(repository: profileRepository),
             signOutUseCase: SignOutUseCase(repository: authRepository),
             connectivityUseCase: ObserveConnectivityUseCase(repository: connectivityRepository)
         )

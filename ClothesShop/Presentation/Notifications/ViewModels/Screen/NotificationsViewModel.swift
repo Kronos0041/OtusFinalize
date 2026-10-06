@@ -9,9 +9,7 @@ final class NotificationsViewModel {
 
     var unreadCount: Int { (mode.content ?? []).filter(isUnread).count }
 
-    private let getNotificationsUseCase: GetNotificationsUseCase
-    private let getReadIDsUseCase: GetReadNotificationIDsUseCase
-    private let markReadUseCase: MarkNotificationReadUseCase
+    private let notificationsUseCases: NotificationsUseCases
     private let connectivityUseCase: ObserveConnectivityUseCase
     @ObservationIgnored private var requestInFlight = false
     @ObservationIgnored private var connectivityTask: Task<Void, Never>?
@@ -19,15 +17,11 @@ final class NotificationsViewModel {
     @ObservationIgnored private var isPreview = false
     #endif
 
-    init(getNotificationsUseCase: GetNotificationsUseCase,
-         getReadIDsUseCase: GetReadNotificationIDsUseCase,
-         markReadUseCase: MarkNotificationReadUseCase,
+    init(notificationsUseCases: NotificationsUseCases,
          connectivityUseCase: ObserveConnectivityUseCase) {
-        self.getNotificationsUseCase = getNotificationsUseCase
-        self.getReadIDsUseCase = getReadIDsUseCase
-        self.markReadUseCase = markReadUseCase
+        self.notificationsUseCases = notificationsUseCases
         self.connectivityUseCase = connectivityUseCase
-        readIDs = getReadIDsUseCase.execute()
+        readIDs = notificationsUseCases.readIDs.execute()
         connectivityTask = Task { [weak self, updates = connectivityUseCase.execute()] in
             for await connected in updates where connected {
                 self?.reloadAfterReconnect()
@@ -68,7 +62,7 @@ final class NotificationsViewModel {
             return
         }
         #endif
-        readIDs = markReadUseCase.execute(notificationID: item.id, currentIDs: readIDs)
+        readIDs = notificationsUseCases.markRead.execute(notificationID: item.id, currentIDs: readIDs)
     }
 
     private func load() async {
@@ -84,7 +78,7 @@ final class NotificationsViewModel {
         requestInFlight = true
         defer { requestInFlight = false }
         do {
-            let items = try await getNotificationsUseCase.execute()
+            let items = try await notificationsUseCases.get.execute()
             mode = .make(from: .success(items.sorted { $0.remoteID < $1.remoteID })) { $0.isEmpty }
         } catch {
             // Ошибка повторной загрузки не стирает уже показанный список.

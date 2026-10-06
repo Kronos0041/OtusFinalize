@@ -17,11 +17,9 @@ final class CartViewModel {
     var total: Int { items.reduce(0) { $0 + $1.product.price * $1.quantity } }
 
     private let ownerID: String?
-    private let getCartUseCase: GetCartUseCase
-    private let addCartItemUseCase: AddCartItemUseCase
-    private let removeCartItemUseCase: RemoveCartItemUseCase
-    private let clearCartUseCase: ClearCartUseCase
+    private let cartUseCases: CartUseCases
     private let getSettingsUseCase: GetStoreSettingsUseCase
+
     @ObservationIgnored private var catalogProducts: [CatalogItemViewModel] = []
     @ObservationIgnored private var pendingItemIDs: Set<String> = []
     @ObservationIgnored private var hasLoadedSettings = false
@@ -30,16 +28,10 @@ final class CartViewModel {
     #endif
 
     init(ownerID: String?,
-         getCartUseCase: GetCartUseCase,
-         addCartItemUseCase: AddCartItemUseCase,
-         removeCartItemUseCase: RemoveCartItemUseCase,
-         clearCartUseCase: ClearCartUseCase,
+         cartUseCases: CartUseCases,
          getSettingsUseCase: GetStoreSettingsUseCase) {
         self.ownerID = ownerID
-        self.getCartUseCase = getCartUseCase
-        self.addCartItemUseCase = addCartItemUseCase
-        self.removeCartItemUseCase = removeCartItemUseCase
-        self.clearCartUseCase = clearCartUseCase
+        self.cartUseCases = cartUseCases
         self.getSettingsUseCase = getSettingsUseCase
         #if DEBUG
         if ownerID == nil {
@@ -113,7 +105,7 @@ final class CartViewModel {
             return
         }
         do {
-            apply(.success(try await getCartUseCase.execute(ownerID: ownerID)))
+            apply(.success(try await cartUseCases.get.execute(ownerID: ownerID)))
         } catch {
             apply(.failure(error))
         }
@@ -147,9 +139,13 @@ final class CartViewModel {
             guard existing.quantity < maximumQuantity else { return }
             save(existing, product: product, quantity: existing.quantity + 1)
         } else {
-            save(CartItemViewModel(id: Self.positionID(productID: product.id, size: size),
-                                   product: product, size: size, quantity: 1),
-                 product: product, quantity: 1)
+            let item = CartItemViewModel(
+                id: Self.positionID(productID: product.id, size: size),
+                product: product,
+                size: size,
+                quantity: 1
+            )
+            save(item, product: product, quantity: 1)
         }
     }
 
@@ -193,7 +189,7 @@ final class CartViewModel {
         pendingItemIDs.formUnion(ids)
         defer { pendingItemIDs.subtract(ids) }
         do {
-            try await clearCartUseCase.execute(ownerID: ownerID, itemIDs: ids)
+            try await cartUseCases.clear.execute(ownerID: ownerID, itemIDs: ids)
             items = []
             errorMessage = nil
             updateMode()
@@ -231,12 +227,16 @@ final class CartViewModel {
         }
     }
 
-    private func performSave(_ item: CartItemViewModel, product: CatalogItemViewModel,
-                             quantity: Int, ownerID: String) async {
+    private func performSave(
+        _ item: CartItemViewModel,
+        product: CatalogItemViewModel,
+        quantity: Int,
+        ownerID: String
+    ) async {
         defer { pendingItemIDs.remove(item.id) }
         let domainItem = CartItem(id: item.id, productID: product.id, size: item.size, quantity: quantity)
         do {
-            try await addCartItemUseCase.execute(ownerID: ownerID, item: domainItem)
+            try await cartUseCases.add.execute(ownerID: ownerID, item: domainItem)
             applySavedItem(item, product: product, quantity: quantity)
             errorMessage = nil
         } catch {
@@ -247,7 +247,7 @@ final class CartViewModel {
     private func performRemove(_ id: String, ownerID: String) async {
         defer { pendingItemIDs.remove(id) }
         do {
-            try await removeCartItemUseCase.execute(ownerID: ownerID, itemID: id)
+            try await cartUseCases.remove.execute(ownerID: ownerID, itemID: id)
             items.removeAll { $0.id == id }
             errorMessage = nil
             updateMode()
