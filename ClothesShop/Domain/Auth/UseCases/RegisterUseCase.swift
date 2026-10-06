@@ -5,8 +5,7 @@ struct RegisterUseCase {
         self.repository = repository
     }
 
-    func execute(email: String, password: String,
-                 completion: @escaping AuthRepositoryProtocol.Completion) {
-        repository.register(email: email, password: password, completion: completion)
+    func execute(email: String, password: String) async throws {
+        try await repository.register(email: email, password: password)
     }
 }

@@ -1,9 +1,8 @@
-import Foundation
-
-enum CartSettingsError: LocalizedError {
+/// Ошибки настроек магазина (`settings/store`).
+/// Тексты для пользователя задаёт Presentation (`CartSettingsError+LocalizedError`).
+enum CartSettingsError: Error, Equatable {
+    /// Документ настроек отсутствует.
+    case missingSettings
+    /// `maximumCartItemQuantity` вне допустимого диапазона.
     case invalidMaximumQuantity
-
-    var errorDescription: String? {
-        "Настройка maximumCartItemQuantity должна быть целым числом от 1 до 999."
-    }
 }

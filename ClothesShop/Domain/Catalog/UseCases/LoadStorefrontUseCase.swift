@@ -1,39 +1,32 @@
-import Foundation
-
+/// Стартовая загрузка магазина: каталог, корзина и настройки читаются параллельно.
+/// Ошибка одного запроса не отменяет остальные — каждый результат возвращается отдельно.
 struct LoadStorefrontUseCase {
-    private let catalogRepository: CatalogRepositoryProtocol
-    private let cartRepository: CartRepositoryProtocol
-    private let settingsRepository: StoreSettingsRepositoryProtocol
+    private let getCatalogUseCase: GetCatalogUseCase
+    private let getCartUseCase: GetCartUseCase
+    private let getStoreSettingsUseCase: GetStoreSettingsUseCase
 
-    init(catalogRepository: CatalogRepositoryProtocol,
-         cartRepository: CartRepositoryProtocol,
-         settingsRepository: StoreSettingsRepositoryProtocol) {
-        self.catalogRepository = catalogRepository
-        self.cartRepository = cartRepository
-        self.settingsRepository = settingsRepository
+    init(getCatalogUseCase: GetCatalogUseCase,
+         getCartUseCase: GetCartUseCase,
+         getStoreSettingsUseCase: GetStoreSettingsUseCase) {
+        self.getCatalogUseCase = getCatalogUseCase
+        self.getCartUseCase = getCartUseCase
+        self.getStoreSettingsUseCase = getStoreSettingsUseCase
     }
 
-    func execute(ownerID: String, completion: @escaping (StorefrontLoadResult) -> Void) {
-        let group = DispatchGroup()
-        var catalog: Result<Catalog, Error>?
-        var cart: Result<[CartItem], Error>?
-        var settings: Result<StoreSettings, Error>?
+    func execute(ownerID: String) async -> StorefrontLoadResult {
+        async let catalog = Self.result { try await getCatalogUseCase.execute() }
+        async let cart = Self.result { try await getCartUseCase.execute(ownerID: ownerID) }
+        async let settings = Self.result { try await getStoreSettingsUseCase.execute() }
+        return StorefrontLoadResult(catalog: await catalog,
+                                    cart: await cart,
+                                    settings: await settings)
+    }
 
-        group.enter()
-        catalogRepository.fetchCatalog { catalog = $0; group.leave() }
-        group.enter()
-        cartRepository.fetchCart(ownerID: ownerID) { cart = $0; group.leave() }
-        group.enter()
-        settingsRepository.fetchSettings { settings = $0; group.leave() }
-
-        group.notify(queue: .main) {
-            let missing = NSError(domain: "ClothesShop.Storefront", code: 1,
-                                  userInfo: [NSLocalizedDescriptionKey: "Получен неполный ответ."])
-            completion(StorefrontLoadResult(
-                catalog: catalog ?? .failure(missing),
-                cart: cart ?? .failure(missing),
-                settings: settings ?? .failure(missing)
-            ))
+    private static func result<Value>(_ operation: () async throws -> Value) async -> Result<Value, Error> {
+        do {
+            return .success(try await operation())
+        } catch {
+            return .failure(error)
         }
     }
 }

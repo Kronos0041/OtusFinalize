@@ -5,7 +5,7 @@ final class StoreSettingsRepositoryImpl: StoreSettingsRepositoryProtocol {
         self.remoteDataSource = remoteDataSource
     }
 
-    func fetchSettings(completion: @escaping (Result<StoreSettings, Error>) -> Void) {
-        remoteDataSource.fetchSettings { completion($0.map(StoreSettingsMapper.map)) }
+    func fetchSettings() async throws -> StoreSettings {
+        StoreSettingsMapper.map(try await remoteDataSource.fetchSettings())
     }
 }

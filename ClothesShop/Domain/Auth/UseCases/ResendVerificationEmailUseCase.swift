@@ -5,7 +5,7 @@ struct ResendVerificationEmailUseCase {
         self.repository = repository
     }
 
-    func execute(completion: @escaping AuthRepositoryProtocol.Completion) {
-        repository.sendEmailVerification(completion: completion)
+    func execute() async throws {
+        try await repository.sendEmailVerification()
     }
 }

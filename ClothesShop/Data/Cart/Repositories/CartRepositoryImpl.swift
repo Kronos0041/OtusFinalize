@@ -5,23 +5,20 @@ final class CartRepositoryImpl: CartRepositoryProtocol {
         self.remoteDataSource = remoteDataSource
     }
 
-    func fetchCart(ownerID: String, completion: @escaping (Result<[CartItem], Error>) -> Void) {
-        remoteDataSource.fetchCart(ownerID: ownerID) { completion($0.map { $0.map(CartMapper.map) }) }
+    func fetchCart(ownerID: String) async throws -> [CartItem] {
+        let records = try await remoteDataSource.fetchCart(ownerID: ownerID)
+        return records.map { CartMapper.map($0) }
     }
 
-    func saveCartItem(ownerID: String, item: CartItem,
-                      completion: @escaping (Result<Void, Error>) -> Void) {
-        remoteDataSource.saveCartItem(ownerID: ownerID, item: CartMapper.map(item),
-                                      completion: completion)
+    func saveCartItem(ownerID: String, item: CartItem) async throws {
+        try await remoteDataSource.saveCartItem(ownerID: ownerID, item: CartMapper.map(item))
     }
 
-    func deleteCartItem(ownerID: String, itemID: String,
-                        completion: @escaping (Result<Void, Error>) -> Void) {
-        remoteDataSource.deleteCartItem(ownerID: ownerID, itemID: itemID, completion: completion)
+    func deleteCartItem(ownerID: String, itemID: String) async throws {
+        try await remoteDataSource.deleteCartItem(ownerID: ownerID, itemID: itemID)
     }
 
-    func clearCart(ownerID: String, itemIDs: [String],
-                   completion: @escaping (Result<Void, Error>) -> Void) {
-        remoteDataSource.clearCart(ownerID: ownerID, itemIDs: itemIDs, completion: completion)
+    func clearCart(ownerID: String, itemIDs: [String]) async throws {
+        try await remoteDataSource.clearCart(ownerID: ownerID, itemIDs: itemIDs)
     }
 }

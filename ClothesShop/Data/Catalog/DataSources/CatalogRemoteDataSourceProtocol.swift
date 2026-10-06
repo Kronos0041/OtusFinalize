@@ -1,3 +1,3 @@
 protocol CatalogRemoteDataSourceProtocol {
-    func fetchCatalog(completion: @escaping (Result<CatalogDTO, Error>) -> Void)
+    func fetchCatalog() async throws -> CatalogDTO
 }

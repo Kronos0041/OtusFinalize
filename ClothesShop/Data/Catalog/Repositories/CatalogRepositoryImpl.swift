@@ -5,7 +5,7 @@ final class CatalogRepositoryImpl: CatalogRepositoryProtocol {
         self.remoteDataSource = remoteDataSource
     }
 
-    func fetchCatalog(completion: @escaping (Result<Catalog, Error>) -> Void) {
-        remoteDataSource.fetchCatalog { completion($0.map(CatalogMapper.map)) }
+    func fetchCatalog() async throws -> Catalog {
+        CatalogMapper.map(try await remoteDataSource.fetchCatalog())
     }
 }

@@ -3,102 +3,69 @@ import Foundation
 
 final class FirebaseAuthDataSourceImpl: AuthRemoteDataSourceProtocol {
     var currentUserID: String? { Auth.auth().currentUser?.uid }
-    var currentProfile: UserProfile { UserProfile(email: Auth.auth().currentUser?.email ?? "") }
+
+    var currentProfile: UserProfile {
+        UserProfile(email: Auth.auth().currentUser?.email ?? "")
+    }
 
     var session: AuthSession {
         guard let user = Auth.auth().currentUser else { return .signedOut }
         return session(for: user)
     }
 
-    func signIn(email: String, password: String,
-                completion: @escaping (Result<Void, Error>) -> Void) {
-        Auth.auth().signIn(withEmail: email, password: password) { result, error in
-            if let error { completion(.failure(FirebaseAuthErrorMapper.map(error))) }
-            else if result != nil { completion(.success(())) }
-            else { completion(.failure(AuthRepositoryError.unexpected)) }
-        }
+    func signIn(email: String, password: String) async throws {
+        try await mapped { _ = try await Auth.auth().signIn(withEmail: email, password: password) }
     }
 
-    func register(email: String, password: String,
-                  completion: @escaping (Result<Void, Error>) -> Void) {
+    func register(email: String, password: String) async throws {
         configureLanguage()
-        Auth.auth().createUser(withEmail: email, password: password) { result, error in
-            if let error { completion(.failure(FirebaseAuthErrorMapper.map(error))); return }
-            guard let user = result?.user else {
-                completion(.failure(AuthRepositoryError.missingUser)); return
-            }
-            user.sendEmailVerification { error in
-                completion(error.map { .failure(FirebaseAuthErrorMapper.map($0)) } ?? .success(()))
-            }
+        try await mapped {
+            let result = try await Auth.auth().createUser(withEmail: email, password: password)
+            try await result.user.sendEmailVerification()
         }
     }
 
-    func sendEmailVerification(completion: @escaping (Result<Void, Error>) -> Void) {
-        guard let user = Auth.auth().currentUser else {
-            completion(.failure(AuthRepositoryError.missingUser)); return
-        }
+    func sendEmailVerification() async throws {
+        let user = try requireUser()
         configureLanguage()
-        user.sendEmailVerification { error in
-            completion(error.map { .failure(FirebaseAuthErrorMapper.map($0)) } ?? .success(()))
-        }
+        try await mapped { try await user.sendEmailVerification() }
     }
 
-    func refreshEmailVerification(completion: @escaping (Result<Bool, Error>) -> Void) {
-        guard let user = Auth.auth().currentUser else {
-            completion(.failure(AuthRepositoryError.missingUser)); return
-        }
-        user.reload { error in
-            if let error { completion(.failure(FirebaseAuthErrorMapper.map(error))); return }
-            guard user.isEmailVerified else { completion(.success(false)); return }
-            user.getIDTokenForcingRefresh(true) { _, error in
-                completion(error.map { .failure(FirebaseAuthErrorMapper.map($0)) } ?? .success(true))
-            }
-        }
+    func refreshEmailVerification() async throws -> Bool {
+        let user = try requireUser()
+        try await mapped { try await user.reload() }
+        guard user.isEmailVerified else { return false }
+        // Новый ID-токен содержит актуальный email_verified — без него правила Firestore отклонят запросы.
+        try await mapped { _ = try await user.getIDTokenResult(forcingRefresh: true) }
+        return true
     }
 
-    func refreshProfile(completion: @escaping (Result<UserProfile, Error>) -> Void) {
-        guard let user = Auth.auth().currentUser else {
-            completion(.failure(AuthRepositoryError.missingUser)); return
+    func refreshProfile() async throws -> UserProfile {
+        let user = try requireUser()
+        try await mapped {
+            try await user.reload()
+            _ = try await user.getIDTokenResult(forcingRefresh: true)
         }
-        user.reload { [weak self] error in
-            if let error { completion(.failure(FirebaseAuthErrorMapper.map(error))); return }
-            user.getIDTokenForcingRefresh(true) { _, error in
-                if let error { completion(.failure(FirebaseAuthErrorMapper.map(error))) }
-                else { completion(.success(self?.currentProfile ?? UserProfile(email: ""))) }
-            }
-        }
+        return currentProfile
     }
 
-    func changePassword(currentPassword: String, newPassword: String,
-                        completion: @escaping (Result<Void, Error>) -> Void) {
-        reauthenticate(password: currentPassword) { result in
-            switch result {
-            case .failure(let error): completion(.failure(error))
-            case .success(let user):
-                user.updatePassword(to: newPassword) { error in
-                    completion(error.map { .failure(FirebaseAuthErrorMapper.map($0)) } ?? .success(()))
-                }
-            }
-        }
+    func changePassword(currentPassword: String, newPassword: String) async throws {
+        let user = try await reauthenticate(password: currentPassword)
+        try await mapped { try await user.updatePassword(to: newPassword) }
     }
 
-    func changeEmail(to email: String, currentPassword: String,
-                     completion: @escaping (Result<Void, Error>) -> Void) {
-        reauthenticate(password: currentPassword) { [weak self] result in
-            switch result {
-            case .failure(let error): completion(.failure(error))
-            case .success(let user):
-                self?.configureLanguage()
-                user.sendEmailVerification(beforeUpdatingEmail: email) { error in
-                    completion(error.map { .failure(FirebaseAuthErrorMapper.map($0)) } ?? .success(()))
-                }
-            }
-        }
+    func changeEmail(to email: String, currentPassword: String) async throws {
+        let user = try await reauthenticate(password: currentPassword)
+        configureLanguage()
+        try await mapped { try await user.sendEmailVerification(beforeUpdatingEmail: email) }
     }
 
     func signOut() throws {
-        do { try Auth.auth().signOut() }
-        catch { throw FirebaseAuthErrorMapper.map(error) }
+        do {
+            try Auth.auth().signOut()
+        } catch {
+            throw FirebaseAuthErrorMapper.map(error)
+        }
     }
 
     func observeSession(_ handler: @escaping (AuthSession) -> Void) -> ObservationToken {
@@ -109,16 +76,26 @@ final class FirebaseAuthDataSourceImpl: AuthRemoteDataSourceProtocol {
         return ObservationToken { Auth.auth().removeStateDidChangeListener(handle) }
     }
 
-    private func reauthenticate(password: String,
-                                completion: @escaping (Result<User, Error>) -> Void) {
-        guard let user = Auth.auth().currentUser, let email = user.email else {
-            completion(.failure(AuthRepositoryError.missingUser)); return
-        }
+    // MARK: - Вспомогательное
+
+    private func requireUser() throws -> User {
+        guard let user = Auth.auth().currentUser else { throw AuthRepositoryError.missingUser }
+        return user
+    }
+
+    private func reauthenticate(password: String) async throws -> User {
+        let user = try requireUser()
+        guard let email = user.email else { throw AuthRepositoryError.missingUser }
         let credential = EmailAuthProvider.credential(withEmail: email, password: password)
-        user.reauthenticate(with: credential) { result, error in
-            if let error { completion(.failure(FirebaseAuthErrorMapper.map(error))) }
-            else if let user = result?.user { completion(.success(user)) }
-            else { completion(.failure(AuthRepositoryError.missingUser)) }
+        return try await mapped { try await user.reauthenticate(with: credential).user }
+    }
+
+    /// Выполняет запрос к Firebase Auth и переводит его ошибки в доменные.
+    private func mapped<Value>(_ operation: () async throws -> Value) async throws -> Value {
+        do {
+            return try await operation()
+        } catch {
+            throw FirebaseAuthErrorMapper.map(error)
         }
     }
 
@@ -126,6 +103,7 @@ final class FirebaseAuthDataSourceImpl: AuthRemoteDataSourceProtocol {
         user.isEmailVerified ? .verified : .awaitingEmailVerification(user.email ?? "")
     }
 
+    /// Письма Firebase отправляются на языке приложения.
     private func configureLanguage() {
         Auth.auth().languageCode = Bundle.main.preferredLocalizations.first ?? "en"
     }

@@ -5,7 +5,8 @@ struct VerifyEmailUseCase {
         self.repository = repository
     }
 
-    func execute(completion: @escaping (Result<Bool, Error>) -> Void) {
-        repository.refreshEmailVerification(completion: completion)
+    /// Возвращает `true`, если email уже подтверждён.
+    func execute() async throws -> Bool {
+        try await repository.refreshEmailVerification()
     }
 }

@@ -8,23 +8,25 @@ final class AuthRepositoryImpl: AuthRepositoryProtocol {
     var currentUserID: String? { remoteDataSource.currentUserID }
     var session: AuthSession { remoteDataSource.session }
 
-    func signIn(email: String, password: String, completion: @escaping Completion) {
-        remoteDataSource.signIn(email: email, password: password, completion: completion)
+    func signIn(email: String, password: String) async throws {
+        try await remoteDataSource.signIn(email: email, password: password)
     }
 
-    func register(email: String, password: String, completion: @escaping Completion) {
-        remoteDataSource.register(email: email, password: password, completion: completion)
+    func register(email: String, password: String) async throws {
+        try await remoteDataSource.register(email: email, password: password)
     }
 
-    func sendEmailVerification(completion: @escaping Completion) {
-        remoteDataSource.sendEmailVerification(completion: completion)
+    func sendEmailVerification() async throws {
+        try await remoteDataSource.sendEmailVerification()
     }
 
-    func refreshEmailVerification(completion: @escaping (Result<Bool, Error>) -> Void) {
-        remoteDataSource.refreshEmailVerification(completion: completion)
+    func refreshEmailVerification() async throws -> Bool {
+        try await remoteDataSource.refreshEmailVerification()
     }
 
-    func signOut() throws { try remoteDataSource.signOut() }
+    func signOut() throws {
+        try remoteDataSource.signOut()
+    }
 
     func observeSession(_ handler: @escaping (AuthSession) -> Void) -> ObservationToken {
         remoteDataSource.observeSession(handler)

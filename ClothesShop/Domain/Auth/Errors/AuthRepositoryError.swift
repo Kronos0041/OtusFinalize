@@ -1,6 +1,6 @@
-import Foundation
-
-enum AuthRepositoryError: LocalizedError {
+/// Ошибки авторизации и управления аккаунтом.
+/// Тексты для пользователя задаёт Presentation (`AuthRepositoryError+LocalizedError`).
+enum AuthRepositoryError: Error, Equatable {
     case missingUser
     case wrongPassword
     case invalidCredentials
@@ -11,8 +11,4 @@ enum AuthRepositoryError: LocalizedError {
     case tooManyRequests
     case sessionExpired
     case unexpected
-
-    var errorDescription: String? {
-        String(describing: self)
-    }
 }

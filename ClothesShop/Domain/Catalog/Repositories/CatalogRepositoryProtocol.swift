@@ -1,3 +1,3 @@
 protocol CatalogRepositoryProtocol {
-    func fetchCatalog(completion: @escaping (Result<Catalog, Error>) -> Void)
+    func fetchCatalog() async throws -> Catalog
 }

@@ -7,15 +7,10 @@ final class FirestoreSettingsDataSourceImpl: StoreSettingsRemoteDataSourceProtoc
         self.database = database
     }
 
-    func fetchSettings(completion: @escaping (Result<StoreSettingsDTO, Error>) -> Void) {
-        database.collection(FirestoreCollection.settings.rawValue)
-            .document("store").getDocument { document, error in
-                if let error { completion(.failure(FirestoreErrorMapper.map(error))); return }
-                guard let document, document.exists else {
-                    completion(.failure(FirestoreDataSourceError.missingStoreSettings)); return
-                }
-                do { completion(.success(try document.data(as: StoreSettingsDTO.self))) }
-                catch { completion(.failure(error)) }
-            }
+    func fetchSettings() async throws -> StoreSettingsDTO {
+        let reference = database.collection(FirestoreCollection.settings.rawValue).document("store")
+        let document = try await FirestoreDecoder.document(reference)
+        guard document.exists else { throw CartSettingsError.missingSettings }
+        return try document.data(as: StoreSettingsDTO.self)
     }
 }

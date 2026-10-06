@@ -7,48 +7,46 @@ final class FirestoreCartDataSourceImpl: CartRemoteDataSourceProtocol {
         self.database = database
     }
 
-    func fetchCart(ownerID: String, completion: @escaping (Result<[CartRecordDTO], Error>) -> Void) {
-        collection(ownerID: ownerID).getDocuments { snapshot, error in
-            completion(FirestoreDecoder.documents(snapshot, error).map { documents in
-                documents.compactMap { document in
-                    let data = document.data()
-                    guard let productID = data["productId"] as? String,
-                          let quantity = data["quantity"] as? Int,
-                          quantity > 0 else { return nil }
-                    return CartRecordDTO(id: document.documentID, productID: productID,
-                                         size: data["size"] as? String, quantity: quantity)
-                }
-            })
+    func fetchCart(ownerID: String) async throws -> [CartRecordDTO] {
+        let documents = try await FirestoreDecoder.documents(of: collection(ownerID: ownerID))
+        return documents.compactMap { document in
+            let data = document.data()
+            guard let productID = data["productId"] as? String,
+                  let quantity = data["quantity"] as? Int,
+                  quantity > 0 else { return nil }
+            return CartRecordDTO(id: document.documentID, productID: productID,
+                                 size: data["size"] as? String, quantity: quantity)
         }
     }
 
-    func saveCartItem(ownerID: String, item: CartRecordDTO,
-                      completion: @escaping (Result<Void, Error>) -> Void) {
-        collection(ownerID: ownerID).document(item.id).setData([
+    func saveCartItem(ownerID: String, item: CartRecordDTO) async throws {
+        let data: [String: Any] = [
             "productId": item.productID,
             "size": item.size ?? NSNull(),
             "quantity": item.quantity,
             "updatedAt": FieldValue.serverTimestamp()
-        ]) { error in completion(error.map { .failure(FirestoreErrorMapper.map($0)) } ?? .success(())) }
+        ]
+        let reference = collection(ownerID: ownerID).document(item.id)
+        try await FirestoreDecoder.perform { try await reference.setData(data) }
     }
 
-    func deleteCartItem(ownerID: String, itemID: String,
-                        completion: @escaping (Result<Void, Error>) -> Void) {
-        collection(ownerID: ownerID).document(itemID).delete {
-            completion($0.map { .failure(FirestoreErrorMapper.map($0)) } ?? .success(()))
-        }
+    func deleteCartItem(ownerID: String, itemID: String) async throws {
+        let reference = collection(ownerID: ownerID).document(itemID)
+        try await FirestoreDecoder.perform { try await reference.delete() }
     }
 
-    func clearCart(ownerID: String, itemIDs: [String],
-                   completion: @escaping (Result<Void, Error>) -> Void) {
-        guard !itemIDs.isEmpty else { completion(.success(())); return }
+    /// Удаляет позиции одной `WriteBatch`, то есть атомарно.
+    func clearCart(ownerID: String, itemIDs: [String]) async throws {
+        guard !itemIDs.isEmpty else { return }
         let batch = database.batch()
-        itemIDs.forEach { batch.deleteDocument(collection(ownerID: ownerID).document($0)) }
-        batch.commit { completion($0.map { .failure(FirestoreErrorMapper.map($0)) } ?? .success(())) }
+        let cart = collection(ownerID: ownerID)
+        itemIDs.forEach { batch.deleteDocument(cart.document($0)) }
+        try await FirestoreDecoder.perform { try await batch.commit() }
     }
 
     private func collection(ownerID: String) -> CollectionReference {
         database.collection(FirestoreCollection.users.rawValue)
-            .document(ownerID).collection("cart")
+            .document(ownerID)
+            .collection("cart")
     }
 }

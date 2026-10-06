@@ -8,13 +8,13 @@ final class NotificationsRepositoryImpl: NotificationsRepositoryProtocol {
         self.readStateDataSource = readStateDataSource
     }
 
-    func fetchNotifications(completion: @escaping (Result<[Notification], Error>) -> Void) {
-        remoteDataSource.fetchNotifications {
-            completion($0.map { $0.map(NotificationMapper.map) })
-        }
+    func fetchNotifications() async throws -> [Notification] {
+        try await remoteDataSource.fetchNotifications().map(NotificationMapper.map)
     }
 
-    func readNotificationIDs() -> Set<String> { readStateDataSource.readNotificationIDs() }
+    func readNotificationIDs() -> Set<String> {
+        readStateDataSource.readNotificationIDs()
+    }
 
     func saveReadNotificationIDs(_ ids: Set<String>) {
         readStateDataSource.saveReadNotificationIDs(ids)

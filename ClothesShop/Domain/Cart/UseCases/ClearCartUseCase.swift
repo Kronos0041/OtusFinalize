@@ -1,10 +1,11 @@
 struct ClearCartUseCase {
     private let repository: CartRepositoryProtocol
 
-    init(repository: CartRepositoryProtocol) { self.repository = repository }
+    init(repository: CartRepositoryProtocol) {
+        self.repository = repository
+    }
 
-    func execute(ownerID: String, itemIDs: [String],
-                 completion: @escaping (Result<Void, Error>) -> Void) {
-        repository.clearCart(ownerID: ownerID, itemIDs: itemIDs, completion: completion)
+    func execute(ownerID: String, itemIDs: [String]) async throws {
+        try await repository.clearCart(ownerID: ownerID, itemIDs: itemIDs)
     }
 }

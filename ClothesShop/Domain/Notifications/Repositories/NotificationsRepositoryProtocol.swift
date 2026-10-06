@@ -1,5 +1,5 @@
 protocol NotificationsRepositoryProtocol {
-    func fetchNotifications(completion: @escaping (Result<[Notification], Error>) -> Void)
+    func fetchNotifications() async throws -> [Notification]
     func readNotificationIDs() -> Set<String>
     func saveReadNotificationIDs(_ ids: Set<String>)
 }

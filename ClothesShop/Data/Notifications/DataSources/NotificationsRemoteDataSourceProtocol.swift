@@ -1,3 +1,3 @@
 protocol NotificationsRemoteDataSourceProtocol {
-    func fetchNotifications(completion: @escaping (Result<[NotificationDTO], Error>) -> Void)
+    func fetchNotifications() async throws -> [NotificationDTO]
 }
