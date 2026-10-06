@@ -42,7 +42,10 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selected) {
-            CatalogView(notifications: notificationsViewModel)
+            CatalogView(
+                notifications: notificationsViewModel,
+                openCart: { selected = .cart }
+            )
                 .tabItem { Label(SwiftGen.Catalog.title, systemImage: "house") }
                 .tag(Tab.products)
 

@@ -11,21 +11,34 @@ import SwiftUI
 struct CategoryCollectionView: View {
     @Environment(CatalogViewModel.self) private var products
 
+    private var itemWidth: CGFloat {
+        let count = max(products.sections.count, 1)
+        return max(70, (getWidth() - 20) / CGFloat(count))
+    }
+
     var body: some View {
         ScrollViewReader { scroll in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 0) {
                     // id — индекс раздела: по нему работает scrollTo(selected).
                     ForEach(products.sections.indices, id: \.self) { index in
-                        CategoryCollectionCellView(item: products.sections[index].category,
-                                                   isSelected: products.isSelected(index)) {
-                            products.selectedCategoryIndex = index
+                        CategoryCollectionCellView(
+                            item: products.sections[index].category,
+                            isSelected: products.isSelected(index),
+                            width: itemWidth
+                        ) {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                products.selectedCategoryIndex = index
+                            }
                         }
+                        .id(index)
                     }
                 }
             }
             .onChange(of: products.selectedCategoryIndex) { _, selected in
-                scroll.scrollTo(selected)
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    scroll.scrollTo(selected, anchor: .center)
+                }
             }
         }
     }

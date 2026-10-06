@@ -12,23 +12,23 @@ struct CatalogView: View {
     @Environment(CatalogViewModel.self) private var products
     /// Владеет ViewModel уведомлений `MainTabView`; здесь только наблюдение.
     let notifications: NotificationsViewModel
+    let openCart: () -> Void
     @State private var router = Router<CatalogRoute>()
 
     var body: some View {
-        @Bindable var products = products
         NavigationStack(path: $router.path) {
             VStack(spacing: 15) {
-                MainTopBar(notificationCount: notifications.unreadCount) {
-                    router.push(.notifications)
-                }
+                MainTopBar(
+                    notificationCount: notifications.unreadCount,
+                    clickBell: { router.push(.notifications) },
+                    clickCart: openCart
+                )
 
-                SearchTextField(frame: (getWidth() - AppLayout.sideInset, 50),
-                                placeholder: SwiftGen.Common.search,
-                                text: $products.searchText)
-
-                ViewModeView(products.mode,
-                             emptyTitle: SwiftGen.Catalog.empty,
-                             retry: { products.reload() }) { _ in
+                ViewModeView(
+                    products.mode,
+                    emptyTitle: SwiftGen.Catalog.empty,
+                    retry: { products.reload() }
+                ) { _ in
                     CatalogSectionTabsView()
                 }
             }
@@ -45,7 +45,10 @@ struct CatalogView: View {
 
 struct CatalogView_Previews: PreviewProvider {
     static var previews: some View {
-        CatalogView(notifications: AppDIContainer.shared.makeNotificationsViewModel())
+        CatalogView(
+            notifications: AppDIContainer.shared.makeNotificationsViewModel(),
+            openCart: {}
+        )
             .environment(AppDIContainer.shared.makeCatalogViewModel())
             .environment(CartPreviewData.makeCart())
             .previewThemes()

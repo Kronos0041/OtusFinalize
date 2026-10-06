@@ -7,13 +7,10 @@
 
 import SwiftUI
 
-/// Фильтр категорий + страницы с товарами. `CatalogViewModel` приходит из окружения.
+/// Листаемые страницы каталога. Поиск и категории находятся внутри `CatalogHeaderView`.
 struct CatalogSectionTabsView: View {
     var body: some View {
-        VStack {
-            CategoryCollectionView()
-            CategoryCollectionTab()
-        }
+        CategoryCollectionTab()
     }
 }
 

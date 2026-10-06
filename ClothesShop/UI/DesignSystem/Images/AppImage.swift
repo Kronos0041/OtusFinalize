@@ -14,6 +14,7 @@ import Foundation
 /// Для картинок такие же символы есть (`Image(.brandLogo)`), но здесь пока используются строковые имена.
 enum AppImage {
     static let brandLogo = "brandLogo"
+    static let brandWordmark = "brandWordmark"
 
     enum Wallpaper {
         static let background = "backgroundWallpaper"

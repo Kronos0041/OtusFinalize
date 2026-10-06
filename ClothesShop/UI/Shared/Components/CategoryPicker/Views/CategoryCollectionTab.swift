@@ -14,21 +14,20 @@ struct CategoryCollectionTab: View {
     var body: some View {
         @Bindable var products = products
         let sections = products.filteredSections
-        VStack(spacing: 0) {
-            Divider()
-
-            TabView(selection: $products.selectedCategoryIndex) {
-                ForEach(sections.indices, id: \.self) { index in
-                    CatalogGridView(section: sections[index],
-                                 emptyTitle: products.isSearching ? SwiftGen.Catalog.Search.empty : nil,
-                                 emptySystemImage: "magnifyingglass",
-                                 emptyMessage: SwiftGen.Catalog.Search.changeQuery)
-                        .tag(index)
-                }
+        TabView(selection: $products.selectedCategoryIndex) {
+            ForEach(sections.indices, id: \.self) { index in
+                CatalogGridView(
+                    section: sections[index],
+                    emptyTitle: products.isSearching ? SwiftGen.Catalog.Search.empty : nil,
+                    emptySystemImage: "magnifyingglass",
+                    emptyMessage: SwiftGen.Catalog.Search.changeQuery,
+                    header: CatalogHeaderView()
+                )
+                    .tag(index)
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .indexViewStyle(.page(backgroundDisplayMode: .interactive))
         }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .indexViewStyle(.page(backgroundDisplayMode: .interactive))
     }
 }
 

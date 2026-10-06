@@ -11,11 +11,17 @@ struct CatalogSectionViewModel: Identifiable {
             .compactMap { category -> CatalogSectionViewModel? in
                 let items = products.filter { $0.categoryID == category.id }.map(CatalogItemViewModel.init)
                 guard !items.isEmpty else { return nil }
-                return CatalogSectionViewModel(id: category.id,
-                                               category: .init(id: category.id, title: category.title),
-                                               products: items)
+                return CatalogSectionViewModel(
+                    id: category.id,
+                    category: .init(id: category.id, title: category.title),
+                    products: items
+                )
             }
-        return [CatalogSectionViewModel(id: allCategory.id, category: allCategory,
-                                        products: sections.flatMap(\.products))] + sections
+        let allProducts = CatalogSectionViewModel(
+            id: allCategory.id,
+            category: allCategory,
+            products: sections.flatMap(\.products)
+        )
+        return [allProducts] + sections
     }
 }

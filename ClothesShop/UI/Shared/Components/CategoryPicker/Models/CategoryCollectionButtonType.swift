@@ -9,8 +9,10 @@ enum CategoryCollectionButtonType {
     var style: CategoryCollectionButtonStyleModel {
         switch self {
         case .selected:
-            return CategoryCollectionButtonStyleModel(foregroundColor: .appWhite,
-                                                      backgroundColor: .appBlack)
+            return CategoryCollectionButtonStyleModel(
+                foregroundColor: .appBlack,
+                indicatorColor: .appBlack
+            )
         case .notSelected:
             return CategoryCollectionButtonStyleModel()
         }
