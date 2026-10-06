@@ -1,4 +1,6 @@
 protocol ConnectivityRepositoryProtocol {
+    /// Есть ли сейчас подключение к сети.
     var isConnected: Bool { get }
-    func observe(_ handler: @escaping (Bool) -> Void) -> ObservationToken
+    /// Поток изменений доступности сети: `true` — связь появилась, `false` — пропала.
+    func updates() -> AsyncStream<Bool>
 }

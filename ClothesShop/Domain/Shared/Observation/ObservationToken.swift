@@ -1,6 +1,6 @@
 import Foundation
 
-/// Удерживает внешнюю подписку (Firebase, NWPathMonitor) активной и отменяет её при освобождении токена.
+/// Удерживает внешнюю подписку (слушатель сессии Firebase Auth) активной и отменяет её при освобождении токена.
 final class ObservationToken {
     private var cancellation: (() -> Void)?
 

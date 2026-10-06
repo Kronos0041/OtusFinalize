@@ -1,38 +1,40 @@
 import Foundation
 import Network
 
+/// Отслеживает доступность сети. С iOS 17 `NWPathMonitor` — это `AsyncSequence`,
+/// поэтому и текущее состояние, и подписки читаются обычным `for await`.
 final class NetworkMonitor: ConnectivityRepositoryProtocol {
-    static let shared = NetworkMonitor()
-
-    private let monitor: NWPathMonitor
-    private let queue = DispatchQueue(label: "ClothesShop.NetworkMonitor")
-    private var handlers: [UUID: (Bool) -> Void] = [:]
-    private let lock = NSLock()
     private(set) var isConnected = true
+    private var monitoringTask: Task<Void, Never>?
 
-    init(monitor: NWPathMonitor = NWPathMonitor()) {
-        self.monitor = monitor
-        monitor.pathUpdateHandler = { [weak self] path in
-            let connected = path.status == .satisfied
-            DispatchQueue.main.async { self?.update(connected) }
-        }
-        monitor.start(queue: queue)
-    }
-
-    func observe(_ handler: @escaping (Bool) -> Void) -> ObservationToken {
-        let id = UUID()
-        lock.lock(); handlers[id] = handler; lock.unlock()
-        return ObservationToken { [weak self] in
-            self?.lock.lock(); self?.handlers.removeValue(forKey: id); self?.lock.unlock()
+    init() {
+        // Состояние обновляется в главном потоке: его читают ViewModel перед запросами.
+        monitoringTask = Task { @MainActor [weak self] in
+            for await path in NWPathMonitor() {
+                self?.isConnected = path.status == .satisfied
+            }
         }
     }
 
-    private func update(_ connected: Bool) {
-        guard isConnected != connected else { return }
-        isConnected = connected
-        lock.lock(); let currentHandlers = Array(handlers.values); lock.unlock()
-        currentHandlers.forEach { $0(connected) }
+    deinit {
+        monitoringTask?.cancel()
     }
 
-    deinit { monitor.cancel() }
+    /// Каждая подписка получает свой монитор; он останавливается, когда подписчик отменяет задачу.
+    /// Повторяющиеся значения отбрасываются — приходят только изменения.
+    func updates() -> AsyncStream<Bool> {
+        AsyncStream { continuation in
+            let task = Task {
+                var lastValue: Bool?
+                for await path in NWPathMonitor() {
+                    let connected = path.status == .satisfied
+                    guard connected != lastValue else { continue }
+                    lastValue = connected
+                    continuation.yield(connected)
+                }
+                continuation.finish()
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
+    }
 }
