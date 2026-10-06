@@ -22,15 +22,21 @@ struct GetStoreSettingsUseCase {
         let defaults = StoreSettings.default
         return StoreSettings(
             maximumCartItemQuantity: settings.maximumCartItemQuantity,
-            imageLoadMaxAttempts: Self.value(settings.imageLoadMaxAttempts,
-                                             in: Self.allowedImageLoadAttempts,
-                                             default: defaults.imageLoadMaxAttempts),
-            imageMemoryCacheCapacityMB: Self.value(settings.imageMemoryCacheCapacityMB,
-                                                   in: Self.allowedImageMemoryCacheMB,
-                                                   default: defaults.imageMemoryCacheCapacityMB),
-            imageDiskCacheCapacityMB: Self.value(settings.imageDiskCacheCapacityMB,
-                                                 in: Self.allowedImageDiskCacheMB,
-                                                 default: defaults.imageDiskCacheCapacityMB)
+            imageLoadMaxAttempts: Self.value(
+                settings.imageLoadMaxAttempts,
+                in: Self.allowedImageLoadAttempts,
+                default: defaults.imageLoadMaxAttempts
+            ),
+            imageMemoryCacheCapacityMB: Self.value(
+                settings.imageMemoryCacheCapacityMB,
+                in: Self.allowedImageMemoryCacheMB,
+                default: defaults.imageMemoryCacheCapacityMB
+            ),
+            imageDiskCacheCapacityMB: Self.value(
+                settings.imageDiskCacheCapacityMB,
+                in: Self.allowedImageDiskCacheMB,
+                default: defaults.imageDiskCacheCapacityMB
+            )
         )
     }
 

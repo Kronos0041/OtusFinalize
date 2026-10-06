@@ -1,8 +1,13 @@
 import SwiftUI
 
 struct ProfileContentView: View {
-    let viewModel: ProfileViewModel
+    private let viewModel: ProfileViewModel
     let selectChange: (AccountChangeType) -> Void
+
+    init(viewModel: ProfileViewModel, selectChange: @escaping (AccountChangeType) -> Void) {
+        self.viewModel = viewModel
+        self.selectChange = selectChange
+    }
 
     var body: some View {
         List {

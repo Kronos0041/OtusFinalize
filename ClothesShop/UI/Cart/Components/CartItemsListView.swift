@@ -11,16 +11,18 @@ struct CartItemsListView: View {
         List {
             ForEach(items) { item in
                 CartSwipeDeleteRow(remove: { remove(item.id) }) {
-                    CartRowView(item: item,
-                                maximumQuantity: maximumQuantity,
-                                decrease: {
-                                    if item.quantity == 1 {
-                                        withAnimation { changeQuantity(item.id, -1) }
-                                    } else {
-                                        changeQuantity(item.id, -1)
-                                    }
-                                },
-                                increase: { changeQuantity(item.id, 1) })
+                    CartRowView(
+                        item: item,
+                        maximumQuantity: maximumQuantity,
+                        decrease: {
+                            if item.quantity == 1 {
+                                withAnimation { changeQuantity(item.id, -1) }
+                            } else {
+                                changeQuantity(item.id, -1)
+                            }
+                        },
+                        increase: { changeQuantity(item.id, 1) }
+                    )
                         .padding(.horizontal, 20)
                         .padding(.vertical, 20)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -47,9 +49,13 @@ struct CartItemsListView: View {
 #if DEBUG
 struct CartItemsListView_Previews: PreviewProvider {
     static var previews: some View {
-        CartItemsListView(items: CartPreviewData.items, total: CartPreviewData.total,
-                          maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
-                          changeQuantity: { _, _ in }, remove: { _ in })
+        CartItemsListView(
+            items: CartPreviewData.items,
+            total: CartPreviewData.total,
+            maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
+            changeQuantity: { _, _ in },
+            remove: { _ in }
+        )
             .background(Color.appWhite)
             .previewThemes()
     }

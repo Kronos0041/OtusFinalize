@@ -16,8 +16,12 @@ struct CartCheckoutView: View {
                             if let size = item.size {
                                 Text(SwiftGen.Cart.size(size)).foregroundColor(.appGray)
                             }
-                            Text(SwiftGen.Cart.lineTotal(item.quantity,
-                                PriceFormatter.string(from: item.product.price * item.quantity)))
+                            Text(
+                                SwiftGen.Cart.lineTotal(
+                                    item.quantity,
+                                    PriceFormatter.string(from: item.product.price * item.quantity)
+                                )
+                            )
                         }
                     }
                 }
@@ -51,8 +55,12 @@ struct CartCheckoutView: View {
 #if DEBUG
 struct CartCheckoutView_Previews: PreviewProvider {
     static var previews: some View {
-        CartCheckoutView(items: CartPreviewData.items, total: CartPreviewData.total,
-                         confirm: {}, cancel: {})
+        CartCheckoutView(
+            items: CartPreviewData.items,
+            total: CartPreviewData.total,
+            confirm: {},
+            cancel: {}
+        )
             .previewThemes()
     }
 }

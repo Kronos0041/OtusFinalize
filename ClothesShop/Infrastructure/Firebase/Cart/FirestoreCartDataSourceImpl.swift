@@ -14,8 +14,12 @@ final class FirestoreCartDataSourceImpl: CartRemoteDataSourceProtocol {
             guard let productID = data["productId"] as? String,
                   let quantity = data["quantity"] as? Int,
                   quantity > 0 else { return nil }
-            return CartRecordDTO(id: document.documentID, productID: productID,
-                                 size: data["size"] as? String, quantity: quantity)
+            return CartRecordDTO(
+                id: document.documentID,
+                productID: productID,
+                size: data["size"] as? String,
+                quantity: quantity
+            )
         }
     }
 

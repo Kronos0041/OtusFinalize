@@ -44,21 +44,31 @@ struct CartRowView: View {
 
     private var quantityControl: some View {
         HStack(spacing: 4) {
-            quantityButton("minus",
-                           label: item.quantity == 1 ? SwiftGen.Cart.delete : SwiftGen.Cart.decrease,
-                           disabled: false,
-                           action: decrease)
+            quantityButton(
+                "minus",
+                label: item.quantity == 1 ? SwiftGen.Cart.delete : SwiftGen.Cart.decrease,
+                disabled: false,
+                action: decrease
+            )
             Text(verbatim: "\(item.quantity)")
                 .font(.system(size: 16, weight: .semibold))
                 .monospacedDigit()
                 .frame(width: 26)
-            quantityButton("plus", label: SwiftGen.Cart.increase,
-                           disabled: item.quantity >= maximumQuantity, action: increase)
+            quantityButton(
+                "plus",
+                label: SwiftGen.Cart.increase,
+                disabled: item.quantity >= maximumQuantity,
+                action: increase
+            )
         }
     }
 
-    private func quantityButton(_ icon: String, label: String, disabled: Bool,
-                                action: @escaping () -> Void) -> some View {
+    private func quantityButton(
+        _ icon: String,
+        label: String,
+        disabled: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 14, weight: .medium))
@@ -77,21 +87,30 @@ struct CartRowView: View {
 struct CartRowView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            CartRowView(item: CartPreviewData.items[0],
-                        maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
-                        decrease: {}, increase: {})
+            CartRowView(
+                item: CartPreviewData.items[0],
+                maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
+                decrease: {},
+                increase: {}
+            )
                 .padding(20)
                 .previewLayout(.sizeThatFits)
                 .previewThemes("С размером")
-            CartRowView(item: CartPreviewData.items[1],
-                        maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
-                        decrease: {}, increase: {})
+            CartRowView(
+                item: CartPreviewData.items[1],
+                maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
+                decrease: {},
+                increase: {}
+            )
                 .padding(20)
                 .previewLayout(.sizeThatFits)
                 .previewThemes("Без размера")
-            CartRowView(item: CartPreviewData.items[0],
-                        maximumQuantity: CartPreviewData.items[0].quantity,
-                        decrease: {}, increase: {})
+            CartRowView(
+                item: CartPreviewData.items[0],
+                maximumQuantity: CartPreviewData.items[0].quantity,
+                decrease: {},
+                increase: {}
+            )
                 .padding(20)
                 .previewLayout(.sizeThatFits)
                 .previewThemes("Достигнут лимит")

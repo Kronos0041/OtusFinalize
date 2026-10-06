@@ -21,12 +21,14 @@ struct ViewModeView<Value, Content: View>: View {
     private let retry: (() -> Void)?
     private let content: (Value) -> Content
 
-    init(_ mode: ViewMode<Value>,
-         emptyTitle: String = SwiftGen.Common.empty,
-         emptySystemImage: String = "tray",
-         emptyMessage: String? = nil,
-         retry: (() -> Void)? = nil,
-         @ViewBuilder content: @escaping (Value) -> Content) {
+    init(
+        _ mode: ViewMode<Value>,
+        emptyTitle: String = SwiftGen.Common.empty,
+        emptySystemImage: String = "tray",
+        emptyMessage: String? = nil,
+        retry: (() -> Void)? = nil,
+        @ViewBuilder content: @escaping (Value) -> Content
+    ) {
         self.mode = mode
         self.emptyTitle = emptyTitle
         self.emptySystemImage = emptySystemImage
@@ -43,20 +45,26 @@ struct ViewModeView<Value, Content: View>: View {
         case .content(let value):
             content(value)
         case .empty:
-            StatePlaceholder(systemImage: emptySystemImage,
-                             title: emptyTitle,
-                             message: emptyMessage.map { Text($0) },
-                             retry: retry)
+            StatePlaceholder(
+                systemImage: emptySystemImage,
+                title: emptyTitle,
+                message: emptyMessage.map { Text($0) },
+                retry: retry
+            )
         case .noInternet:
-            StatePlaceholder(systemImage: "wifi.slash",
-                             title: SwiftGen.Network.offline,
-                             message: Text(SwiftGen.Network.reconnect),
-                             retry: retry)
+            StatePlaceholder(
+                systemImage: "wifi.slash",
+                title: SwiftGen.Network.offline,
+                message: Text(SwiftGen.Network.reconnect),
+                retry: retry
+            )
         case .error(let message):
-            StatePlaceholder(systemImage: "exclamationmark.triangle",
-                             title: SwiftGen.Network.loadFailed,
-                             message: Text(verbatim: message),
-                             retry: retry)
+            StatePlaceholder(
+                systemImage: "exclamationmark.triangle",
+                title: SwiftGen.Network.loadFailed,
+                message: Text(verbatim: message),
+                retry: retry
+            )
         }
     }
 }

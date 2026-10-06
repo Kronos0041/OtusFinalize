@@ -1,8 +1,7 @@
 import SwiftUI
 
 struct ProfileView: View {
-    /// Владеет ViewModel `MainTabView`; здесь только наблюдение.
-    let viewModel: ProfileViewModel
+    private let viewModel: ProfileViewModel
     @Environment(\.scenePhase) private var scenePhase
     @State private var accountChange: AccountChangeType?
 
@@ -13,10 +12,12 @@ struct ProfileView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                ViewModeView(viewModel.mode,
-                             emptyTitle: SwiftGen.Common.empty,
-                             emptySystemImage: "person.crop.circle",
-                             retry: viewModel.loadProfile) { _ in
+            ViewModeView(
+                viewModel.mode,
+                emptyTitle: SwiftGen.Common.empty,
+                emptySystemImage: "person.crop.circle",
+                retry: viewModel.loadProfile
+            ) { _ in
                     ProfileContentView(viewModel: viewModel, selectChange: open)
                 }
 

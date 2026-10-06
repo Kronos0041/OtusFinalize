@@ -13,19 +13,26 @@ struct CartView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                ViewModeView(cart.mode,
-                             emptyTitle: SwiftGen.Cart.empty,
-                             emptySystemImage: "bag",
-                             emptyMessage: SwiftGen.Cart.emptyHint,
-                             retry: reload) { _ in
-                    CartItemsListView(items: cart.items, total: cart.total,
-                                      maximumQuantity: cart.maximumQuantity,
-                                      changeQuantity: cart.changeQuantity,
-                                      remove: cart.remove)
+                ViewModeView(
+                    cart.mode,
+                    emptyTitle: SwiftGen.Cart.empty,
+                    emptySystemImage: "bag",
+                    emptyMessage: SwiftGen.Cart.emptyHint,
+                    retry: reload
+                ) { _ in
+                    CartItemsListView(
+                        items: cart.items,
+                        total: cart.total,
+                        maximumQuantity: cart.maximumQuantity,
+                        changeQuantity: cart.changeQuantity,
+                        remove: cart.remove
+                    )
                 }
-                CartActionsView(isEmpty: cart.items.isEmpty,
-                                checkout: { showCheckout = true },
-                                continueShopping: continueShopping)
+                CartActionsView(
+                    isEmpty: cart.items.isEmpty,
+                    checkout: { showCheckout = true },
+                    continueShopping: continueShopping
+                )
             }
             .background(Color.appWhite)
             .foregroundColor(.appBlack)
@@ -33,9 +40,12 @@ struct CartView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .sheet(isPresented: $showCheckout, onDismiss: checkoutDismissed) {
-            CartCheckoutView(items: cart.items, total: cart.total,
-                             confirm: confirmCheckout,
-                             cancel: { showCheckout = false })
+            CartCheckoutView(
+                items: cart.items,
+                total: cart.total,
+                confirm: confirmCheckout,
+                cancel: { showCheckout = false }
+            )
         }
         .alert(SwiftGen.Cart.demoSuccess, isPresented: $showSuccess) {
             Button(SwiftGen.Common.ok, role: .cancel) {}

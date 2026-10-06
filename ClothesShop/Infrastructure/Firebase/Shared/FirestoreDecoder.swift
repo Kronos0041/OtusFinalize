@@ -3,13 +3,17 @@ import os
 
 /// Общие операции чтения и записи Firestore с переводом ошибок в доменные.
 enum FirestoreDecoder {
-    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "ClothesShop",
-                                       category: "Firestore")
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "ClothesShop",
+        category: "Firestore"
+    )
 
     /// Читает коллекцию и декодирует документы. Некорректные документы пропускаются и логируются.
-    static func fetchAll<T: Decodable>(_ collection: FirestoreCollection,
-                                       from database: Firestore,
-                                       as type: T.Type) async throws -> [T] {
+    static func fetchAll<T: Decodable>(
+        _ collection: FirestoreCollection,
+        from database: Firestore,
+        as type: T.Type
+    ) async throws -> [T] {
         let snapshots = try await Self.documents(of: database.collection(collection.rawValue))
         return snapshots.compactMap { document in
             do {

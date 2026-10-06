@@ -2,9 +2,11 @@ import SwiftUI
 
 struct CartSwipeDeleteRow<Content: View>: View {
     private let actionWidth: CGFloat = 96
-    private let animation = Animation.interactiveSpring(response: 0.32,
-                                                         dampingFraction: 0.82,
-                                                         blendDuration: 0.15)
+    private let animation = Animation.interactiveSpring(
+        response: 0.32,
+        dampingFraction: 0.82,
+        blendDuration: 0.15
+    )
     let remove: () -> Void
     @ViewBuilder let content: Content
 

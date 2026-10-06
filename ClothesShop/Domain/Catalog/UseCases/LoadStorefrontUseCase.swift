@@ -5,9 +5,11 @@ struct LoadStorefrontUseCase {
     private let getCartUseCase: GetCartUseCase
     private let getStoreSettingsUseCase: GetStoreSettingsUseCase
 
-    init(getCatalogUseCase: GetCatalogUseCase,
-         getCartUseCase: GetCartUseCase,
-         getStoreSettingsUseCase: GetStoreSettingsUseCase) {
+    init(
+        getCatalogUseCase: GetCatalogUseCase,
+        getCartUseCase: GetCartUseCase,
+        getStoreSettingsUseCase: GetStoreSettingsUseCase
+    ) {
         self.getCatalogUseCase = getCatalogUseCase
         self.getCartUseCase = getCartUseCase
         self.getStoreSettingsUseCase = getStoreSettingsUseCase
@@ -17,9 +19,11 @@ struct LoadStorefrontUseCase {
         async let catalog = Self.result { try await getCatalogUseCase.execute() }
         async let cart = Self.result { try await getCartUseCase.execute(ownerID: ownerID) }
         async let settings = Self.result { try await getStoreSettingsUseCase.execute() }
-        return StorefrontLoadResult(catalog: await catalog,
-                                    cart: await cart,
-                                    settings: await settings)
+        return StorefrontLoadResult(
+            catalog: await catalog,
+            cart: await cart,
+            settings: await settings
+        )
     }
 
     private static func result<Value>(_ operation: () async throws -> Value) async -> Result<Value, Error> {
