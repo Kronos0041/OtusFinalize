@@ -7,6 +7,9 @@
     "seed": "node seed.mjs",
     "seed:dry": "node seed.mjs --dry-run",
     "seed:cli": "node seed-with-cli.mjs",
+    "settings:dry": "node seed.mjs --settings-only --dry-run",
+    "settings:seed": "node seed.mjs --settings-only",
+    "settings:seed:cli": "node seed-with-cli.mjs --settings-only",
     "images:prepare": "node prepare-images.mjs"
   },
   "engines": {

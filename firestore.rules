@@ -5,6 +5,11 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.email_verified == true;
     }
 
+    function maximumCartItemQuantity() {
+      return get(/databases/$(database)/documents/settings/store)
+        .data.maximumCartItemQuantity;
+    }
+
     // Демо-данные: читают только пользователи с подтверждённой почтой; пишет скрипт firebase/seed
     // (Admin SDK обходит правила).
     match /categories/{categoryId} {
@@ -22,9 +27,27 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    match /prof/{profileId} {
+    match /settings/{settingsId} {
       allow read: if hasVerifiedEmail();
       allow write: if false;
+    }
+
+    match /users/{uid}/cart/{cartItemId} {
+      allow read: if hasVerifiedEmail() && request.auth.uid == uid;
+      allow create, update: if hasVerifiedEmail()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly([
+          'productId', 'size', 'quantity', 'updatedAt'
+        ])
+        && request.resource.data.productId is string
+        && (request.resource.data.size == null || request.resource.data.size is string)
+        && request.resource.data.quantity is int
+        && request.resource.data.quantity >= 1
+        && (request.resource.data.quantity <= maximumCartItemQuantity()
+          || (resource != null
+            && request.resource.data.quantity < resource.data.quantity))
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if hasVerifiedEmail() && request.auth.uid == uid;
     }
   }
 }

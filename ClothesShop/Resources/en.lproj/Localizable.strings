@@ -48,8 +48,9 @@
 "cart.increase" = "Increase quantity";
 "cart.decrease" = "Decrease quantity";
 "cart.chooseSize" = "Select a size to add this product to your bag.";
-"cart.added" = "Added to your bag";
-"cart.quantityLimit" = "You can add up to 99 of each item.";
+"cart.added" = "Added";
+"cart.quantityLimit" = "You can add up to %lld of each item.";
+"cart.updateFailed" = "Couldn't update your bag. Please try again.";
 "cart.confirmDemo" = "Confirm demo order";
 "cart.demoHint" = "This is a demo. No payment will be charged and no order will be sent to the store.";
 "cart.demoSuccess" = "Demo order completed";

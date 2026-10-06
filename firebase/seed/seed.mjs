@@ -14,18 +14,20 @@ import { readFile } from 'node:fs/promises';
 
 const PROJECT_ID = 'test-6d334';
 const dryRun = process.argv.includes('--dry-run');
+const settingsOnly = process.argv.includes('--settings-only');
 
 const readJson = async (relativePath) =>
   JSON.parse(await readFile(new URL(relativePath, import.meta.url), 'utf8'));
 
 const catalog = await readJson('./catalog.json');
 const notifications = await readJson('./notifications.json');
+const settings = await readJson('./settings.json');
 
-validate(catalog, notifications);
-console.log(`Категорий: ${catalog.categories.length}, товаров: ${catalog.products.length}, уведомлений: ${notifications.length}`);
+validate(catalog, notifications, settings);
+console.log(`Категорий: ${catalog.categories.length}, товаров: ${catalog.products.length}, уведомлений: ${notifications.length}, лимит корзины: ${settings.maximumCartItemQuantity}`);
 
 if (dryRun) {
-  console.log('Dry run: файлы корректны, запись в Firestore не выполнялась.');
+  console.log(`Dry run: файлы корректны, запись ${settingsOnly ? 'настроек ' : ''}в Firestore не выполнялась.`);
   process.exit(0);
 }
 
@@ -35,6 +37,13 @@ const { initializeFirestore } = await import('firebase-admin/firestore');
 const app = initializeApp({ credential: applicationDefault(), projectId: PROJECT_ID });
 // HTTPS работает также в сетях, где gRPC/HTTP2 недоступен.
 const db = initializeFirestore(app, { preferRest: true });
+
+if (settingsOnly) {
+  await db.collection('settings').doc('store').set(settings);
+  console.log(`Готово: настройки магазина загружены в проект ${PROJECT_ID}.`);
+  process.exit(0);
+}
+
 const batch = db.batch();
 
 await syncCollection('categories', catalog.categories);
@@ -43,6 +52,7 @@ await syncCollection('products', catalog.products);
 for (const { docId, ...data } of notifications) {
   batch.set(db.collection('notificationList').doc(docId), data);
 }
+batch.set(db.collection('settings').doc('store'), settings);
 
 await batch.commit();
 console.log(`Готово: данные загружены в проект ${PROJECT_ID}.`);
@@ -60,7 +70,7 @@ async function syncCollection(name, items) {
   }
 }
 
-function validate(catalog, notifications) {
+function validate(catalog, notifications, settings) {
   const errors = [];
   const categoryIds = new Set(catalog.categories.map((c) => c.id));
   const productIds = new Set();
@@ -86,6 +96,11 @@ function validate(catalog, notifications) {
   }
   for (const n of notifications) {
     if (!n.docId || !n.title || !Number.isInteger(n.id)) errors.push(`Уведомление без docId/title/id: ${JSON.stringify(n)}`);
+  }
+  if (!Number.isInteger(settings.maximumCartItemQuantity)
+      || settings.maximumCartItemQuantity < 1
+      || settings.maximumCartItemQuantity > 999) {
+    errors.push('Настройка maximumCartItemQuantity должна быть целым числом от 1 до 999');
   }
   if (catalog.products.length > 450) errors.push('Слишком много документов для одного batch (лимит 500)');
 
