@@ -1,34 +1,35 @@
 import SwiftUI
+import UIKit
 
 /// Картинка по URL с повторной загрузкой.
 ///
-/// `AsyncImage` сам не повторяет запрос: если загрузка отменилась (ячейка пересоздалась
-/// или вкладка `TabView` перерисовалась в фоне), он навсегда остаётся в `.failure`.
-/// Здесь при появлении заглушки на экране загрузка запускается заново —
-/// не больше `imageLoadMaxAttempts` раз (из `settings/store`), повтор обычно отдаётся из `URLCache`.
+/// Загрузка привязана к жизненному циклу view: при уходе с экрана задача отменяется,
+/// а при возвращении запускается снова. Успешный ответ сохраняется в общем `URLCache`.
 struct RemoteImageView: View {
     let url: URL?
     var contentMode: ContentMode = .fill
     var placeholderIconSize: CGFloat = 36
 
     @Environment(\.imageLoadMaxAttempts) private var maxAttempts
-    @State private var attempt = 0
+    @State private var image: UIImage?
+    @State private var loadedURL: URL?
+    @State private var didFail = false
 
     var body: some View {
-        AsyncImage(url: url) { phase in
-            switch phase {
-            case .success(let image):
-                image.resizable().aspectRatio(contentMode: contentMode)
-            case .empty:
-                if url == nil { placeholder } else { loading }
-            case .failure:
-                placeholder.onAppear(perform: retryIfPossible)
-            @unknown default:
+        Group {
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: contentMode)
+            } else if url == nil || didFail {
                 placeholder
+            } else {
+                loading
             }
         }
-        // Новый идентификатор пересоздаёт AsyncImage и запускает загрузку заново.
-        .id(attempt)
+        .task(id: url) {
+            await loadImage(maxAttempts: maxAttempts)
+        }
     }
 
     private var loading: some View {
@@ -43,10 +44,47 @@ struct RemoteImageView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func retryIfPossible() {
-        guard url != nil, attempt < maxAttempts else { return }
-        // Откладываем, чтобы не менять состояние во время построения body.
-        DispatchQueue.main.async { attempt += 1 }
+    @MainActor
+    private func loadImage(maxAttempts: Int) async {
+        guard let url else { return }
+
+        if loadedURL != url {
+            image = nil
+            loadedURL = nil
+            didFail = false
+        }
+
+        guard image == nil else { return }
+
+        didFail = false
+        let attemptsCount = max(0, maxAttempts) + 1
+
+        for attempt in 0..<attemptsCount {
+            do {
+                let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
+                let (data, response) = try await URLSession.shared.data(for: request)
+                try Task.checkCancellation()
+
+                guard let response = response as? HTTPURLResponse,
+                      (200..<300).contains(response.statusCode),
+                      let loadedImage = UIImage(data: data) else {
+                    throw URLError(.cannotDecodeContentData)
+                }
+
+                image = loadedImage
+                loadedURL = url
+                return
+            } catch is CancellationError {
+                return
+            } catch {
+                guard attempt < attemptsCount - 1 else {
+                    didFail = true
+                    return
+                }
+
+                try? await Task.sleep(for: .milliseconds(250))
+            }
+        }
     }
 }
 
@@ -57,8 +95,10 @@ struct RemoteImageView_Previews: PreviewProvider {
                 .frame(width: 160, height: 160)
                 .previewLayout(.sizeThatFits)
                 .previewDisplayName("Без URL — заглушка")
-            RemoteImageView(url: URL(string: "https://test-6d334.web.app/products/glasses-navigator.png"),
-                            contentMode: .fit)
+            RemoteImageView(
+                url: URL(string: "https://test-6d334.web.app/products/glasses-navigator.png"),
+                contentMode: .fit
+            )
                 .frame(width: 160, height: 160)
                 .previewLayout(.sizeThatFits)
                 .previewDisplayName("Загрузка по URL")
