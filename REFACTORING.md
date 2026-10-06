@@ -17,13 +17,13 @@ ClothesShopApp ──► LoadPreview ─(AuthVM)──► AuthView ──► Tab
                                                                 │         ├─ CategoryCollectionView (чипы категорий)
                                                                 │         └─ CategoryCollectionTab (TabView-страницы)
                                                                 │              └─ MainGridView → MainGridCellView → ShopDescriptionView
-                                                                └─ ProfileView (MainViewModel) ───────── Firestore "prof"
+                                                                └─ ProfileView (MainViewModel) ───────── Firebase Auth
 ```
 
 Потоки данных:
 - **Каталог** — полностью захардкожен в инициализаторе `MainGrideVM` (~170 строк). Раздел «Все» собирался копированием товаров в `onAppear`, лайки хранились в каждой копии и синхронизировались вручную.
 - **Авторизация** — `AuthVM` ↔ `NetworkService` (FirebaseAuth). Корневой экран переключается по состоянию сессии: выход, ожидание подтверждения email, подтверждённый вход.
-- **Уведомления / профиль** — вью сами ходят в `DataBaseService` из `onAppear`.
+- **Уведомления / профиль** — вью сами ходят в Firebase-сервисы из `onAppear`.
 
 ## 2. Слабые места
 
@@ -69,8 +69,8 @@ ClothesShopApp ──► LoadPreview ─(AuthVM)──► AuthView ──► Tab
 | `style` хранится в модели категории | Вычисляется: `CategoryCollectionButtonEnum(isSelected:)` |
 | `@Binding` в ячейку + `index` для лайка | Ячейка получает значение и `isLiked`, действия — замыканиями |
 | `NetworkService` c `ResponseBody` | `register` / `signIn` / `observeAuthState` → `Result<Void, Error>` |
-| Парсинг внутри сервиса, классы с опционалами | `NotificationItem` / `UserProfile` — структуры с `init(document:)`; идентичность по `documentID` |
-| Загрузка профиля во вью | `MainViewModel.loadProfile()` |
+| Парсинг уведомлений внутри сервиса, классы с опционалами | `NotificationItem` — структура с `init(document:)`; идентичность по `documentID` |
+| Загрузка профиля во вью | `MainViewModel.loadProfile()` через Firebase Authentication |
 | Валидация e-mail во вью | `AuthVM.emailEditingChanged(isEditing:)`, `submit(mode:)` |
 | Кортеж `error: (value, state)` | `AuthBanner { message, isVisible }` |
 | Копия фона | `View/Elements/BlurredWallpaperBackground.swift` |
@@ -116,7 +116,7 @@ ClothesShopApp ──► LoadPreview ─(AuthVM)──► AuthView ──► Tab
 
 Что изменилось в проекте:
 - CocoaPods → **SPM**, Firebase Apple SDK **12.x** (FirebaseCore, FirebaseAuth, FirebaseFirestore; FirebaseUI убран). Для Firebase 12 нужен Xcode 16.2+.
-- Подключён Firebase-проект `test-6d334`: `.firebaserc`, `firebase.json`, `firestore.rules` (чтение `prof` и `notificationList` — только вошедшим, запись с клиента запрещена).
+- Подключён Firebase-проект `test-6d334`: `.firebaserc`, `firebase.json`, `firestore.rules` (чтение `notificationList` — только вошедшим, запись с клиента запрещена).
 - Авторизация: ошибки Firebase показываются в баннере, валидация перед отправкой, `isSubmitting` + спиннер, слушатель снимается в `deinit`, после входа корневой экран переключается по `isSignedIn` — вместо push-переходов.
 
 Актуальная схема входа:
@@ -157,17 +157,19 @@ Firebase теперь импортируют только `ClothesShopApp` и с
 
 Модели: `CatalogDTO` / `CategoryDTO` / `ProductDTO` декодируют документы Firestore через `document.data(as:)`; id товаров и категорий строковые (id документов Firestore), перечисление `CategoryName` удалено.
 
-## 8. Покупка: предлагаемая схема (ещё не реализована)
+## 8. Покупка: серверная корзина и дальнейший план
 
-Оплата в объём диплома не входит, поэтому «покупка» = корзина + оформление демо-заказа, который сохраняется в Firestore. Всё работает на тарифе Spark, Cloud Functions не нужны.
+Оплата в объём диплома не входит. Корзина уже сохраняется в Firestore; создание документа заказа остаётся дальнейшим этапом. Всё работает на тарифе Spark, Cloud Functions не нужны.
 
 **Данные** (всё под пользователем — правила простые):
 ```
-users/{uid}/cart/{productId_size}   { productId, size, quantity, addedAt }
+users/{uid}/cart/{productId_size}   { productId, size, quantity, updatedAt }
+settings/store                       { maximumCartItemQuantity }
 users/{uid}/orders/{orderId}        { items: [{ productId, title, size, quantity, price }],
                                       total, status: "created", createdAt }
 ```
 - В корзине — только ссылка на товар и количество: название и цена берутся из актуального каталога.
+- Максимальное количество одной позиции загружается из `settings/store` и проверяется также правилами Firestore.
 - В заказе — снимок позиций с ценой на момент оформления: заказ не должен меняться, если каталог обновится.
 
 **Правила:**
@@ -179,10 +181,10 @@ match /users/{uid}/{document=**} {
 Для заказа дополнительно проверять `status == "created"` и запрещать `update`/`delete`, чтобы клиент не мог «переписать» историю.
 
 **Клиент:**
-- `CartRepository` (Firestore) + `CartVM` на уровне `TabViewContent`, чтобы корзину видели каталог, карточка и вкладка корзины. Слушатель `addSnapshotListener` держит корзину в актуальном состоянии на всех экранах.
-- Карточка товара: выбор размера (обязателен, если `sizes` не пуст) и кнопка «Добавить» → `CartVM.add(product, size)`; повторное добавление увеличивает количество.
+- `FirestoreService` + `CartVM` находятся на уровне `TabViewContent`, поэтому корзину видят каталог, карточка и вкладка корзины. При входе каталог, настройки магазина и корзина читаются параллельно одним объединённым сценарием загрузки.
+- Карточка товара: выбор размера (обязателен, если `sizes` не пуст) и кнопка «Добавить» → `CartVM.add(product, size)`; добавленная позиция показывает «Добавлено» и удаляется повторным нажатием.
 - Третья вкладка «Корзина» с бейджем: позиции, ± количество, удаление, итог через `PriceFormatter`, кнопка «Оформить заказ (демо)».
-- Оформление: одна `WriteBatch` — создаёт документ заказа и удаляет позиции корзины, то есть всё атомарно. После успеха — экран «Заказ №… оформлен», история заказов в профиле.
+- Текущее демо-оформление очищает серверную корзину одной `WriteBatch`. Следующий этап — в том же batch создать документ заказа, затем показывать номер заказа и историю в профиле.
 - Итог считает клиент. В реальном магазине цену пересчитывал бы сервер (Cloud Function по `products`), но Functions требуют тарифа Blaze. Для диплома это стоит упомянуть как известное ограничение.
 
 ## 9. Четвёртый проход: режимы экрана, локализация, ресурсы
