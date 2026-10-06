@@ -5,14 +5,14 @@ import SwiftUI
 /// `AsyncImage` сам не повторяет запрос: если загрузка отменилась (ячейка пересоздалась
 /// или вкладка `TabView` перерисовалась в фоне), он навсегда остаётся в `.failure`.
 /// Здесь при появлении заглушки на экране загрузка запускается заново —
-/// не больше `maxAttempts` раз, повтор обычно отдаётся из `URLCache`.
+/// не больше `imageLoadMaxAttempts` раз (из `settings/store`), повтор обычно отдаётся из `URLCache`.
 struct RemoteImageView: View {
     let url: URL?
     var contentMode: ContentMode = .fill
     var placeholderIconSize: CGFloat = 36
 
+    @Environment(\.imageLoadMaxAttempts) private var maxAttempts
     @State private var attempt = 0
-    private let maxAttempts = 3
 
     var body: some View {
         AsyncImage(url: url) { phase in
@@ -54,10 +54,14 @@ struct RemoteImageView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             RemoteImageView(url: nil)
+                .frame(width: 160, height: 160)
+                .previewLayout(.sizeThatFits)
+                .previewDisplayName("Без URL — заглушка")
             RemoteImageView(url: URL(string: "https://test-6d334.web.app/products/glasses-navigator.png"),
                             contentMode: .fit)
+                .frame(width: 160, height: 160)
+                .previewLayout(.sizeThatFits)
+                .previewDisplayName("Загрузка по URL")
         }
-        .frame(width: 160, height: 160)
-        .previewLayout(.sizeThatFits)
     }
 }

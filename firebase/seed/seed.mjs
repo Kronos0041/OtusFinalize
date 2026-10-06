@@ -24,7 +24,7 @@ const notifications = await readJson('./notifications.json');
 const settings = await readJson('./settings.json');
 
 validate(catalog, notifications, settings);
-console.log(`Категорий: ${catalog.categories.length}, товаров: ${catalog.products.length}, уведомлений: ${notifications.length}, лимит корзины: ${settings.maximumCartItemQuantity}`);
+console.log(`Категорий: ${catalog.categories.length}, товаров: ${catalog.products.length}, уведомлений: ${notifications.length}, лимит корзины: ${settings.maximumCartItemQuantity}, повторов картинок: ${settings.imageLoadMaxAttempts}, кэш картинок: ${settings.imageMemoryCacheCapacityMB}/${settings.imageDiskCacheCapacityMB} МБ`);
 
 if (dryRun) {
   console.log(`Dry run: файлы корректны, запись ${settingsOnly ? 'настроек ' : ''}в Firestore не выполнялась.`);
@@ -97,10 +97,18 @@ function validate(catalog, notifications, settings) {
   for (const n of notifications) {
     if (!n.docId || !n.title || !Number.isInteger(n.id)) errors.push(`Уведомление без docId/title/id: ${JSON.stringify(n)}`);
   }
-  if (!Number.isInteger(settings.maximumCartItemQuantity)
-      || settings.maximumCartItemQuantity < 1
-      || settings.maximumCartItemQuantity > 999) {
-    errors.push('Настройка maximumCartItemQuantity должна быть целым числом от 1 до 999');
+  // Диапазоны совпадают с GetStoreSettingsUseCase в приложении.
+  const settingRanges = {
+    maximumCartItemQuantity: [1, 999],
+    imageLoadMaxAttempts: [0, 10],
+    imageMemoryCacheCapacityMB: [1, 512],
+    imageDiskCacheCapacityMB: [1, 2048],
+  };
+  for (const [key, [min, max]] of Object.entries(settingRanges)) {
+    const value = settings[key];
+    if (!Number.isInteger(value) || value < min || value > max) {
+      errors.push(`Настройка ${key} должна быть целым числом от ${min} до ${max}`);
+    }
   }
   if (catalog.products.length > 450) errors.push('Слишком много документов для одного batch (лимит 500)');
 
