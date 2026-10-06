@@ -225,7 +225,7 @@ match /users/{uid}/{document=**} {
 - Удалены `AppErrorService` (тексты ошибок — прямо в `AuthVM` через `String(localized:)`, отдельный тип не нужен) и `ElemantsTitle`.
 
 ### Цвета, картинки, шрифты
-- **Цвета** уже лежат в Assets (`AppColor/*.colorset`, со светлой и тёмной темой). `AppColor.swift` стал расширением `Color`: `.appBlack`, `.appGray` и т. д. — ровно те имена, которые Xcode генерирует сам. Генерация (`Color.appBlack` / `ColorResource`) требует iOS 17, а проект — iOS 15, поэтому пока расширение ручное. Чтобы имена не конфликтовали, в проекте выставлено `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = NO`. При переходе на iOS 17: удалить `AppColor.swift` и включить настройку — вызовы не меняются.
+- **Цвета** уже лежат в Assets (`AppColor/*.colorset`, со светлой и тёмной темой). `AppColor.swift` стал расширением `Color`: `.appBlack`, `.appGray` и т. д. — ровно те имена, которые Xcode генерирует сам. После перехода на iOS 17 ручной `AppColor.swift` удалён: Xcode генерирует `Color.appBlack` / `ColorResource` сам (`ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS` и `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS` = `YES`), вызовы не изменились.
 - **Картинки** тоже в Assets; в `AppImage` оставлены только иконки интерфейса. Фото товаров приходят из Firestore по имени.
 - **Шрифты** в Assets не кладут: каталог ассетов их не поддерживает, iOS регистрирует шрифты только из бандла через `UIAppFonts`. Сделано: `Font.babylonica(size:)` вместо строки имени, из `Info.plist` убран пустой элемент. Файл `Font/ofont.ru_Miama Nueva 2.ttf` не входит в проект и не используется — его можно удалить.
 
