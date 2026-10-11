@@ -21,10 +21,10 @@ struct ProductDetailsScreen: View {
         _selectedSize = State(initialValue: selectedSize)
     }
 
-    private var mode: ViewMode<CatalogItemViewModel> { products.productMode(id: productID) }
+    private var mode: ViewMode<CatalogItemUIModel> { products.productMode(id: productID) }
 
     /// Актуальная версия товара после обновления каталога.
-    private var current: CatalogItemViewModel? { products.product(id: productID) }
+    private var current: CatalogItemUIModel? { products.product(id: productID) }
 
     var body: some View {
         GeometryReader { geometry in
@@ -80,37 +80,45 @@ struct ProductDetailsScreen: View {
 
 #if DEBUG
 struct ProductDetailsScreen_Previews: PreviewProvider {
-    private static func content(_ product: CatalogItemViewModel, size: String?) -> some View {
-        let catalog = AppDIContainer.shared.makeCatalogViewModel()
-        catalog.applyPreview(products: [product])
-        return ProductDetailsScreen(productID: product.id, selectedSize: size)
-            .environment(catalog)
-            .environment(CartPreviewData.makeCart(isEmpty: true))
-    }
-
-    private static func state(_ mode: ViewMode<[CatalogSectionViewModel]>) -> some View {
-        let catalog = AppDIContainer.shared.makeCatalogViewModel()
-        catalog.applyPreview(mode: mode)
-        return ProductDetailsScreen(productID: CartPreviewData.items[0].product.id)
-            .environment(catalog)
-            .environment(CartPreviewData.makeCart(isEmpty: true))
-    }
-
     static var previews: some View {
         Group {
-            content(CartPreviewData.items[0].product, size: "M")
+            screen(PreviewData.watch.id, size: "M", .preview(cartItems: []))
                 .previewThemes("Размер выбран")
-            content(CartPreviewData.items[0].product, size: nil)
+            screen(PreviewData.watch.id, .preview(cartItems: []))
                 .previewThemes("Размер не выбран")
-            content(CartPreviewData.productWithoutSizes, size: nil)
+            screen(PreviewData.glasses.id, .preview(cartItems: []))
                 .previewThemes("Без размеров")
-            content(CartPreviewData.productLongContent, size: "XL")
+            screen(
+                PreviewData.longContent.id,
+                size: "XL",
+                .preview(catalog: .success(Catalog(
+                    categories: PreviewData.categories,
+                    products: [PreviewData.longContent]
+                )), cartItems: [])
+            )
                 .previewThemes("Длинные тексты")
-            state(.loading).previewThemes("Загрузка")
-            state(.empty).previewThemes("Товар не найден")
-            state(.noInternet).previewThemes("Нет сети")
-            state(.error("Сервер недоступен")).previewThemes("Ошибка")
+            screen(PreviewData.watch.id, .preview(catalog: .loading, cartItems: []))
+                .previewThemes("Загрузка")
+            screen("missing", .preview(cartItems: []))
+                .previewThemes("Товар не найден")
+            screen(PreviewData.watch.id, .preview(isConnected: false, cartItems: []))
+                .previewThemes("Нет сети")
+            screen(
+                PreviewData.watch.id,
+                .preview(catalog: .failure(PreviewError("Сервер недоступен")), cartItems: [])
+            )
+                .previewThemes("Ошибка")
         }
+    }
+
+    private static func screen(
+        _ productID: String,
+        size: String? = nil,
+        _ container: AppDIContainer
+    ) -> some View {
+        ProductDetailsScreen(productID: productID, selectedSize: size)
+            .environment(container.makeLoadedCatalogViewModel())
+            .environment(container.makeLoadedCartViewModel())
     }
 }
 #endif

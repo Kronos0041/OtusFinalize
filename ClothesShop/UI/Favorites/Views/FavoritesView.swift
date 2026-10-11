@@ -12,7 +12,7 @@ struct FavoritesView: View {
                 emptySystemImage: "heart",
                 retry: { products.reload() }
             ) { favorites in
-                let section = CatalogSectionViewModel(
+                let section = CatalogSectionUIModel(
                     id: "favorites",
                     category: .init(id: "favorites", title: SwiftGen.Favorites.title),
                     products: favorites
@@ -30,15 +30,18 @@ struct FavoritesView: View {
 #if DEBUG
 struct FavoritesView_Previews: PreviewProvider {
     static var previews: some View {
-        let viewModel = AppDIContainer.shared.makeCatalogViewModel()
-        viewModel.applyPreview(
-            products: CartPreviewData.items.map(\.product),
-            favoriteIDs: Set(CartPreviewData.items.map { $0.product.id })
-        )
-        return FavoritesView()
-            .environment(viewModel)
-            .environment(CartPreviewData.makeCart())
-            .previewThemes()
+        Group {
+            content(AppDIContainer.preview(favoriteIDs: Set(PreviewData.cartRecords.map(\.productID))))
+                .previewThemes("Есть избранное")
+            content(AppDIContainer.preview())
+                .previewThemes("Пусто")
+        }
+    }
+
+    private static func content(_ container: AppDIContainer) -> some View {
+        FavoritesView()
+            .environment(container.makeLoadedCatalogViewModel())
+            .environment(container.makeLoadedCartViewModel())
     }
 }
 #endif

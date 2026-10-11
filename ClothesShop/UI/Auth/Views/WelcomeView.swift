@@ -89,10 +89,12 @@ struct WelcomeView: View {
     }
 }
 
+#if DEBUG
 struct WelcomeView_Previews: PreviewProvider {
     static var previews: some View {
-        WelcomeView(viewModel: AppDIContainer.shared.makeAuthViewModel(),
-                    container: .shared)
+        let container = AppDIContainer.preview(authSession: .signedOut)
+        return WelcomeView(viewModel: container.makeAuthViewModel(), container: container)
             .previewThemes()
     }
 }
+#endif

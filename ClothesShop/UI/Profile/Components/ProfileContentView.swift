@@ -49,9 +49,10 @@ struct ProfileContentView: View {
 #if DEBUG
 struct ProfileContentView_Previews: PreviewProvider {
     static var previews: some View {
-        let viewModel = AppDIContainer.shared.makeProfileViewModel()
-        viewModel.applyPreview(profile: UserProfile(email: "alex@example.com"))
-        return ProfileContentView(viewModel: viewModel, selectChange: { _ in })
+        ProfileContentView(
+            viewModel: AppDIContainer.preview().makeLoadedProfileViewModel(),
+            selectChange: { _ in }
+        )
             .previewThemes()
     }
 }

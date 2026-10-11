@@ -21,9 +21,8 @@ struct UserProfileCell: View {
 #if DEBUG
 struct UserProfileCell_Previews: PreviewProvider {
     static var previews: some View {
-        let viewModel = AppDIContainer.shared.makeProfileViewModel()
-        viewModel.applyPreview(profile: UserProfile(email: "alex@example.com"))
-        return UserProfileCell().environment(viewModel)
+        UserProfileCell()
+            .environment(AppDIContainer.preview().makeLoadedProfileViewModel())
             .previewThemes()
     }
 }

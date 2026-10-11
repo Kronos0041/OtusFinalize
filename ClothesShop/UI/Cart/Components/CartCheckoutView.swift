@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CartCheckoutView: View {
-    let items: [CartItemViewModel]
+    let items: [CartItemUIModel]
     let total: Int
     let confirm: () -> Void
     let cancel: () -> Void
@@ -56,8 +56,8 @@ struct CartCheckoutView: View {
 struct CartCheckoutView_Previews: PreviewProvider {
     static var previews: some View {
         CartCheckoutView(
-            items: CartPreviewData.items,
-            total: CartPreviewData.total,
+            items: PreviewData.cartItems,
+            total: PreviewData.cartTotal,
             confirm: {},
             cancel: {}
         )

@@ -1,6 +1,6 @@
 import Foundation
 
-struct CatalogItemViewModel: Identifiable, Equatable, Codable {
+struct CatalogItemUIModel: Identifiable, Equatable, Codable {
     let id: String
     let categoryID: String
     let imageURL: URL?

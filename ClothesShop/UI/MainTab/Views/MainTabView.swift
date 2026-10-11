@@ -91,17 +91,10 @@ struct MainTabView: View {
 }
 
 #if DEBUG
-/// Пустые состояния без запросов к Firebase.
+/// Данные из fake-репозиториев, без запросов к Firebase.
 struct MainTabView_Previews: PreviewProvider {
     static var previews: some View {
-        let container = AppDIContainer.shared
-        let viewModel = container.makeMainTabViewModel()
-        viewModel.catalog.applyCatalog(.success(Catalog(categories: [], products: [])))
-        let notifications = container.makeNotificationsViewModel()
-        notifications.applyPreview(items: [])
-        let profile = container.makeProfileViewModel()
-        profile.applyPreview(profile: UserProfile(email: "preview@example.com"))
-        return MainTabView(viewModel: viewModel, notificationsViewModel: notifications, profileViewModel: profile)
+        MainTabView(container: .preview())
             .previewThemes()
     }
 }

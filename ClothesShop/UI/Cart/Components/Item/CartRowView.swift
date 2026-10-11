@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CartRowView: View {
-    let item: CartItemViewModel
+    let item: CartItemUIModel
     let maximumQuantity: Int
     let decrease: () -> Void
     let increase: () -> Void
@@ -88,7 +88,7 @@ struct CartRowView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             CartRowView(
-                item: CartPreviewData.items[0],
+                item: PreviewData.cartItems[0],
                 maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
                 decrease: {},
                 increase: {}
@@ -97,7 +97,7 @@ struct CartRowView_Previews: PreviewProvider {
                 .previewLayout(.sizeThatFits)
                 .previewThemes("С размером")
             CartRowView(
-                item: CartPreviewData.items[1],
+                item: PreviewData.cartItems[1],
                 maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
                 decrease: {},
                 increase: {}
@@ -106,8 +106,8 @@ struct CartRowView_Previews: PreviewProvider {
                 .previewLayout(.sizeThatFits)
                 .previewThemes("Без размера")
             CartRowView(
-                item: CartPreviewData.items[0],
-                maximumQuantity: CartPreviewData.items[0].quantity,
+                item: PreviewData.cartItems[0],
+                maximumQuantity: PreviewData.cartItems[0].quantity,
                 decrease: {},
                 increase: {}
             )

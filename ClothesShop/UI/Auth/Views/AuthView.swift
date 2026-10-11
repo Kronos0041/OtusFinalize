@@ -68,6 +68,7 @@ struct AuthView: View {
     }
 }
 
+#if DEBUG
 struct AuthView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -76,6 +77,7 @@ struct AuthView_Previews: PreviewProvider {
             AuthView(mode: .registration)
                 .previewThemes("Регистрация")
         }
-        .environment(AppDIContainer.shared.makeAuthViewModel())
+        .environment(AppDIContainer.preview(authSession: .signedOut).makeAuthViewModel())
     }
 }
+#endif

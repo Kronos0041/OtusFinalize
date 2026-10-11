@@ -23,9 +23,6 @@ final class ProfileViewModel {
     private let connectivityUseCase: ObserveConnectivityUseCase
     private let validator: AuthInputValidator
     @ObservationIgnored private var connectivityTask: Task<Void, Never>?
-    #if DEBUG
-    @ObservationIgnored private var isPreview = false
-    #endif
 
     init(profileUseCases: ProfileUseCases,
          signOutUseCase: SignOutUseCase,
@@ -47,18 +44,7 @@ final class ProfileViewModel {
         connectivityTask?.cancel()
     }
 
-    #if DEBUG
-    func applyPreview(profile: UserProfile) {
-        isPreview = true
-        user = profile
-        mode = .content(profile)
-    }
-    #endif
-
     func loadProfile() {
-        #if DEBUG
-        if isPreview { return }
-        #endif
         guard !isRefreshing, !isSubmitting else { return }
         guard connectivityUseCase.isConnected else {
             profileError = SwiftGen.Network.offline
@@ -88,12 +74,6 @@ final class ProfileViewModel {
             return false
         }
         formError = nil
-        #if DEBUG
-        if isPreview {
-            resetForm()
-            return true
-        }
-        #endif
         isSubmitting = true
         defer { isSubmitting = false }
         let submittedEmail = newEmail
@@ -116,9 +96,6 @@ final class ProfileViewModel {
     }
 
     func signOut() {
-        #if DEBUG
-        if isPreview { return }
-        #endif
         guard !isSubmitting else { return }
         do {
             try signOutUseCase.execute()

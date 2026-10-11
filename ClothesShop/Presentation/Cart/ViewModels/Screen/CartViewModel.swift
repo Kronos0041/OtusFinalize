@@ -4,8 +4,8 @@ import Observation
 @MainActor
 @Observable
 final class CartViewModel {
-    private(set) var items: [CartItemViewModel] = []
-    private(set) var mode: ViewMode<[CartItemViewModel]> = .loading
+    private(set) var items: [CartItemUIModel] = []
+    private(set) var mode: ViewMode<[CartItemUIModel]> = .loading
     private(set) var errorMessage: String?
     private(set) var isLoaded = false
     private(set) var maximumQuantity = StoreSettings.default.maximumCartItemQuantity
@@ -20,12 +20,9 @@ final class CartViewModel {
     private let cartUseCases: CartUseCases
     private let getSettingsUseCase: GetStoreSettingsUseCase
 
-    @ObservationIgnored private var catalogProducts: [CatalogItemViewModel] = []
+    @ObservationIgnored private var catalogProducts: [CatalogItemUIModel] = []
     @ObservationIgnored private var pendingItemIDs: Set<String> = []
     @ObservationIgnored private var hasLoadedSettings = false
-    #if DEBUG
-    @ObservationIgnored private var isPreview = false
-    #endif
 
     init(ownerID: String?,
          cartUseCases: CartUseCases,
@@ -33,20 +30,12 @@ final class CartViewModel {
         self.ownerID = ownerID
         self.cartUseCases = cartUseCases
         self.getSettingsUseCase = getSettingsUseCase
-        #if DEBUG
-        if ownerID == nil {
-            isPreview = true
-            isLoaded = true
-            hasLoadedSettings = true
-            mode = .empty
-        }
-        #endif
     }
 
     // MARK: - Данные
 
     /// Актуальные товары каталога: из них берутся названия и цены позиций.
-    func updateCatalog(_ products: [CatalogItemViewModel]) {
+    func updateCatalog(_ products: [CatalogItemUIModel]) {
         catalogProducts = products
         let byID = Dictionary(products.map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
         items = items.map { item in
@@ -78,7 +67,7 @@ final class CartViewModel {
             let products = Dictionary(catalogProducts.map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
             items = records.compactMap { record in
                 products[record.productID].map {
-                    CartItemViewModel(id: record.id, product: $0, size: record.size, quantity: record.quantity)
+                    CartItemUIModel(id: record.id, product: $0, size: record.size, quantity: record.quantity)
                 }
             }
             isLoaded = hasLoadedSettings
@@ -113,19 +102,19 @@ final class CartViewModel {
 
     // MARK: - Позиции
 
-    func item(productID: String, size: String?) -> CartItemViewModel? {
+    func item(productID: String, size: String?) -> CartItemUIModel? {
         items.first { $0.product.id == productID && $0.size == size }
     }
 
     /// Можно ли добавить товар с выбранным размером или убрать уже добавленную позицию.
-    func canToggle(_ product: CatalogItemViewModel, size: String?) -> Bool {
+    func canToggle(_ product: CatalogItemUIModel, size: String?) -> Bool {
         guard isLoaded else { return false }
         if item(productID: product.id, size: size) != nil { return true }
         return isValid(size: size, for: product)
     }
 
     /// Добавляет товар или убирает уже добавленную позицию с тем же размером.
-    func toggle(_ product: CatalogItemViewModel, size: String?) {
+    func toggle(_ product: CatalogItemUIModel, size: String?) {
         if let existing = item(productID: product.id, size: size) {
             remove(existing.id)
         } else {
@@ -133,13 +122,13 @@ final class CartViewModel {
         }
     }
 
-    func add(_ product: CatalogItemViewModel, size: String?) {
+    func add(_ product: CatalogItemUIModel, size: String?) {
         guard isValid(size: size, for: product) else { return }
         if let existing = item(productID: product.id, size: size) {
             guard existing.quantity < maximumQuantity else { return }
             save(existing, product: product, quantity: existing.quantity + 1)
         } else {
-            let item = CartItemViewModel(
+            let item = CartItemUIModel(
                 id: Self.positionID(productID: product.id, size: size),
                 product: product,
                 size: size,
@@ -162,13 +151,6 @@ final class CartViewModel {
 
     func remove(_ id: String) {
         guard items.contains(where: { $0.id == id }), !pendingItemIDs.contains(id) else { return }
-        #if DEBUG
-        if isPreview {
-            items.removeAll { $0.id == id }
-            updateMode()
-            return
-        }
-        #endif
         guard let ownerID else { return }
         pendingItemIDs.insert(id)
         Task { [weak self] in await self?.performRemove(id, ownerID: ownerID) }
@@ -177,13 +159,6 @@ final class CartViewModel {
     /// Очищает корзину. Возвращает `true`, если позиции удалены.
     func clear() async -> Bool {
         guard !items.isEmpty, pendingItemIDs.isEmpty else { return items.isEmpty }
-        #if DEBUG
-        if isPreview {
-            items = []
-            updateMode()
-            return true
-        }
-        #endif
         guard let ownerID else { return false }
         let ids = items.map(\.id)
         pendingItemIDs.formUnion(ids)
@@ -206,20 +181,14 @@ final class CartViewModel {
 
     // MARK: - Вспомогательное
 
-    private func isValid(size: String?, for product: CatalogItemViewModel) -> Bool {
+    private func isValid(size: String?, for product: CatalogItemUIModel) -> Bool {
         if product.sizes.isEmpty { return size == nil }
         guard let size else { return false }
         return product.sizes.contains(size)
     }
 
-    private func save(_ item: CartItemViewModel, product: CatalogItemViewModel, quantity: Int) {
+    private func save(_ item: CartItemUIModel, product: CatalogItemUIModel, quantity: Int) {
         guard !pendingItemIDs.contains(item.id) else { return }
-        #if DEBUG
-        if isPreview {
-            applySavedItem(item, product: product, quantity: quantity)
-            return
-        }
-        #endif
         guard let ownerID, isLoaded else { return }
         pendingItemIDs.insert(item.id)
         Task { [weak self] in
@@ -228,8 +197,8 @@ final class CartViewModel {
     }
 
     private func performSave(
-        _ item: CartItemViewModel,
-        product: CatalogItemViewModel,
+        _ item: CartItemUIModel,
+        product: CatalogItemUIModel,
         quantity: Int,
         ownerID: String
     ) async {
@@ -256,12 +225,12 @@ final class CartViewModel {
         }
     }
 
-    private func applySavedItem(_ item: CartItemViewModel, product: CatalogItemViewModel, quantity: Int) {
+    private func applySavedItem(_ item: CartItemUIModel, product: CatalogItemUIModel, quantity: Int) {
         if let index = items.firstIndex(where: { $0.id == item.id }) {
             items[index].product = product
             items[index].quantity = quantity
         } else {
-            items.append(CartItemViewModel(id: item.id, product: product, size: item.size, quantity: quantity))
+            items.append(CartItemUIModel(id: item.id, product: product, size: item.size, quantity: quantity))
         }
         updateMode()
     }

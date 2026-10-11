@@ -31,11 +31,13 @@ struct CategoryCollectionTab: View {
     }
 }
 
+#if DEBUG
 struct CategoryCollectionTab_Previews: PreviewProvider {
     static var previews: some View {
         CategoryCollectionTab()
-            .environment(AppDIContainer.shared.makeCatalogViewModel())
+            .environment(AppDIContainer.preview().makeLoadedCatalogViewModel())
             .environment(Router<CatalogRoute>())
             .previewThemes()
     }
 }
+#endif

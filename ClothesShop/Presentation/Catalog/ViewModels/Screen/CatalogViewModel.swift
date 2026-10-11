@@ -4,9 +4,9 @@ import Observation
 @MainActor
 @Observable
 final class CatalogViewModel {
-    private(set) var mode: ViewMode<[CatalogSectionViewModel]> = .loading
+    private(set) var mode: ViewMode<[CatalogSectionUIModel]> = .loading
     /// Разделы с учётом поиска. Пересчитываются только при смене каталога или запроса.
-    private(set) var filteredSections: [CatalogSectionViewModel] = []
+    private(set) var filteredSections: [CatalogSectionUIModel] = []
     var selectedCategoryIndex = 0
     var searchText = "" {
         didSet { updateFilteredSections() }
@@ -14,20 +14,20 @@ final class CatalogViewModel {
     private(set) var favoriteProductIDs: Set<String>
 
     /// Вызывается при каждом обновлении каталога. Через него корзина получает актуальные названия и цены.
-    @ObservationIgnored var onProductsUpdate: (([CatalogItemViewModel]) -> Void)?
+    @ObservationIgnored var onProductsUpdate: (([CatalogItemUIModel]) -> Void)?
 
-    var sections: [CatalogSectionViewModel] { mode.content ?? [] }
+    var sections: [CatalogSectionUIModel] { mode.content ?? [] }
 
     /// Все товары каталога (раздел «Все»).
-    var allProducts: [CatalogItemViewModel] { sections.first?.products ?? [] }
+    var allProducts: [CatalogItemUIModel] { sections.first?.products ?? [] }
 
     var isSearching: Bool { !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
 
-    private var favoriteProducts: [CatalogItemViewModel] {
+    private var favoriteProducts: [CatalogItemUIModel] {
         allProducts.filter { favoriteProductIDs.contains($0.id) }
     }
 
-    var favoritesMode: ViewMode<[CatalogItemViewModel]> {
+    var favoritesMode: ViewMode<[CatalogItemUIModel]> {
         switch mode {
         case .loading: return .loading
         case .content: return favoriteProducts.isEmpty ? .empty : .content(favoriteProducts)
@@ -46,9 +46,6 @@ final class CatalogViewModel {
     @ObservationIgnored private var catalog: Catalog?
     @ObservationIgnored private var requestInFlight = false
     @ObservationIgnored private var connectivityTask: Task<Void, Never>?
-    #if DEBUG
-    @ObservationIgnored private var isPreview = false
-    #endif
 
     init(getCatalogUseCase: GetCatalogUseCase,
          searchProductsUseCase: SearchProductsUseCase,
@@ -77,27 +74,6 @@ final class CatalogViewModel {
         connectivityTask?.cancel()
     }
 
-    #if DEBUG
-    func applyPreview(products: [CatalogItemViewModel], favoriteIDs: Set<String> = []) {
-        isPreview = true
-        favoriteProductIDs = favoriteIDs
-        let section = CatalogSectionViewModel(
-            id: CatalogSectionViewModel.allCategory.id,
-            category: CatalogSectionViewModel.allCategory,
-            products: products
-        )
-        mode = .content([section])
-        updateFilteredSections()
-    }
-
-    /// Фиксирует произвольное состояние экрана (loading / empty / noInternet / error) для превью.
-    func applyPreview(mode: ViewMode<[CatalogSectionViewModel]>) {
-        isPreview = true
-        self.mode = mode
-        updateFilteredSections()
-    }
-    #endif
-
     func loadIfNeeded() {
         if mode.content == nil { reload() }
     }
@@ -112,9 +88,6 @@ final class CatalogViewModel {
     }
 
     func load() async {
-        #if DEBUG
-        if isPreview { return }
-        #endif
         guard !requestInFlight else { return }
         guard connectivityUseCase.isConnected else {
             if mode.content == nil { mode = .noInternet }
@@ -134,7 +107,7 @@ final class CatalogViewModel {
         // Ошибка повторной загрузки не стирает уже показанный каталог.
         if case .failure = result, mode.content != nil { return }
         if case .success(let catalog) = result { self.catalog = catalog }
-        mode = .make(from: result.map(CatalogSectionViewModel.sections)) {
+        mode = .make(from: result.map(CatalogSectionUIModel.sections)) {
             $0.allSatisfy { $0.products.isEmpty }
         }
         if selectedCategoryIndex >= sections.count { selectedCategoryIndex = 0 }
@@ -142,11 +115,11 @@ final class CatalogViewModel {
         if mode.content != nil { onProductsUpdate?(allProducts) }
     }
 
-    func product(id: String) -> CatalogItemViewModel? {
+    func product(id: String) -> CatalogItemUIModel? {
         allProducts.first { $0.id == id }
     }
 
-    func productMode(id: String) -> ViewMode<CatalogItemViewModel> {
+    func productMode(id: String) -> ViewMode<CatalogItemUIModel> {
         switch mode {
         case .loading: return .loading
         case .content: return product(id: id).map(ViewMode.content) ?? .empty
@@ -156,7 +129,7 @@ final class CatalogViewModel {
         }
     }
 
-    func isFavorite(_ product: CatalogItemViewModel) -> Bool {
+    func isFavorite(_ product: CatalogItemUIModel) -> Bool {
         favoriteProductIDs.contains(product.id)
     }
 
@@ -164,7 +137,7 @@ final class CatalogViewModel {
         selectedCategoryIndex == index
     }
 
-    func toggleFavorite(_ product: CatalogItemViewModel) {
+    func toggleFavorite(_ product: CatalogItemUIModel) {
         guard let ownerID else { return }
         favoriteProductIDs = toggleFavoriteUseCase.execute(
             productID: product.id,

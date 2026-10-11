@@ -43,14 +43,30 @@ struct CatalogView: View {
     }
 }
 
+#if DEBUG
 struct CatalogView_Previews: PreviewProvider {
     static var previews: some View {
+        Group {
+            content(AppDIContainer.preview(favoriteIDs: [PreviewData.watch.id]))
+                .previewThemes("Каталог")
+            content(AppDIContainer.preview(catalog: .loading))
+                .previewThemes("Загрузка")
+            content(AppDIContainer.preview(catalog: .success(PreviewData.emptyCatalog)))
+                .previewThemes("Пусто")
+            content(AppDIContainer.preview(isConnected: false))
+                .previewThemes("Нет сети")
+            content(AppDIContainer.preview(catalog: .failure(PreviewError("Сервер недоступен"))))
+                .previewThemes("Ошибка")
+        }
+    }
+
+    private static func content(_ container: AppDIContainer) -> some View {
         CatalogView(
-            notifications: AppDIContainer.shared.makeNotificationsViewModel(),
+            notifications: container.makeNotificationsViewModel(),
             openCart: {}
         )
-            .environment(AppDIContainer.shared.makeCatalogViewModel())
-            .environment(CartPreviewData.makeCart())
-            .previewThemes()
+            .environment(container.makeLoadedCatalogViewModel())
+            .environment(container.makeLoadedCartViewModel())
     }
 }
+#endif

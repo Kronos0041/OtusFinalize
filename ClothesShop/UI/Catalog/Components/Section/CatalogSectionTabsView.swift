@@ -14,11 +14,13 @@ struct CatalogSectionTabsView: View {
     }
 }
 
+#if DEBUG
 struct CatalogSectionTabsView_Previews: PreviewProvider {
     static var previews: some View {
         CatalogSectionTabsView()
-            .environment(AppDIContainer.shared.makeCatalogViewModel())
+            .environment(AppDIContainer.preview().makeLoadedCatalogViewModel())
             .environment(Router<CatalogRoute>())
             .previewThemes()
     }
 }
+#endif

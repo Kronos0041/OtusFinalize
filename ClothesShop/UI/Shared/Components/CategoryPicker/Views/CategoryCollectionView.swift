@@ -13,7 +13,8 @@ struct CategoryCollectionView: View {
 
     private var itemWidth: CGFloat {
         let count = max(products.sections.count, 1)
-        return max(70, (getWidth() - 20) / CGFloat(count))
+        let availableWidth = getWidth() - ComponentConstants.Layout.contentHorizontalInset
+        return max(ComponentConstants.CategoryPicker.minItemWidth, availableWidth / CGFloat(count))
     }
 
     var body: some View {
@@ -27,7 +28,7 @@ struct CategoryCollectionView: View {
                             isSelected: products.isSelected(index),
                             width: itemWidth
                         ) {
-                            withAnimation(.easeInOut(duration: 0.2)) {
+                            withAnimation(.easeInOut(duration: ComponentConstants.Animation.categorySwitchDuration)) {
                                 products.selectedCategoryIndex = index
                             }
                         }
@@ -36,7 +37,7 @@ struct CategoryCollectionView: View {
                 }
             }
             .onChange(of: products.selectedCategoryIndex) { _, selected in
-                withAnimation(.easeInOut(duration: 0.2)) {
+                withAnimation(.easeInOut(duration: ComponentConstants.Animation.categorySwitchDuration)) {
                     scroll.scrollTo(selected, anchor: .center)
                 }
             }
@@ -44,10 +45,30 @@ struct CategoryCollectionView: View {
     }
 }
 
+#if DEBUG
 struct CategoryCollectionView_Previews: PreviewProvider {
     static var previews: some View {
-        CategoryCollectionView()
-            .environment(AppDIContainer.shared.makeCatalogViewModel())
-            .previewThemes()
+        Group {
+            CategoryCollectionView()
+                .environment(makeViewModel(PreviewData.catalog, selected: 1))
+                .previewLayout(.sizeThatFits)
+                .previewThemes("Помещаются на экран")
+            CategoryCollectionView()
+                .environment(makeViewModel(
+                    PreviewData.catalog(categoryTitles: [
+                        "Часы", "Ручки", "Очки", "Чемоданы", "Кожгалантерея", "Украшения"
+                    ]),
+                    selected: 5
+                ))
+                .previewLayout(.sizeThatFits)
+                .previewThemes("Скролл")
+        }
+    }
+
+    private static func makeViewModel(_ catalog: Catalog, selected: Int) -> CatalogViewModel {
+        let viewModel = AppDIContainer.preview(catalog: .success(catalog)).makeLoadedCatalogViewModel()
+        viewModel.selectedCategoryIndex = selected
+        return viewModel
     }
 }
+#endif

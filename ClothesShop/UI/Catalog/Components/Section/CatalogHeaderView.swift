@@ -22,11 +22,13 @@ struct CatalogHeaderView: View {
     }
 }
 
+#if DEBUG
 struct CatalogHeaderView_Previews: PreviewProvider {
     static var previews: some View {
         CatalogHeaderView()
-            .environment(AppDIContainer.shared.makeCatalogViewModel())
+            .environment(AppDIContainer.preview().makeLoadedCatalogViewModel())
             .previewLayout(.sizeThatFits)
             .previewThemes()
     }
 }
+#endif

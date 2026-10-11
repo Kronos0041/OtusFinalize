@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CategoryCollectionCellView: View {
-    let item: CategoryItemViewModel
+    let item: CategoryUIModel
     let isSelected: Bool
     let width: CGFloat
     let onTap: () -> Void
@@ -19,17 +19,17 @@ struct CategoryCollectionCellView: View {
 
     var body: some View {
         Button(action: onTap) {
-            VStack(spacing: 8) {
+            VStack(spacing: ComponentConstants.CategoryPicker.titleIndicatorSpacing) {
                 Text(item.title)
-                    .font(.system(size: 16, weight: isSelected ? .semibold : .regular))
+                    .font(.system(size: ComponentConstants.CategoryPicker.fontSize, weight: isSelected ? .semibold : .regular))
                     .frame(maxWidth: .infinity)
 
                 Rectangle()
                     .fill(style.indicatorColor)
-                    .frame(height: 2)
+                    .frame(height: ComponentConstants.CategoryPicker.indicatorHeight)
             }
             .foregroundColor(style.foregroundColor)
-            .frame(width: width, height: 48)
+            .frame(width: width, height: ComponentConstants.CategoryPicker.itemHeight)
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -39,7 +39,7 @@ struct CategoryCollectionCellView: View {
 struct CategoryCollectionCellView_Previews: PreviewProvider {
     static var previews: some View {
         CategoryCollectionCellView(
-            item: CatalogSectionViewModel.allCategory,
+            item: CatalogSectionUIModel.allCategory,
             isSelected: true,
             width: 80
         ) {}

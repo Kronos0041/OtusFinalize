@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ProductDetailsView: View {
-    let product: CatalogItemViewModel
+    let product: CatalogItemUIModel
     @Binding var selectedSize: String?
     let imageSize: CGFloat
 
@@ -68,7 +68,7 @@ struct ProductDetailsView: View {
 #if DEBUG
 struct ProductDetailsView_Previews: PreviewProvider {
     /// На экране view лежит внутри `List`; в превью нужен свой `ScrollView`, иначе длинный контент обрезается.
-    private static func details(_ product: CatalogItemViewModel, size: String?) -> some View {
+    private static func details(_ product: CatalogItemUIModel, size: String?) -> some View {
         ScrollView {
             ProductDetailsView(product: product, selectedSize: .constant(size), imageSize: 340)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -77,15 +77,15 @@ struct ProductDetailsView_Previews: PreviewProvider {
 
     static var previews: some View {
         Group {
-            details(CartPreviewData.items[0].product, size: "M")
+            details(PreviewData.cartItems[0].product, size: "M")
                 .previewThemes("Размер выбран")
-            details(CartPreviewData.items[0].product, size: nil)
+            details(PreviewData.cartItems[0].product, size: nil)
                 .previewThemes("Размер не выбран")
-            details(CartPreviewData.productWithoutSizes, size: nil)
+            details(PreviewData.productWithoutSizes, size: nil)
                 .previewThemes("Без размеров (sizes.isEmpty)")
-            details(CartPreviewData.productWithoutImage, size: "M")
+            details(PreviewData.productWithoutImage, size: "M")
                 .previewThemes("Без картинки")
-            details(CartPreviewData.productLongContent, size: "XL")
+            details(PreviewData.productLongContent, size: "XL")
                 .previewThemes("Длинные тексты, много размеров")
         }
     }

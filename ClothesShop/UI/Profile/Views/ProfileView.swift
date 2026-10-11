@@ -68,10 +68,12 @@ struct ProfileView: View {
 #if DEBUG
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        let viewModel = AppDIContainer.shared.makeProfileViewModel()
-        viewModel.applyPreview(profile: UserProfile(email: "alex@example.com"))
-        return ProfileView(viewModel: viewModel)
-            .previewThemes()
+        Group {
+            ProfileView(viewModel: AppDIContainer.preview().makeProfileViewModel())
+                .previewThemes("Профиль")
+            ProfileView(viewModel: AppDIContainer.preview(isConnected: false).makeProfileViewModel())
+                .previewThemes("Нет сети")
+        }
     }
 }
 #endif

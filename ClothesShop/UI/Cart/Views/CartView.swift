@@ -73,9 +73,21 @@ struct CartView: View {
 #if DEBUG
 struct CartView_Previews: PreviewProvider {
     static var previews: some View {
+        Group {
+            content(AppDIContainer.preview())
+                .previewThemes("С товарами")
+            content(AppDIContainer.preview(cartItems: []))
+                .previewThemes("Пустая")
+            content(AppDIContainer.preview(settings: .loading))
+                .previewThemes("Загрузка")
+            content(AppDIContainer.preview(settings: .failure(PreviewError("Сервер недоступен"))))
+                .previewThemes("Ошибка")
+        }
+    }
+
+    private static func content(_ container: AppDIContainer) -> some View {
         CartView(continueShopping: {}, reload: {})
-            .environment(CartPreviewData.makeCart())
-            .previewThemes()
+            .environment(container.makeLoadedCartViewModel())
     }
 }
 #endif

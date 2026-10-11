@@ -43,24 +43,17 @@ struct NotificationsView: View {
 #if DEBUG
 struct NotificationsView_Previews: PreviewProvider {
     static var previews: some View {
-        let viewModel = AppDIContainer.shared.makeNotificationsViewModel()
-        let items = [
-            Notification(
-                id: "new-collection",
-                remoteID: 1,
-                title: "Новая коллекция",
-                description: "Часы и аксессуары уже в каталоге."
-            ),
-            Notification(
-                id: "favorites",
-                remoteID: 2,
-                title: "Ваши избранные товары",
-                description: "Сохранённые товары всегда под рукой."
-            )
-        ]
-        viewModel.applyPreview(items: items, readIDs: ["favorites"])
-        return NotificationsView(notifications: viewModel)
-            .previewThemes()
+        Group {
+            NotificationsView(notifications: AppDIContainer.preview(readNotificationIDs: ["favorites"])
+                .makeNotificationsViewModel())
+                .previewThemes("Список")
+            NotificationsView(notifications: AppDIContainer.preview(notifications: .success([]))
+                .makeNotificationsViewModel())
+                .previewThemes("Пусто")
+            NotificationsView(notifications: AppDIContainer.preview(isConnected: false)
+                .makeNotificationsViewModel())
+                .previewThemes("Нет сети")
+        }
     }
 }
 #endif

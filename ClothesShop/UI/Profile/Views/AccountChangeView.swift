@@ -74,12 +74,10 @@ struct AccountChangeView: View {
     }
 }
 
-
 #if DEBUG
 struct AccountChangeView_Previews: PreviewProvider {
     static var previews: some View {
-        let viewModel = AppDIContainer.shared.makeProfileViewModel()
-        viewModel.applyPreview(profile: UserProfile(email: "alex@example.com"))
+        let viewModel = AppDIContainer.preview().makeLoadedProfileViewModel()
         return Group {
             AccountChangeView(change: .password, viewModel: viewModel, close: {})
                 .previewThemes("Смена пароля")

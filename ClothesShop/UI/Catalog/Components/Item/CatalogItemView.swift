@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Карточка товара: фото, избранное, метка, название, цена и краткое описание.
 struct CatalogItemView: View {
-    let item: CatalogItemViewModel
+    let item: CatalogItemUIModel
     let isLiked: Bool
     let width: CGFloat
 
@@ -20,6 +20,8 @@ struct CatalogItemView: View {
         VStack(alignment: .leading, spacing: 8) {
             productImage
                 .frame(width: width, height: width)
+                .clipped()
+                .contentShape(Rectangle())
                 .overlay(alignment: .topTrailing) { likeButton }
 
             if let badge = item.badge {
@@ -51,6 +53,7 @@ struct CatalogItemView: View {
         }
         .padding(.bottom, 10)
         .frame(width: width, alignment: .topLeading)
+        .frame(maxHeight: .infinity, alignment: .top)
         .background(Color.appGray.opacity(0.08))
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .foregroundColor(.appBlack)
@@ -59,7 +62,8 @@ struct CatalogItemView: View {
     }
 
     private var productImage: some View {
-        RemoteImageView(url: item.imageURL, contentMode: .fit)
+        // .fill: картинка товара вертикальная, с .fit по бокам остаются пустые поля.
+        RemoteImageView(url: item.imageURL, contentMode: .fill)
             .accessibilityLabel(Text(item.title))
     }
 
@@ -120,7 +124,7 @@ struct CatalogItemView_Previews: PreviewProvider {
     }
 
     private static func card(
-        item: CatalogItemViewModel,
+        item: CatalogItemUIModel,
         isLiked: Bool = false
     ) -> some View {
         CatalogItemView(
@@ -141,8 +145,8 @@ struct CatalogItemView_Previews: PreviewProvider {
         details: String,
         price: Int,
         badge: String? = nil
-    ) -> CatalogItemViewModel {
-        CatalogItemViewModel(
+    ) -> CatalogItemUIModel {
+        CatalogItemUIModel(
             id: id,
             categoryID: "preview",
             imageURL: URL(string: "https://test-6d334.web.app/products/\(image)"),

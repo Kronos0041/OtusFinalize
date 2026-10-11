@@ -13,9 +13,6 @@ final class NotificationsViewModel {
     private let connectivityUseCase: ObserveConnectivityUseCase
     @ObservationIgnored private var requestInFlight = false
     @ObservationIgnored private var connectivityTask: Task<Void, Never>?
-    #if DEBUG
-    @ObservationIgnored private var isPreview = false
-    #endif
 
     init(notificationsUseCases: NotificationsUseCases,
          connectivityUseCase: ObserveConnectivityUseCase) {
@@ -33,14 +30,6 @@ final class NotificationsViewModel {
         connectivityTask?.cancel()
     }
 
-    #if DEBUG
-    func applyPreview(items: [Notification], readIDs: Set<String> = []) {
-        isPreview = true
-        self.readIDs = readIDs
-        mode = items.isEmpty ? .empty : .content(items)
-    }
-    #endif
-
     func reload() {
         Task { [weak self] in await self?.load() }
     }
@@ -56,19 +45,10 @@ final class NotificationsViewModel {
 
     func markRead(_ item: Notification) {
         guard isUnread(item) else { return }
-        #if DEBUG
-        if isPreview {
-            readIDs.insert(item.id)
-            return
-        }
-        #endif
         readIDs = notificationsUseCases.markRead.execute(notificationID: item.id, currentIDs: readIDs)
     }
 
     private func load() async {
-        #if DEBUG
-        if isPreview { return }
-        #endif
         guard !requestInFlight else { return }
         guard connectivityUseCase.isConnected else {
             if mode.content == nil { mode = .noInternet }

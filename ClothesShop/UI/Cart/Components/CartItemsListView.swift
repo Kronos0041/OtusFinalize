@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CartItemsListView: View {
-    let items: [CartItemViewModel]
+    let items: [CartItemUIModel]
     let total: Int
     let maximumQuantity: Int
     let changeQuantity: (String, Int) -> Void
@@ -50,8 +50,8 @@ struct CartItemsListView: View {
 struct CartItemsListView_Previews: PreviewProvider {
     static var previews: some View {
         CartItemsListView(
-            items: CartPreviewData.items,
-            total: CartPreviewData.total,
+            items: PreviewData.cartItems,
+            total: PreviewData.cartTotal,
             maximumQuantity: StoreSettings.default.maximumCartItemQuantity,
             changeQuantity: { _, _ in },
             remove: { _ in }

@@ -45,10 +45,15 @@ struct EmailVerificationView: View {
     }
 }
 
+#if DEBUG
 struct EmailVerificationView_Previews: PreviewProvider {
     static var previews: some View {
-        EmailVerificationView(email: "alex@example.com")
-            .environment(AppDIContainer.shared.makeAuthViewModel())
+        let email = PreviewData.profile.email
+        return EmailVerificationView(email: email)
+            .environment(
+                AppDIContainer.preview(authSession: .awaitingEmailVerification(email)).makeAuthViewModel()
+            )
             .previewThemes()
     }
 }
+#endif

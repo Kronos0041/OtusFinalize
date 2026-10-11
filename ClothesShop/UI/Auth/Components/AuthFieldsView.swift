@@ -30,15 +30,18 @@ struct AuthFieldsView: View {
     }
 }
 
+#if DEBUG
 struct AuthFieldsView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            AuthFieldsView(auth: AppDIContainer.shared.makeAuthViewModel(), mode: .signIn, width: 340)
+        let container = AppDIContainer.preview(authSession: .signedOut)
+        return Group {
+            AuthFieldsView(auth: container.makeAuthViewModel(), mode: .signIn, width: 340)
                 .previewLayout(.sizeThatFits)
                 .previewThemes("Вход")
-            AuthFieldsView(auth: AppDIContainer.shared.makeAuthViewModel(), mode: .registration, width: 340)
+            AuthFieldsView(auth: container.makeAuthViewModel(), mode: .registration, width: 340)
                 .previewLayout(.sizeThatFits)
                 .previewThemes("Регистрация")
         }
     }
 }
+#endif

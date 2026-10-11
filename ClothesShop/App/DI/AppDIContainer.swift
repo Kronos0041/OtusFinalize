@@ -4,7 +4,20 @@ import FirebaseFirestore
 /// из Data и Infrastructure. Работает в главном потоке, как и создаваемые им ViewModel.
 @MainActor
 final class AppDIContainer {
-    static let shared = AppDIContainer()
+    static let shared = AppDIContainer.live()
+
+    /// Реализации Domain-репозиториев, из которых контейнер собирает use case и ViewModel.
+    struct Repositories {
+        let auth: AuthRepositoryProtocol
+        let profile: ProfileRepositoryProtocol
+        let catalog: CatalogRepositoryProtocol
+        let cart: CartRepositoryProtocol
+        let settings: StoreSettingsRepositoryProtocol
+        let favorites: FavoritesRepositoryProtocol
+        let notifications: NotificationsRepositoryProtocol
+        let connectivity: ConnectivityRepositoryProtocol
+        let imageCache: ImageCacheRepositoryProtocol
+    }
 
     private let authRepository: AuthRepositoryProtocol
     private let profileRepository: ProfileRepositoryProtocol
@@ -16,40 +29,58 @@ final class AppDIContainer {
     private let connectivityRepository: ConnectivityRepositoryProtocol
     private let imageCacheRepository: ImageCacheRepositoryProtocol
 
+    init(repositories: Repositories) {
+        authRepository = repositories.auth
+        profileRepository = repositories.profile
+        catalogRepository = repositories.catalog
+        cartRepository = repositories.cart
+        settingsRepository = repositories.settings
+        favoritesRepository = repositories.favorites
+        notificationsRepository = repositories.notifications
+        connectivityRepository = repositories.connectivity
+        imageCacheRepository = repositories.imageCache
+    }
+
+    /// Рабочий контейнер: Firebase, UserDefaults, URLCache и монитор сети.
+    ///
     /// - Parameter firestore: экземпляр базы; `nil` — стандартный `Firestore.firestore()`.
     ///   Создаётся только после `FirebaseConfigurator.configure()`, поэтому не задан значением по умолчанию.
-    init(
+    static func live(
         firestore: Firestore? = nil,
         authRemoteDataSource: AuthRemoteDataSourceProtocol = FirebaseAuthDataSourceImpl(),
         connectivityRepository: ConnectivityRepositoryProtocol = NetworkMonitor()
-    ) {
+    ) -> AppDIContainer {
         FirebaseConfigurator.configure()
         // Кэш ставится до первых экранов со значениями по умолчанию:
         // `settings/store` доступен только после входа и применяется после загрузки магазина.
-        imageCacheRepository = URLCacheImageCacheRepositoryImpl(
+        let imageCacheRepository = URLCacheImageCacheRepositoryImpl(
             memoryCapacityMB: StoreSettings.default.imageMemoryCacheCapacityMB,
             diskCapacityMB: StoreSettings.default.imageDiskCacheCapacityMB
         )
         let database = firestore ?? Firestore.firestore()
 
-        let catalogDataSource = FirestoreCatalogDataSourceImpl(database: database)
-        let cartDataSource = FirestoreCartDataSourceImpl(database: database)
-        let settingsDataSource = FirestoreSettingsDataSourceImpl(database: database)
-        let notificationsDataSource = FirestoreNotificationsDataSourceImpl(database: database)
-
-        authRepository = AuthRepositoryImpl(remoteDataSource: authRemoteDataSource)
-        profileRepository = ProfileRepositoryImpl(remoteDataSource: authRemoteDataSource)
-        catalogRepository = CatalogRepositoryImpl(remoteDataSource: catalogDataSource)
-        cartRepository = CartRepositoryImpl(remoteDataSource: cartDataSource)
-        settingsRepository = StoreSettingsRepositoryImpl(remoteDataSource: settingsDataSource)
-        favoritesRepository = FavoritesRepositoryImpl(
-            localDataSource: UserDefaultsFavoritesDataSourceImpl()
-        )
-        notificationsRepository = NotificationsRepositoryImpl(
-            remoteDataSource: notificationsDataSource,
-            readStateDataSource: UserDefaultsNotificationReadStateDataSourceImpl()
-        )
-        self.connectivityRepository = connectivityRepository
+        return AppDIContainer(repositories: Repositories(
+            auth: AuthRepositoryImpl(remoteDataSource: authRemoteDataSource),
+            profile: ProfileRepositoryImpl(remoteDataSource: authRemoteDataSource),
+            catalog: CatalogRepositoryImpl(
+                remoteDataSource: FirestoreCatalogDataSourceImpl(database: database)
+            ),
+            cart: CartRepositoryImpl(
+                remoteDataSource: FirestoreCartDataSourceImpl(database: database)
+            ),
+            settings: StoreSettingsRepositoryImpl(
+                remoteDataSource: FirestoreSettingsDataSourceImpl(database: database)
+            ),
+            favorites: FavoritesRepositoryImpl(
+                localDataSource: UserDefaultsFavoritesDataSourceImpl()
+            ),
+            notifications: NotificationsRepositoryImpl(
+                remoteDataSource: FirestoreNotificationsDataSourceImpl(database: database),
+                readStateDataSource: UserDefaultsNotificationReadStateDataSourceImpl()
+            ),
+            connectivity: connectivityRepository,
+            imageCache: imageCacheRepository
+        ))
     }
 
     func makeAuthViewModel() -> AuthViewModel {
