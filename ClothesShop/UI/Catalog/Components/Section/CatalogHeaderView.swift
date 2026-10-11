@@ -5,13 +5,14 @@ struct CatalogHeaderView: View {
     @Environment(CatalogViewModel.self) private var products
 
     var body: some View {
-        @Bindable var products = products
-
         VStack(spacing: 15) {
             SearchTextField(
                 frame: (getWidth() - AppLayout.sideInset, 50),
                 placeholder: SwiftGen.Common.search,
-                text: $products.searchText
+                text: Binding(
+                    get: { products.searchText },
+                    set: { products.updateSearchText($0) }
+                )
             )
 
             CategoryCollectionView()

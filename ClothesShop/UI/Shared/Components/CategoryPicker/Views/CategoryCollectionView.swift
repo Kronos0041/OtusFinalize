@@ -29,7 +29,7 @@ struct CategoryCollectionView: View {
                             width: itemWidth
                         ) {
                             withAnimation(.easeInOut(duration: ComponentConstants.Animation.categorySwitchDuration)) {
-                                products.selectedCategoryIndex = index
+                                products.selectCategory(at: index)
                             }
                         }
                         .id(index)
@@ -67,7 +67,7 @@ struct CategoryCollectionView_Previews: PreviewProvider {
 
     private static func makeViewModel(_ catalog: Catalog, selected: Int) -> CatalogViewModel {
         let viewModel = AppDIContainer.preview(catalog: .success(catalog)).makeLoadedCatalogViewModel()
-        viewModel.selectedCategoryIndex = selected
+        viewModel.selectCategory(at: selected)
         return viewModel
     }
 }

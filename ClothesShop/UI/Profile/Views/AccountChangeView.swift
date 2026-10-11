@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AccountChangeView: View {
     let change: AccountChangeType
-    @Bindable var viewModel: ProfileViewModel
+    let viewModel: ProfileViewModel
     let close: () -> Void
 
     private var title: String {
@@ -13,15 +13,24 @@ struct AccountChangeView: View {
         NavigationStack {
             Form {
                 Section(SwiftGen.Profile.currentPassword) {
-                    SecureField(SwiftGen.Profile.currentPassword, text: $viewModel.currentPassword)
+                    SecureField(SwiftGen.Profile.currentPassword, text: Binding(
+                        get: { viewModel.currentPassword },
+                        set: viewModel.updateCurrentPassword
+                    ))
                         .textContentType(.password)
                 }
 
                 if change == .password {
                     Section(SwiftGen.Profile.newPassword) {
-                        SecureField(SwiftGen.Profile.newPassword, text: $viewModel.newPassword)
+                        SecureField(SwiftGen.Profile.newPassword, text: Binding(
+                            get: { viewModel.newPassword },
+                            set: viewModel.updateNewPassword
+                        ))
                             .textContentType(.newPassword)
-                        SecureField(SwiftGen.Profile.repeatNewPassword, text: $viewModel.repeatPassword)
+                        SecureField(SwiftGen.Profile.repeatNewPassword, text: Binding(
+                            get: { viewModel.repeatPassword },
+                            set: viewModel.updateRepeatPassword
+                        ))
                             .textContentType(.newPassword)
                         Text(SwiftGen.Profile.passwordHint)
                             .font(.footnote)
@@ -29,7 +38,10 @@ struct AccountChangeView: View {
                     }
                 } else {
                     Section {
-                        TextField(SwiftGen.Profile.newEmail, text: $viewModel.newEmail)
+                        TextField(SwiftGen.Profile.newEmail, text: Binding(
+                            get: { viewModel.newEmail },
+                            set: viewModel.updateNewEmail
+                        ))
                             .keyboardType(.emailAddress)
                             .textContentType(.emailAddress)
                             .textInputAutocapitalization(.never)

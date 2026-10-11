@@ -1,6 +1,11 @@
 struct CartItemUIModel: Identifiable, Equatable {
     let id: String
-    var product: CatalogItemUIModel
+    let product: CatalogItemUIModel
     let size: String?
-    var quantity: Int
+    let quantity: Int
+
+    /// Та же позиция с актуальным товаром и/или количеством.
+    func with(product: CatalogItemUIModel? = nil, quantity: Int? = nil) -> CartItemUIModel {
+        CartItemUIModel(id: id, product: product ?? self.product, size: size, quantity: quantity ?? self.quantity)
+    }
 }

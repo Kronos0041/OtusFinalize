@@ -16,7 +16,7 @@ struct CatalogView: View {
     @State private var router = Router<CatalogRoute>()
 
     var body: some View {
-        NavigationStack(path: $router.path) {
+        NavigationStack(path: Binding(get: { router.path }, set: router.updatePath)) {
             VStack(spacing: 15) {
                 MainTopBar(
                     notificationCount: notifications.unreadCount,

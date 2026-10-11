@@ -10,7 +10,7 @@ import SwiftUI
 /// Стартовый экран: логотип и выбор «вход / регистрация».
 /// Если пользователь уже авторизован, сразу открывается `MainTabView`.
 struct WelcomeView: View {
-    @Bindable private var auth: AuthViewModel
+    private let auth: AuthViewModel
     private let container: AppDIContainer
 
     @State private var logoRotation: Double = 0
@@ -19,7 +19,7 @@ struct WelcomeView: View {
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     init(viewModel: AuthViewModel, container: AppDIContainer) {
-        _auth = Bindable(viewModel)
+        auth = viewModel
         self.container = container
     }
 
@@ -31,7 +31,7 @@ struct WelcomeView: View {
                 EmailVerificationView(email: email)
                     .environment(auth)
             } else {
-                NavigationStack(path: $auth.path) {
+                NavigationStack(path: Binding(get: { auth.path }, set: auth.updatePath)) {
                     ZStack {
                         BlurredWallpaperBackground()
 

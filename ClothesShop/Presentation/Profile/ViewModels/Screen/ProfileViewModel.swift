@@ -7,16 +7,16 @@ final class ProfileViewModel {
 
     private(set) var mode: ViewMode<UserProfile> = .loading
     private(set) var user: UserProfile
-    var currentPassword = ""
-    var newPassword = ""
-    var repeatPassword = ""
-    var newEmail = ""
+    private(set) var currentPassword = ""
+    private(set) var newPassword = ""
+    private(set) var repeatPassword = ""
+    private(set) var newEmail = ""
     private(set) var isSubmitting = false
     private(set) var isRefreshing = false
     private(set) var formError: String?
     private(set) var profileError: String?
     private(set) var signOutError: String?
-    var successMessage: String?
+    private(set) var successMessage: String?
 
     private let profileUseCases: ProfileUseCases
     private let signOutUseCase: SignOutUseCase
@@ -55,6 +55,28 @@ final class ProfileViewModel {
         if mode.content == nil { mode = .loading }
         isRefreshing = true
         Task { [weak self] in await self?.performLoadProfile() }
+    }
+
+    // MARK: - Ввод
+
+    func updateCurrentPassword(_ password: String) {
+        currentPassword = password
+    }
+
+    func updateNewPassword(_ password: String) {
+        newPassword = password
+    }
+
+    func updateRepeatPassword(_ password: String) {
+        repeatPassword = password
+    }
+
+    func updateNewEmail(_ email: String) {
+        newEmail = email
+    }
+
+    func dismissSuccessMessage() {
+        successMessage = nil
     }
 
     func resetForm() {

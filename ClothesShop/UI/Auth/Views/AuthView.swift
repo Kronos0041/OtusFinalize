@@ -62,7 +62,7 @@ struct AuthView: View {
                     .frame(width: fieldsWidth)
                     .background(Color.appRed.opacity(0.6))
                     .cornerRadius(10)
-                    .onTapGesture { auth.banner.isVisible = false }
+                    .onTapGesture { auth.dismissBanner() }
             }
         }
     }

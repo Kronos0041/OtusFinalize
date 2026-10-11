@@ -5,7 +5,7 @@ struct FavoritesView: View {
     @State private var router = Router<CatalogRoute>()
 
     var body: some View {
-        NavigationStack(path: $router.path) {
+        NavigationStack(path: Binding(get: { router.path }, set: router.updatePath)) {
             ViewModeView(
                 products.favoritesMode,
                 emptyTitle: SwiftGen.Favorites.empty,

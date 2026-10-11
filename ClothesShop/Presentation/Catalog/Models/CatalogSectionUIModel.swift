@@ -1,7 +1,12 @@
 struct CatalogSectionUIModel: Identifiable {
     let id: String
     let category: CategoryUIModel
-    var products: [CatalogItemUIModel]
+    let products: [CatalogItemUIModel]
+
+    /// Тот же раздел с другим набором товаров (например, отфильтрованным поиском).
+    func withProducts(_ products: [CatalogItemUIModel]) -> CatalogSectionUIModel {
+        CatalogSectionUIModel(id: id, category: category, products: products)
+    }
 
     static let allCategory = CategoryUIModel(id: "all", title: SwiftGen.Catalog.all)
 

@@ -12,9 +12,11 @@ struct CategoryCollectionTab: View {
     @Environment(CatalogViewModel.self) private var products
 
     var body: some View {
-        @Bindable var products = products
         let sections = products.filteredSections
-        TabView(selection: $products.selectedCategoryIndex) {
+        TabView(selection: Binding(
+            get: { products.selectedCategoryIndex },
+            set: { products.selectCategory(at: $0) }
+        )) {
             ForEach(sections.indices, id: \.self) { index in
                 CatalogGridView(
                     section: sections[index],

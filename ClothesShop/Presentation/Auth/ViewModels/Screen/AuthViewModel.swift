@@ -4,15 +4,15 @@ import Observation
 @MainActor
 @Observable
 final class AuthViewModel {
-    var email = ""
-    var password = ""
-    var repeatPassword = ""
-    var banner = AuthBanner.hidden
+    private(set) var email = ""
+    private(set) var password = ""
+    private(set) var repeatPassword = ""
+    private(set) var banner = AuthBanner.hidden
     private(set) var isSubmitting = false
     private(set) var session: AuthSession
     private(set) var verificationMessage = ""
     /// Стек экранов авторизации. Сбрасывается при смене сессии.
-    var path: [AuthRoute] = []
+    private(set) var path: [AuthRoute] = []
 
     var isSignedIn: Bool { session == .verified }
 
@@ -33,6 +33,31 @@ final class AuthViewModel {
         self.validator = validator
         session = authUseCases.observeSession.currentSession
     }
+
+    // MARK: - Ввод
+
+    func updateEmail(_ email: String) {
+        self.email = email
+    }
+
+    func updatePassword(_ password: String) {
+        self.password = password
+    }
+
+    func updateRepeatPassword(_ repeatPassword: String) {
+        self.repeatPassword = repeatPassword
+    }
+
+    func dismissBanner() {
+        banner = banner.dismissed
+    }
+
+    /// Стек экранов меняет `NavigationStack` (кнопка «Назад», свайп).
+    func updatePath(_ path: [AuthRoute]) {
+        self.path = path
+    }
+
+    // MARK: - Сценарии
 
     func openAuthForm(mode: AuthMode) {
         banner = .hidden
@@ -86,7 +111,7 @@ final class AuthViewModel {
 
     func emailEditingChanged(isEditing: Bool) {
         guard !email.isEmpty else {
-            banner.isVisible = false
+            dismissBanner()
             return
         }
         guard !isEditing else { return }

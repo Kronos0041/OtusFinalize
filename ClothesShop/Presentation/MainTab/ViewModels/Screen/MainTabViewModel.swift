@@ -34,7 +34,7 @@ final class MainTabViewModel {
 
         // Корзина берёт названия и цены из каталога: любое обновление каталога
         // (стартовое, pull-to-refresh, после восстановления сети) сразу попадает в неё.
-        catalog.onProductsUpdate = { [weak cart] products in cart?.updateCatalog(products) }
+        catalog.observeProductsUpdates { [weak cart] products in cart?.updateCatalog(products) }
 
         connectivityTask = Task { [weak self, updates = connectivityUseCase.execute()] in
             for await connected in updates where connected {

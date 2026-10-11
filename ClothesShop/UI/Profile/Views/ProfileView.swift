@@ -51,9 +51,9 @@ struct ProfileView: View {
         }
         .alert(SwiftGen.Profile.settings, isPresented: Binding(
             get: { viewModel.successMessage != nil },
-            set: { if !$0 { viewModel.successMessage = nil } }
+            set: { if !$0 { viewModel.dismissSuccessMessage() } }
         )) {
-            Button(SwiftGen.Common.ok, role: .cancel) { viewModel.successMessage = nil }
+            Button(SwiftGen.Common.ok, role: .cancel, action: viewModel.dismissSuccessMessage)
         } message: {
             Text(verbatim: viewModel.successMessage ?? "")
         }

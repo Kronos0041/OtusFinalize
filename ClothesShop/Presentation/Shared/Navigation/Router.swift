@@ -6,18 +6,14 @@ import Observation
 @MainActor
 @Observable
 final class Router<Route: Hashable> {
-    var path: [Route] = []
+    private(set) var path: [Route] = []
 
     func push(_ route: Route) {
         path.append(route)
     }
 
-    func pop() {
-        guard !path.isEmpty else { return }
-        path.removeLast()
-    }
-
-    func popToRoot() {
-        path.removeAll()
+    /// Стек меняет `NavigationStack` (кнопка «Назад», свайп).
+    func updatePath(_ path: [Route]) {
+        self.path = path
     }
 }

@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct AuthFieldsView: View {
-    @Bindable var auth: AuthViewModel
+    let auth: AuthViewModel
     let mode: AuthMode
     let width: CGFloat
 
     var body: some View {
         VStack(spacing: 15) {
-            TextField(SwiftGen.Common.email, text: $auth.email, onEditingChanged: { isEditing in
+            TextField(SwiftGen.Common.email, text: Binding(get: { auth.email }, set: auth.updateEmail), onEditingChanged: { isEditing in
                 auth.emailEditingChanged(isEditing: isEditing)
             })
             .keyboardType(.emailAddress)
@@ -15,11 +15,11 @@ struct AuthFieldsView: View {
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
 
-            SecureField(SwiftGen.Auth.password, text: $auth.password)
+            SecureField(SwiftGen.Auth.password, text: Binding(get: { auth.password }, set: auth.updatePassword))
                 .textContentType(mode == .registration ? .newPassword : .password)
 
             if mode == .registration {
-                SecureField(SwiftGen.Auth.repeatPassword, text: $auth.repeatPassword)
+                SecureField(SwiftGen.Auth.repeatPassword, text: Binding(get: { auth.repeatPassword }, set: auth.updateRepeatPassword))
                     .textContentType(.newPassword)
             }
         }

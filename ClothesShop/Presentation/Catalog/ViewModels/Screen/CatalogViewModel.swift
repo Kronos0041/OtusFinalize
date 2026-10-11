@@ -7,14 +7,12 @@ final class CatalogViewModel {
     private(set) var mode: ViewMode<[CatalogSectionUIModel]> = .loading
     /// Разделы с учётом поиска. Пересчитываются только при смене каталога или запроса.
     private(set) var filteredSections: [CatalogSectionUIModel] = []
-    var selectedCategoryIndex = 0
-    var searchText = "" {
-        didSet { updateFilteredSections() }
-    }
+    private(set) var selectedCategoryIndex = 0
+    private(set) var searchText = ""
     private(set) var favoriteProductIDs: Set<String>
 
     /// Вызывается при каждом обновлении каталога. Через него корзина получает актуальные названия и цены.
-    @ObservationIgnored var onProductsUpdate: (([CatalogItemUIModel]) -> Void)?
+    @ObservationIgnored private var onProductsUpdate: (([CatalogItemUIModel]) -> Void)?
 
     var sections: [CatalogSectionUIModel] { mode.content ?? [] }
 
@@ -72,6 +70,11 @@ final class CatalogViewModel {
 
     deinit {
         connectivityTask?.cancel()
+    }
+
+    /// Подписка на обновления каталога. Через неё корзина получает актуальные названия и цены.
+    func observeProductsUpdates(_ handler: @escaping ([CatalogItemUIModel]) -> Void) {
+        onProductsUpdate = handler
     }
 
     func loadIfNeeded() {
@@ -133,6 +136,18 @@ final class CatalogViewModel {
         favoriteProductIDs.contains(product.id)
     }
 
+    /// Выбор вкладки категории. Индекс вне диапазона сбрасывается на «Все» при следующем обновлении каталога.
+    func selectCategory(at index: Int) {
+        guard index >= 0, index != selectedCategoryIndex else { return }
+        selectedCategoryIndex = index
+    }
+
+    func updateSearchText(_ text: String) {
+        guard text != searchText else { return }
+        searchText = text
+        updateFilteredSections()
+    }
+
     func isSelected(_ index: Int) -> Bool {
         selectedCategoryIndex == index
     }
@@ -154,9 +169,7 @@ final class CatalogViewModel {
         }
         let matchingIDs = Set(searchProductsUseCase.execute(products: catalog.products, query: searchText).map(\.id))
         filteredSections = sections.map { section in
-            var result = section
-            result.products = section.products.filter { matchingIDs.contains($0.id) }
-            return result
+            section.withProducts(section.products.filter { matchingIDs.contains($0.id) })
         }
     }
 

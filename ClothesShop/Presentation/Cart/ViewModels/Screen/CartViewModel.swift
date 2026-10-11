@@ -39,9 +39,7 @@ final class CartViewModel {
         catalogProducts = products
         let byID = Dictionary(products.map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
         items = items.map { item in
-            var result = item
-            result.product = byID[item.product.id] ?? item.product
-            return result
+            item.with(product: byID[item.product.id])
         }
         if !items.isEmpty { updateMode() }
     }
@@ -122,7 +120,7 @@ final class CartViewModel {
         }
     }
 
-    func add(_ product: CatalogItemUIModel, size: String?) {
+    private func add(_ product: CatalogItemUIModel, size: String?) {
         guard isValid(size: size, for: product) else { return }
         if let existing = item(productID: product.id, size: size) {
             guard existing.quantity < maximumQuantity else { return }
@@ -227,8 +225,7 @@ final class CartViewModel {
 
     private func applySavedItem(_ item: CartItemUIModel, product: CatalogItemUIModel, quantity: Int) {
         if let index = items.firstIndex(where: { $0.id == item.id }) {
-            items[index].product = product
-            items[index].quantity = quantity
+            items[index] = items[index].with(product: product, quantity: quantity)
         } else {
             items.append(CartItemUIModel(id: item.id, product: product, size: item.size, quantity: quantity))
         }

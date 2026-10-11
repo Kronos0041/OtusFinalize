@@ -1,6 +1,11 @@
 import SwiftUI
 
 struct CategoryCollectionButtonStyleModel {
-    var foregroundColor: Color = .appGray
-    var indicatorColor: Color = .clear
+    let foregroundColor: Color
+    let indicatorColor: Color
+
+    init(foregroundColor: Color = .appGray, indicatorColor: Color = .clear) {
+        self.foregroundColor = foregroundColor
+        self.indicatorColor = indicatorColor
+    }
 }
