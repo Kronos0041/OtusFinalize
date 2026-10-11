@@ -1,6 +1,6 @@
 enum AuthErrorMessageMapper {
     static func message(for error: Error, verifyingCurrentPassword: Bool = true) -> String {
-        if error is ConnectivityError { return SwiftGen.Network.offline }
+        if error is ConnectivityError || error is RemoteDataError { return error.localizedDescription }
         guard let error = error as? AuthRepositoryError else { return error.localizedDescription }
         switch error {
         case .missingUser: return SwiftGen.Auth.Error.sessionEnded

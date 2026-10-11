@@ -181,6 +181,22 @@ internal enum SwiftGen {
     internal static let offline = SwiftGen.tr("Localizable", "network.offline", fallback: "No internet connection")
     /// Data will load automatically once you're back online.
     internal static let reconnect = SwiftGen.tr("Localizable", "network.reconnect", fallback: "Data will load automatically once you're back online.")
+    /// Server is not responding. Please try again later.
+    internal static let serverUnavailable = SwiftGen.tr("Localizable", "network.serverUnavailable", fallback: "Server is not responding. Please try again later.")
+    internal enum Error {
+      /// Received invalid data from the server.
+      internal static let invalidData = SwiftGen.tr("Localizable", "network.error.invalidData", fallback: "Received invalid data from the server.")
+      /// The requested data wasn't found.
+      internal static let notFound = SwiftGen.tr("Localizable", "network.error.notFound", fallback: "The requested data wasn't found.")
+      /// You don't have access to this data.
+      internal static let permissionDenied = SwiftGen.tr("Localizable", "network.error.permissionDenied", fallback: "You don't have access to this data.")
+      /// Too many requests. Please try again later.
+      internal static let quotaExceeded = SwiftGen.tr("Localizable", "network.error.quotaExceeded", fallback: "Too many requests. Please try again later.")
+      /// Your session has expired. Please sign in again.
+      internal static let unauthorized = SwiftGen.tr("Localizable", "network.error.unauthorized", fallback: "Your session has expired. Please sign in again.")
+      /// Something went wrong. Please try again.
+      internal static let unexpected = SwiftGen.tr("Localizable", "network.error.unexpected", fallback: "Something went wrong. Please try again.")
+    }
   }
   internal enum Notifications {
     /// No notifications yet

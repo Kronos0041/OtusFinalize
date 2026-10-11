@@ -16,7 +16,7 @@ enum ViewMode<Content> {
         switch result {
         case .success(let value): return isEmpty(value) ? .empty : .content(value)
         case .failure(let error):
-            return error is ConnectivityError ? .noInternet : .error(error.localizedDescription)
+            return error as? ConnectivityError == .offline ? .noInternet : .error(error.localizedDescription)
         }
     }
 }

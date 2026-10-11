@@ -12,6 +12,7 @@ enum FirebaseAuthErrorMapper {
         case .invalidEmail: return AuthRepositoryError.invalidEmail
         case .weakPassword: return AuthRepositoryError.weakPassword
         case .networkError: return ConnectivityError.offline
+        case .webNetworkRequestFailed: return ConnectivityError.serverUnavailable
         case .tooManyRequests: return AuthRepositoryError.tooManyRequests
         case .requiresRecentLogin, .invalidUserToken, .userTokenExpired:
             return AuthRepositoryError.sessionExpired

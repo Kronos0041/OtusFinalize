@@ -94,4 +94,11 @@
 "network.offline" = "No internet connection";
 "network.reconnect" = "Data will load automatically once you're back online.";
 "network.loadFailed" = "Couldn't load data";
+"network.serverUnavailable" = "Server is not responding. Please try again later.";
+"network.error.unauthorized" = "Your session has expired. Please sign in again.";
+"network.error.permissionDenied" = "You don't have access to this data.";
+"network.error.notFound" = "The requested data wasn't found.";
+"network.error.quotaExceeded" = "Too many requests. Please try again later.";
+"network.error.invalidData" = "Received invalid data from the server.";
+"network.error.unexpected" = "Something went wrong. Please try again.";
 "welcome.subtitle" = "Old money style";

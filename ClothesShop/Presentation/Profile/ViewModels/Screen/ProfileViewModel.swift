@@ -119,7 +119,7 @@ final class ProfileViewModel {
             let message = AuthErrorMessageMapper.message(for: error)
             profileError = message
             if mode.content == nil {
-                mode = error is ConnectivityError ? .noInternet : .error(message)
+                mode = error as? ConnectivityError == .offline ? .noInternet : .error(message)
             }
         }
     }

@@ -94,4 +94,11 @@
 "network.offline" = "Нет подключения к интернету";
 "network.reconnect" = "Данные загрузятся автоматически, когда появится сеть.";
 "network.loadFailed" = "Не удалось загрузить данные";
+"network.serverUnavailable" = "Сервер не отвечает. Попробуйте позже.";
+"network.error.unauthorized" = "Сессия истекла. Войдите заново.";
+"network.error.permissionDenied" = "Нет доступа к этим данным.";
+"network.error.notFound" = "Данные не найдены.";
+"network.error.quotaExceeded" = "Слишком много запросов. Попробуйте позже.";
+"network.error.invalidData" = "Сервер вернул некорректные данные.";
+"network.error.unexpected" = "Что-то пошло не так. Попробуйте ещё раз.";
 "welcome.subtitle" = "Стиль тихой роскоши";
