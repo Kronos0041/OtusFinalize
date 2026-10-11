@@ -1,7 +1,6 @@
 "common.email" = "Email";
 "common.ok" = "OK";
 "common.back" = "Back";
-"common.next" = "Next";
 "common.add" = "Add";
 "common.cancel" = "Cancel";
 "common.retry" = "Try again";
@@ -48,11 +47,14 @@
 "cart.increase" = "Increase quantity";
 "cart.decrease" = "Decrease quantity";
 "cart.chooseSize" = "Select a size to add this product to your bag.";
-"cart.added" = "Added to your bag";
-"cart.quantityLimit" = "You can add up to 99 of each item.";
+"cart.added" = "Added";
+"cart.quantityLimit" = "You can add up to %lld of each item.";
+"cart.updateFailed" = "Couldn't update your bag. Please try again.";
 "cart.confirmDemo" = "Confirm demo order";
 "cart.demoHint" = "This is a demo. No payment will be charged and no order will be sent to the store.";
 "cart.demoSuccess" = "Demo order completed";
+"cart.error.missingSettings" = "Store settings are unavailable. Please try again later.";
+"cart.error.invalidSettings" = "Store settings are invalid: the bag limit must be between 1 and 999.";
 "catalog.all" = "All";
 "catalog.empty" = "The catalog is empty";
 "catalog.search.clear" = "Clear search";

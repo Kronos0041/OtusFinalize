@@ -1,0 +1,6 @@
+{
+  "maximumCartItemQuantity": 99,
+  "imageLoadMaxAttempts": 3,
+  "imageMemoryCacheCapacityMB": 32,
+  "imageDiskCacheCapacityMB": 128
+}

@@ -1,7 +1,6 @@
 "common.email" = "Email";
 "common.ok" = "Ok";
 "common.back" = "Назад";
-"common.next" = "Далее";
 "common.add" = "Добавить";
 "common.cancel" = "Отмена";
 "common.retry" = "Повторить";
@@ -48,11 +47,14 @@
 "cart.increase" = "Увеличить количество";
 "cart.decrease" = "Уменьшить количество";
 "cart.chooseSize" = "Выберите размер, чтобы добавить товар в корзину.";
-"cart.added" = "Товар добавлен в корзину";
-"cart.quantityLimit" = "В корзину можно добавить не более 99 единиц одной позиции.";
+"cart.added" = "Добавлено";
+"cart.quantityLimit" = "В корзину можно добавить не более %lld единиц одной позиции.";
+"cart.updateFailed" = "Не удалось обновить корзину. Попробуйте ещё раз.";
 "cart.confirmDemo" = "Подтвердить демо-заказ";
 "cart.demoHint" = "Это демонстрация. Оплата не списывается, заказ не отправляется в магазин.";
 "cart.demoSuccess" = "Демо-заказ оформлен";
+"cart.error.missingSettings" = "Настройки магазина недоступны. Попробуйте позже.";
+"cart.error.invalidSettings" = "Настройки магазина некорректны: лимит корзины должен быть от 1 до 999.";
 "catalog.all" = "Все";
 "catalog.empty" = "Каталог пока пуст";
 "catalog.search.clear" = "Очистить поиск";
