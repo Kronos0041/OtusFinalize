@@ -18,7 +18,7 @@ struct SearchTextField: View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .resizable()
-                .frame(width: 20, height: 20)
+                .frame(width: ComponentConstants.Search.iconSize, height: ComponentConstants.Search.iconSize)
                 .foregroundColor(Color.appBlack)
             TextField(placeholder, text: $text)
                 .textInputAutocapitalization(.never)
@@ -31,7 +31,7 @@ struct SearchTextField: View {
             } label: {
                 Image(systemName: "xmark.circle.fill")
                     .foregroundColor(.appGray)
-                    .frame(width: 28, height: 28)
+                    .frame(width: ComponentConstants.Search.clearButtonSize, height: ComponentConstants.Search.clearButtonSize)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text(SwiftGen.Catalog.Search.clear))
@@ -42,7 +42,7 @@ struct SearchTextField: View {
         .padding()
         .frame(width: frame.width, height: frame.height)
         .background(Color.appSliver)
-        .cornerRadius(10)
+        .cornerRadius(ComponentConstants.Search.cornerRadius)
     }
 }
 

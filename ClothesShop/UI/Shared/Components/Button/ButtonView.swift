@@ -18,13 +18,13 @@ struct ButtonView: View {
             Spacer()
             Text(model.title)
                 .bold()
-                .font(.system(size: 18))
+                .font(.system(size: ComponentConstants.Button.fontSize))
                 .foregroundColor(style.foregroundColor)
             Spacer()
         }
         .frame(width: AppLayout.fullWidthButton.width, height: AppLayout.fullWidthButton.height)
         .background(style.background)
-        .cornerRadius(10)
+        .cornerRadius(ComponentConstants.Button.cornerRadius)
     }
 }
 

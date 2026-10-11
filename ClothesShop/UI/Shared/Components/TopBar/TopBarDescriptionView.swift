@@ -18,7 +18,7 @@ struct TopBarDescriptionView: View {
                 Image(systemName: "arrow.left")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 25, height: 25)
+                    .frame(width: ComponentConstants.TopBar.backIconSize, height: ComponentConstants.TopBar.backIconSize)
                     .padding()
                     .foregroundColor(Color.appBlack)
                     .accessibilityLabel(Text(SwiftGen.Common.back))
@@ -28,7 +28,7 @@ struct TopBarDescriptionView: View {
 
             Text(title)
                 .bold()
-                .font(.system(size: 24, design: .serif))
+                .font(.system(size: ComponentConstants.TopBar.titleFontSize, design: .serif))
                 .foregroundColor(Color.appBlack)
         }
         .frame(width: frame.width, height: frame.height)

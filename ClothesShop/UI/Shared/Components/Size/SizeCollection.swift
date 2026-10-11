@@ -13,25 +13,25 @@ struct SizeCollection: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
+            HStack(spacing: ComponentConstants.SizeCollection.spacing) {
                 ForEach(sizes, id: \.self) { size in
                     Button { selection = size } label: {
                         Text(verbatim: size)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.system(size: ComponentConstants.SizeCollection.fontSize, weight: .medium))
                         .foregroundColor(selection == size ? .appWhite : .appBlack)
-                        .padding(.horizontal, 16)
-                        .frame(minWidth: 52, minHeight: 50)
+                        .padding(.horizontal, ComponentConstants.SizeCollection.horizontalPadding)
+                        .frame(minWidth: ComponentConstants.SizeCollection.minCellWidth, minHeight: ComponentConstants.SizeCollection.minCellHeight)
                         .background(selection == size ? Color.appBlack : Color.appWhite)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.appGray.opacity(0.3), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: ComponentConstants.SizeCollection.cornerRadius)
+                                .stroke(Color.appGray.opacity(ComponentConstants.SizeCollection.borderOpacity), lineWidth: ComponentConstants.SizeCollection.borderWidth)
                         )
                     }
                     .buttonStyle(.plain)
                     .accessibilityAddTraits(selection == size ? .isSelected : [])
                 }
             }
-            .padding(1)
+            .padding(ComponentConstants.SizeCollection.borderInset)
         }
 
     }

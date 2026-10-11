@@ -18,7 +18,7 @@ struct BlurredWallpaperBackground: View {
             .overlay(
                 ZStack {
                     Rectangle()
-                        .foregroundColor(Color.appWhite.opacity(0.1))
+                        .foregroundColor(Color.appWhite.opacity(ComponentConstants.Background.overlayOpacity))
                         .ignoresSafeArea()
                 }
                 .background(.ultraThinMaterial)

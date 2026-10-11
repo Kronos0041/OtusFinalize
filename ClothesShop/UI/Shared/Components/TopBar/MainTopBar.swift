@@ -18,10 +18,10 @@ struct MainTopBar: View {
                 .resizable()
                 .renderingMode(.template)
                 .scaledToFit()
-                .frame(width: 160, height: 40)
+                .frame(width: ComponentConstants.TopBar.wordmarkSize.width, height: ComponentConstants.TopBar.wordmarkSize.height)
                 .accessibilityLabel(Text(verbatim: "Montblanc"))
 
-            HStack(spacing: 16) {
+            HStack(spacing: ComponentConstants.TopBar.actionsSpacing) {
                 Spacer()
 
                 Button(action: clickBell) {
@@ -32,15 +32,15 @@ struct MainTopBar: View {
 
                 Button(action: clickCart) {
                     Image(systemName: "bag")
-                        .font(.system(size: 26, weight: .regular))
-                        .frame(width: 36, height: 44)
+                        .font(.system(size: ComponentConstants.TopBar.cartIconFontSize, weight: .regular))
+                        .frame(width: ComponentConstants.TopBar.cartButtonSize.width, height: ComponentConstants.TopBar.cartButtonSize.height)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text(SwiftGen.Cart.title))
             }
         }
         .foregroundColor(.appBlack)
-        .frame(width: getWidth() - AppLayout.sideInset, height: 56)
+        .frame(width: getWidth() - AppLayout.sideInset, height: ComponentConstants.TopBar.mainHeight)
     }
 }
 

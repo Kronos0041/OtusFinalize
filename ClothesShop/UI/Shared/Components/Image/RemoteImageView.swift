@@ -8,7 +8,7 @@ import UIKit
 struct RemoteImageView: View {
     let url: URL?
     var contentMode: ContentMode = .fill
-    var placeholderIconSize: CGFloat = 36
+    var placeholderIconSize: CGFloat = ComponentConstants.RemoteImage.placeholderIconSize
 
     @Environment(\.imageLoadMaxAttempts) private var maxAttempts
     @State private var image: UIImage?
@@ -82,7 +82,7 @@ struct RemoteImageView: View {
                     return
                 }
 
-                try? await Task.sleep(for: .milliseconds(250))
+                try? await Task.sleep(for: .milliseconds(ComponentConstants.RemoteImage.retryDelayMilliseconds))
             }
         }
     }

@@ -11,7 +11,7 @@ struct BellView: View {
     let notificationCount: Int
 
     private var badgeText: String {
-        notificationCount > 99 ? "99+" : "\(notificationCount)"
+        notificationCount > ComponentConstants.Bell.maxBadgeCount ? "\(ComponentConstants.Bell.maxBadgeCount)+" : "\(notificationCount)"
     }
 
     var body: some View {
@@ -19,7 +19,7 @@ struct BellView: View {
             Image(systemName: "bell")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 30, height: 30)
+                .frame(width: ComponentConstants.Bell.iconSize, height: ComponentConstants.Bell.iconSize)
 
             if notificationCount > 0 {
                 VStack {
@@ -27,19 +27,19 @@ struct BellView: View {
                         Spacer()
                         Text(badgeText)
                             .bold()
-                            .font(.system(size: 8))
+                            .font(.system(size: ComponentConstants.Bell.badgeFontSize))
                             .foregroundColor(Color.appWhite)
-                            .frame(width: 20, height: 20)
+                            .frame(width: ComponentConstants.Bell.badgeSize, height: ComponentConstants.Bell.badgeSize)
                             .background(.red)
-                            .cornerRadius(10)
-                            .offset(x: 3, y: -8)
+                            .cornerRadius(ComponentConstants.Bell.badgeSize / 2)
+                            .offset(ComponentConstants.Bell.badgeOffset)
                     }
                     Spacer()
                 }
-                .frame(width: 30, height: 30)
+                .frame(width: ComponentConstants.Bell.iconSize, height: ComponentConstants.Bell.iconSize)
             }
         }
-        .frame(width: 30, height: 30)
+        .frame(width: ComponentConstants.Bell.iconSize, height: ComponentConstants.Bell.iconSize)
     }
 }
 
