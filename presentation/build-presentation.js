@@ -221,6 +221,50 @@ function card(s, x, y, w, h, num, head, body) {
   s.addNotes("По исследованиям, в люксе покупатель онлайн ориентируется прежде всего на изображения: дорогую вещь хочется рассмотреть, как в бутике. Baymard отмечает, что недостаточное увеличение фото — причина отказа от покупки. Поэтому в приложении сделан полноэкранный просмотр с масштабированием, цена видна сразу, а описание разделено на короткое и подробное. Визуальный стиль — минимализм с большим количеством свободного места, как у Montblanc, Chanel и The Row.");
 }
 
+// 3g ─ Приложения Montblanc в App Store: отзывы
+{
+  const s = slide("Приложения Montblanc в App Store");
+  label(s, "Магазина среди них нет. Средняя оценка по всем странам и что пишут в отзывах", 0.5, 0.95, 9, { size: 13, color: INK, h: 0.35 });
+  const apps = [
+    ["Hub", "блокнот Augmented Paper", "2,96", "165"],
+    ["Sound", "наушники", "1,95", "129"],
+    ["Digital Paper", "цифровой блокнот", "2,8", "10"],
+    ["Summit", "смарт-часы", "2,0", "5"],
+  ];
+  apps.forEach((a, i) => {
+    const y = 1.4 + i * 0.68;
+    box(s, 0.5, y, 3.0, 0.58, { fill: MIST });
+    s.addText(a[0], { x: 0.65, y: y + 0.04, w: 1.9, h: 0.28, fontFace: HEAD, fontSize: 13, bold: true, color: INK, margin: 0, valign: "middle", isTextBox: true });
+    s.addText(a[1], { x: 0.65, y: y + 0.3, w: 1.9, h: 0.24, fontFace: BODY, fontSize: 10, color: GREY, margin: 0, valign: "middle", isTextBox: true });
+    s.addText("★ " + a[2], { x: 2.5, y: y + 0.04, w: 0.9, h: 0.28, fontFace: HEAD, fontSize: 14, bold: true, color: GOLD, align: "right", margin: 0, valign: "middle", isTextBox: true });
+    s.addText(a[3] + " оц.", { x: 2.5, y: y + 0.3, w: 0.9, h: 0.24, fontFace: BODY, fontSize: 10, color: GREY, align: "right", margin: 0, valign: "middle", isTextBox: true });
+  });
+  const cols = [
+    ["Нравится", MIST, INK, GREY, [
+      "Сами устройства и их дизайн",
+      "Идея связки бумаги и цифры (Hub)",
+      "Базовые функции, когда всё подключилось",
+    ]],
+    ["Не нравится", INK, GOLD, "E8E2D6", [
+      "Часы и наушники не подключаются к iPhone",
+      "Выкидывает из аккаунта, код сброса не приходит",
+      "Синхронизация по 30+ минут",
+      "Редкие обновления, нет справки",
+      "Нет Strava, HealthKit, локализации",
+    ]],
+  ];
+  cols.forEach((c, i) => {
+    const x = 3.7 + i * 2.95, w = 2.8;
+    box(s, x, 1.4, w, 2.62, { fill: c[1] });
+    s.addText(c[0], { x: x + 0.15, y: 1.48, w: w - 0.3, h: 0.34, fontFace: HEAD, fontSize: 15, bold: true, color: c[2], margin: 0, valign: "middle", isTextBox: true });
+    s.addText(c[4].map((t, j) => ({ text: t, options: { bullet: true, breakLine: j < c[4].length - 1 } })),
+      { x: x + 0.15, y: 1.88, w: w - 0.3, h: 2.08, fontFace: BODY, fontSize: 11, color: c[3], margin: 0, valign: "top", paraSpaceAfter: 4, isTextBox: true, fit: "shrink" });
+  });
+  box(s, 0.5, 4.2, 9, 0.62, { fill: GOLD, text: "Вывод: цифровым продуктам бренда не хватает надёжного входа, стабильного подключения и регулярной поддержки. ClothesShop закрывает эти потребности", size: 12, bold: true });
+  label(s, "Источник: App Store, 4 приложения Montblanc International GmbH, 27 стран, 39 отзывов с текстом (2016–2026), данные на 13.10.2026", 0.5, 4.95, 9, { size: 9 });
+  s.addNotes("Собрал отзывы обо всех приложениях Montblanc в App Store. Приложения для покупок у бренда нет: есть приложения для блокнота, наушников и часов. Оценки низкие, от 1,95 до 2,96. Хвалят сами устройства, а ругают приложения: часы Summit не подключаются к iPhone (это большинство отзывов), Digital Paper выкидывает из аккаунта при каждом запуске, синхронизация идёт по полчаса, обновлений мало. Для нашего приложения отсюда требования: надёжный вход и сохранение сессии, стабильная работа и регулярные обновления.");
+}
+
 // 4 ─ Проблема
 {
   const s = slide("Какую проблему решаем");
@@ -264,6 +308,26 @@ function card(s, x, y, w, h, num, head, body) {
   });
   label(s, "Дополнительно: профиль, смена пароля и email, уведомления, RU / EN, светлая и тёмная темы", 0.7, 4.3, 8.6, { size: 13 });
   s.addNotes("Здесь удобно показать живую демонстрацию в симуляторе. Покупка — демо-оформление: платёжная интеграция в объём диплома не входит.");
+}
+
+// 5a ─ Доступность
+{
+  const s = slide("Доступность и удобство");
+  const b = (text, last) => ({ text, options: { bullet: true, breakLine: !last } });
+  card(s, 0.5, 1.15, 4.4, 3.85, 1, "VoiceOver", [
+    b("Подписи и роли у кнопок, заголовков, выбранного размера и категории"),
+    b("Карточка товара читается одной фразой, лайк — отдельное действие в роторе"),
+    b("Удаление из корзины без свайпа, фото закрывается жестом «Z»"),
+    b("Всплывающие сообщения и счётчик уведомлений озвучиваются", true),
+  ]);
+  card(s, 5.1, 1.15, 4.4, 2.3, 2, "Уменьшение движения", [
+    b("На заставке логотип не вращается"),
+    b("Остаётся плавное растворение — безопасная анимация по HIG"),
+    { text: "accessibilityReduceMotion", options: { fontFace: "Courier New", fontSize: 12, color: INK, paraSpaceBefore: 4 } },
+  ]);
+  card(s, 5.1, 3.6, 4.4, 1.4, 3, "Поделиться",
+    "Товаром и фото — через системное меню (ShareLink)");
+  s.addNotes("Приложением должны пользоваться и незрячие покупатели, и люди с вестибулярными нарушениями. VoiceOver: у элементов есть подписи и роли (кнопка, заголовок, выбрано), карточка товара озвучивается целиком, а лайк вынесен в действие ротора; удаление из корзины и закрытие фото доступны без жестов, которые VoiceOver перехватывает; тосты озвучиваются через announcement. «Уменьшение движения» — системная настройка в Универсальном доступе: Apple советует убирать вращение и масштабирование, оставляя растворение. На заставке логотип делает оборот на 360°, поэтому при включённой настройке вращение отключается, а растворение остаётся. Поделиться: с карточки товара отправляются название, цена, описание и ссылка на фото, из полноэкранного просмотра — само изображение; используется системный ShareLink, поэтому доступны все приложения и AirDrop.");
 }
 
 // 6 ─ Clean Architecture
@@ -518,16 +582,17 @@ function card(s, x, y, w, h, num, head, body) {
     ["Реальный сервер", "Собственный сервер или существующий бэкенд Montblanc: новая реализация DataSource вместо Firebase"],
     ["Оплата и заказы", "Настоящее оформление заказа и оплата вместо демо-режима"],
     ["Аналитика в Firebase", "Просмотры товаров, лайки и добавления в корзину для бизнес-аналитики бренда"],
+    ["Заказ под контролем", "Точное наличие, статус заказа с push-уведомлениями и связь с поддержкой из приложения"],
   ];
   items.forEach((it, i) => {
-    const y = 1.2 + i * 1.2;
-    box(s, 0.5, y, 9, 1.05, { fill: MIST });
-    s.addShape(pres.ShapeType.ellipse, { x: 0.75, y: y + 0.3, w: 0.45, h: 0.45, fill: { color: INK }, line: { type: "none" } });
-    s.addText(String(i + 1), { x: 0.75, y: y + 0.3, w: 0.45, h: 0.45, fontFace: HEAD, fontSize: 16, bold: true, color: GOLD, align: "center", valign: "middle", margin: 0, isTextBox: true });
-    s.addText(it[0], { x: 1.45, y, w: 2.9, h: 1.05, fontFace: HEAD, fontSize: 17, bold: true, color: INK, margin: 0, valign: "middle", isTextBox: true });
-    s.addText(it[1], { x: 4.5, y, w: 4.8, h: 1.05, fontFace: BODY, fontSize: 14, color: GREY, margin: 0, valign: "middle", isTextBox: true });
+    const y = 1.15 + i * 0.95, h = 0.85;
+    box(s, 0.5, y, 9, h, { fill: MIST });
+    s.addShape(pres.ShapeType.ellipse, { x: 0.75, y: y + 0.2, w: 0.45, h: 0.45, fill: { color: INK }, line: { type: "none" } });
+    s.addText(String(i + 1), { x: 0.75, y: y + 0.2, w: 0.45, h: 0.45, fontFace: HEAD, fontSize: 16, bold: true, color: GOLD, align: "center", valign: "middle", margin: 0, isTextBox: true });
+    s.addText(it[0], { x: 1.45, y, w: 2.9, h, fontFace: HEAD, fontSize: 17, bold: true, color: INK, margin: 0, valign: "middle", isTextBox: true });
+    s.addText(it[1], { x: 4.5, y, w: 4.8, h, fontFace: BODY, fontSize: 13, color: GREY, margin: 0, valign: "middle", isTextBox: true, fit: "shrink" });
   });
-  s.addNotes("Что будет после сделки. Сервер: новая реализация DataSource, остальные слои не меняются. Оплата и заказы: настоящий checkout вместо демо. Аналитика: события просмотров, лайков и добавления в корзину в Firebase Analytics для бизнес-аналитики бренда.");
+  s.addNotes("Что будет после сделки. Сервер: новая реализация DataSource, остальные слои не меняются. Оплата и заказы: настоящий checkout вместо демо. Аналитика: события просмотров, лайков и добавления в корзину в Firebase Analytics для бизнес-аналитики бренда. Заказ под контролем: у Montblanc нет приложения для покупок (в App Store только приложения для часов, наушников и цифрового блокнота), а сайт на Trustpilot оценён в 1,5 из 5 — покупатели жалуются на неточное наличие, задержки заказов без объяснений и молчащую поддержку. Приложение закрывает именно эти боли.");
 }
 
 // 16 ─ Спасибо
