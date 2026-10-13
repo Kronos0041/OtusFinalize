@@ -3,7 +3,7 @@ struct GetFavoritesUseCase {
 
     init(repository: FavoritesRepositoryProtocol) { self.repository = repository }
 
-    func execute(ownerID: String) -> Set<String> {
+    func getFavoriteIDs(ownerID: String) -> Set<String> {
         repository.favoriteProductIDs(ownerID: ownerID)
     }
 }

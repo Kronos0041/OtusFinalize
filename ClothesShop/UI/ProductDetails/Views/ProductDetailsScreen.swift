@@ -10,9 +10,9 @@ import SwiftUI
 /// Карточка товара с описанием, размерами и ценой.
 /// Свайп вниз перезагружает каталог из Firestore; экран сразу показывает свежие данные товара.
 struct ProductDetailsScreen: View {
-    @Environment(CatalogViewModel.self) private var products
-    @Environment(CartViewModel.self) private var cart
-    @Environment(\.dismiss) private var dismiss
+    @Environment(CatalogViewModel.self) private var catalogViewModel
+    @Environment(CartViewModel.self) private var cartViewModel
+    @Environment(Router<CatalogRoute>.self) private var router
     @State private var selectedSize: String?
     let productID: String
 
@@ -21,24 +21,33 @@ struct ProductDetailsScreen: View {
         _selectedSize = State(initialValue: selectedSize)
     }
 
-    private var mode: ViewMode<CatalogItemUIModel> { products.productMode(id: productID) }
+    private var mode: ViewMode<CatalogItemUIModel> { catalogViewModel.productMode(id: productID) }
 
     /// Актуальная версия товара после обновления каталога.
-    private var current: CatalogItemUIModel? { products.product(id: productID) }
+    private var current: CatalogItemUIModel? { catalogViewModel.product(id: productID) }
 
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
                 TopBarDescriptionView(
                     title: SwiftGen.Product.title,
-                    onBack: { dismiss() },
+                    onBack: { router.pop() },
                     frame: (width: geometry.size.width, height: 50)
-                )
+                ) {
+                    if let current {
+                        ShareLink(item: current.shareText, preview: SharePreview(current.title)) {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.system(size: ComponentConstants.TopBar.shareIconSize))
+                                .foregroundColor(.appBlack)
+                        }
+                        .accessibilityLabel(Text(SwiftGen.Common.share))
+                    }
+                }
 
                 ViewModeView(
                     mode,
                     emptyTitle: SwiftGen.Common.empty,
-                    retry: { products.reload() }
+                    retry: { catalogViewModel.reload() }
                 ) { loadedProduct in
                     List {
                         ProductDetailsView(
@@ -52,18 +61,18 @@ struct ProductDetailsScreen: View {
                             .listRowBackground(Color.appWhite)
                     }
                     .listStyle(.plain)
-                    .refreshable { await products.refresh() }
+                    .refreshable { await catalogViewModel.refresh() }
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 if let current {
                     ProductPurchaseBar(
                         width: geometry.size.width,
-                        isInCart: cart.item(productID: current.id, size: selectedSize) != nil,
-                        canModifyCart: cart.canToggle(current, size: selectedSize),
-                        isLiked: products.isFavorite(current),
-                        toggleCart: { cart.toggle(current, size: selectedSize) },
-                        toggleLike: { products.toggleFavorite(current) }
+                        isInCart: cartViewModel.item(productID: current.id, size: selectedSize) != nil,
+                        canModifyCart: cartViewModel.canToggle(current, size: selectedSize),
+                        isLiked: catalogViewModel.isFavorite(current),
+                        toggleCart: { cartViewModel.toggle(current, size: selectedSize) },
+                        toggleLike: { catalogViewModel.toggleFavorite(current) }
                     )
                 }
             }
@@ -71,7 +80,7 @@ struct ProductDetailsScreen: View {
             .foregroundColor(.appBlack)
         }
         .toolbar(.hidden, for: .navigationBar)
-        .onAppear { products.loadIfNeeded() }
+        .onAppear { catalogViewModel.loadIfNeeded() }
         .onChange(of: current?.sizes ?? []) { _, sizes in
             if let selectedSize, !sizes.contains(selectedSize) { self.selectedSize = nil }
         }
@@ -82,30 +91,30 @@ struct ProductDetailsScreen: View {
 struct ProductDetailsScreen_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            screen(PreviewData.watch.id, size: "M", .preview(cartItems: []))
+            screen(PreviewData.watch.id, size: "M", .mock(cartItems: []))
                 .previewThemes("Размер выбран")
-            screen(PreviewData.watch.id, .preview(cartItems: []))
+            screen(PreviewData.watch.id, .mock(cartItems: []))
                 .previewThemes("Размер не выбран")
-            screen(PreviewData.glasses.id, .preview(cartItems: []))
+            screen(PreviewData.glasses.id, .mock(cartItems: []))
                 .previewThemes("Без размеров")
             screen(
                 PreviewData.longContent.id,
                 size: "XL",
-                .preview(catalog: .success(Catalog(
+                .mock(catalog: .success(Catalog(
                     categories: PreviewData.categories,
                     products: [PreviewData.longContent]
                 )), cartItems: [])
             )
                 .previewThemes("Длинные тексты")
-            screen(PreviewData.watch.id, .preview(catalog: .loading, cartItems: []))
+            screen(PreviewData.watch.id, .mock(catalog: .loading, cartItems: []))
                 .previewThemes("Загрузка")
-            screen("missing", .preview(cartItems: []))
+            screen("missing", .mock(cartItems: []))
                 .previewThemes("Товар не найден")
-            screen(PreviewData.watch.id, .preview(isConnected: false, cartItems: []))
+            screen(PreviewData.watch.id, .mock(isConnected: false, cartItems: []))
                 .previewThemes("Нет сети")
             screen(
                 PreviewData.watch.id,
-                .preview(catalog: .failure(PreviewError("Сервер недоступен")), cartItems: [])
+                .mock(catalog: .failure(MockError("Сервер недоступен")), cartItems: [])
             )
                 .previewThemes("Ошибка")
         }
@@ -119,6 +128,7 @@ struct ProductDetailsScreen_Previews: PreviewProvider {
         ProductDetailsScreen(productID: productID, selectedSize: size)
             .environment(container.makeLoadedCatalogViewModel())
             .environment(container.makeLoadedCartViewModel())
+            .environment(Router<CatalogRoute>())
     }
 }
 #endif

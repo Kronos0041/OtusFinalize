@@ -6,19 +6,6 @@ import FirebaseFirestore
 final class AppDIContainer {
     static let shared = AppDIContainer.live()
 
-    /// Реализации Domain-репозиториев, из которых контейнер собирает use case и ViewModel.
-    struct Repositories {
-        let auth: AuthRepositoryProtocol
-        let profile: ProfileRepositoryProtocol
-        let catalog: CatalogRepositoryProtocol
-        let cart: CartRepositoryProtocol
-        let settings: StoreSettingsRepositoryProtocol
-        let favorites: FavoritesRepositoryProtocol
-        let notifications: NotificationsRepositoryProtocol
-        let connectivity: ConnectivityRepositoryProtocol
-        let imageCache: ImageCacheRepositoryProtocol
-    }
-
     private let authRepository: AuthRepositoryProtocol
     private let profileRepository: ProfileRepositoryProtocol
     private let catalogRepository: CatalogRepositoryProtocol
@@ -29,7 +16,7 @@ final class AppDIContainer {
     private let connectivityRepository: ConnectivityRepositoryProtocol
     private let imageCacheRepository: ImageCacheRepositoryProtocol
 
-    init(repositories: Repositories) {
+    init(repositories: AppRepositories) {
         authRepository = repositories.auth
         profileRepository = repositories.profile
         catalogRepository = repositories.catalog
@@ -59,7 +46,7 @@ final class AppDIContainer {
         )
         let database = firestore ?? Firestore.firestore()
 
-        return AppDIContainer(repositories: Repositories(
+        return AppDIContainer(repositories: AppRepositories(
             auth: AuthRepositoryImpl(remoteDataSource: authRemoteDataSource),
             profile: ProfileRepositoryImpl(remoteDataSource: authRemoteDataSource),
             catalog: CatalogRepositoryImpl(
@@ -76,16 +63,30 @@ final class AppDIContainer {
             ),
             notifications: NotificationsRepositoryImpl(
                 remoteDataSource: FirestoreNotificationsDataSourceImpl(database: database),
-                readStateDataSource: UserDefaultsNotificationReadStateDataSourceImpl()
+                localDataSource: UserDefaultsNotificationsDataSourceImpl()
             ),
             connectivity: connectivityRepository,
             imageCache: imageCacheRepository
         ))
     }
 
+    func makeSessionViewModel() -> SessionViewModel {
+        SessionViewModel(observeSessionUseCase: ObserveAuthSessionUseCase(repository: authRepository))
+    }
+
     func makeAuthViewModel() -> AuthViewModel {
         AuthViewModel(
             authUseCases: AuthUseCases(repository: authRepository)
+        )
+    }
+
+    func makeEmailVerificationViewModel(email: String, onVerified: @escaping () -> Void) -> EmailVerificationViewModel {
+        EmailVerificationViewModel(
+            email: email,
+            resendUseCase: ResendVerificationEmailUseCase(repository: authRepository),
+            verifyEmailUseCase: VerifyEmailUseCase(repository: authRepository),
+            signOutUseCase: SignOutUseCase(repository: authRepository),
+            onVerified: onVerified
         )
     }
 
@@ -98,6 +99,7 @@ final class AppDIContainer {
             searchProductsUseCase: SearchProductsUseCase(),
             getFavoritesUseCase: GetFavoritesUseCase(repository: favoritesRepository),
             toggleFavoriteUseCase: ToggleFavoriteUseCase(repository: favoritesRepository),
+            clearFavoritesUseCase: ClearFavoritesUseCase(repository: favoritesRepository),
             connectivityUseCase: ObserveConnectivityUseCase(repository: connectivityRepository),
             ownerID: ownerID ?? authRepository.currentUserID,
             automaticallyReloads: automaticallyReloads
@@ -128,12 +130,12 @@ final class AppDIContainer {
     }
 
     func makeMainTabViewModel() -> MainTabViewModel {
-        let catalog = makeCatalogViewModel(automaticallyReloads: false)
-        let cart = makeCartViewModel()
+        let catalogViewModel = makeCatalogViewModel(automaticallyReloads: false)
+        let cartViewModel = makeCartViewModel()
         return MainTabViewModel(
-            catalog: catalog,
-            cart: cart,
-            loadStorefrontUseCase: LoadStorefrontUseCase(
+            catalogViewModel: catalogViewModel,
+            cartViewModel: cartViewModel,
+            getShopDataUseCase: GetShopDataUseCase(
                 getCatalogUseCase: GetCatalogUseCase(repository: catalogRepository),
                 getCartUseCase: GetCartUseCase(repository: cartRepository),
                 getStoreSettingsUseCase: GetStoreSettingsUseCase(repository: settingsRepository)

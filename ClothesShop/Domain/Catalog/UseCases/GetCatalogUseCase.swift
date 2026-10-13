@@ -5,7 +5,7 @@ struct GetCatalogUseCase {
         self.repository = repository
     }
 
-    func execute() async throws -> Catalog {
+    func getCatalog() async throws -> Catalog {
         try await repository.fetchCatalog()
     }
 }

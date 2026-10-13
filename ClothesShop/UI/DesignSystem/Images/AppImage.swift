@@ -16,6 +16,10 @@ enum AppImage {
     static let brandLogo = "brandLogo"
     static let brandWordmark = "brandWordmark"
 
+    /// Знаки внешних способов входа, цветные (без перекраски).
+    static let googleLogo = "googleLogo"
+    static let facebookLogo = "facebookLogo"
+
     enum Wallpaper {
         static let background = "backgroundWallpaper"
     }

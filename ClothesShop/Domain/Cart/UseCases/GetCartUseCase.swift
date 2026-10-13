@@ -5,7 +5,7 @@ struct GetCartUseCase {
         self.repository = repository
     }
 
-    func execute(ownerID: String) async throws -> [CartItem] {
+    func getCart(ownerID: String) async throws -> [CartItem] {
         try await repository.fetchCart(ownerID: ownerID)
     }
 }

@@ -24,6 +24,18 @@ enum ComponentConstants {
         /// - Decrease: контент прижмётся к краям экрана; при 0 карточки упрутся в края.
         /// - Important: Должна совпадать для ленты и сетки, иначе их края разъедутся.
         static let contentHorizontalInset: CGFloat = 20
+
+        /// Суммарный горизонтальный отступ полей ввода, кнопок и верхней панели от краёв экрана, 40 pt.
+        ///
+        /// Используется в `ButtonView`, `AuthView`, `CatalogHeaderView` и `MainTopBar`: ширина — `getWidth() - sideInset`.
+        /// - Increase: поля и кнопки станут уже.
+        /// - Decrease: поля и кнопки прижмутся к краям экрана.
+        static let sideInset: CGFloat = 40
+
+        /// Высота основных кнопок (`ButtonView`, кнопка «Добавить» на экране товара), 50 pt.
+        ///
+        /// - Decrease: меньше 44 pt — в кнопку станет трудно попасть.
+        static let buttonHeight: CGFloat = 50
     }
 
     // MARK: - Animation
@@ -36,6 +48,20 @@ enum ComponentConstants {
         /// - Increase: переключение станет плавнее, но при быстрых свайпах по страницам лента будет отставать.
         /// - Decrease: переключение станет резким; при 0 анимации не будет.
         static let categorySwitchDuration: Double = 0.2
+    }
+
+    // MARK: - Splash
+
+    /// Заставка при запуске (`SplashView`).
+    enum Splash {
+        /// Длительность одного оборота логотипа, 1 с. По окончании заставка закрывается.
+        ///
+        /// - Increase: запуск станет дольше.
+        /// - Decrease: оборот станет резким, логотип не успеют рассмотреть.
+        static let rotationDuration: Double = 1.5
+
+        /// Длительность растворения заставки при переходе к приложению, 0.3 с.
+        static let fadeDuration: Double = 0.5
     }
 
     // MARK: - CategoryPicker
@@ -133,6 +159,41 @@ enum ComponentConstants {
         static let retryDelayMilliseconds = 250
     }
 
+    // MARK: - FullScreenImage
+
+    /// Просмотр картинки на весь экран (`FullScreenImageView`).
+    enum FullScreenImage {
+        /// Максимальное увеличение щипком, 4×.
+        ///
+        /// - Increase: можно приблизить сильнее, но картинка начнёт размываться.
+        /// - Decrease: при 1 увеличение отключится.
+        static let maxScale: CGFloat = 4
+
+        /// Увеличение по двойному тапу к месту тапа, 2.5×. Должно быть не больше `maxScale`.
+        static let doubleTapScale: CGFloat = 2.5
+
+        /// Насколько протянуть вниз, чтобы закрыть экран, 120 pt.
+        ///
+        /// - Increase: экран будет закрываться только длинным свайпом.
+        /// - Decrease: экран станет закрываться от случайного движения.
+        static let dismissDistance: CGFloat = 120
+
+        /// Скорость свайпа вниз, при которой экран закрывается даже коротким движением, 1000 pt/с.
+        ///
+        /// - Increase: быстрый короткий свайп перестанет закрывать экран.
+        /// - Decrease: экран станет закрываться от случайного рывка.
+        static let dismissVelocity: CGFloat = 1000
+
+        /// Диаметр круглых кнопок «Закрыть» и «Поделиться», 36 pt.
+        static let buttonSize: CGFloat = 36
+
+        /// Размер иконок в круглых кнопках, 15 pt.
+        static let buttonIconSize: CGFloat = 15
+
+        /// Затемнение подложки кнопок, 0.45. Кнопки должны читаться и на светлом, и на тёмном фото.
+        static let buttonBackgroundOpacity: Double = 0.45
+    }
+
     // MARK: - Search
 
     /// Поле поиска каталога (`SearchTextField`).
@@ -158,7 +219,7 @@ enum ComponentConstants {
 
     // MARK: - Button
 
-    /// Основная кнопка на всю ширину (`ButtonView`). Размеры кнопки задаёт `AppLayout.fullWidthButton`.
+    /// Основная кнопка на всю ширину (`ButtonView`). Размеры задают `Layout.sideInset` и `Layout.buttonHeight`.
     enum Button {
         /// Размер шрифта заголовка кнопки, 18 pt.
         ///
@@ -178,7 +239,7 @@ enum ComponentConstants {
     enum Bell {
         /// Размер иконки колокольчика и всего компонента, 30 × 30 pt.
         ///
-        /// - Increase: иконка станет крупнее соседней иконки корзины в `MainTopBar`.
+        /// - Increase: иконка станет крупнее вордмарка и налезет на него в `MainTopBar`.
         /// - Decrease: зона нажатия станет меньше; бейдж начнёт перекрывать иконку.
         static let iconSize: CGFloat = 30
 
@@ -197,7 +258,7 @@ enum ComponentConstants {
         /// Смещение бейджа от правого верхнего угла колокольчика, (3, −8) pt.
         ///
         /// - Increase/Decrease: сдвигает бейдж; при больших значениях он выйдет за пределы
-        ///   кнопки и может перекрыть соседнюю иконку корзины.
+        ///   кнопки и обрежется краем экрана.
         static let badgeOffset = CGSize(width: 3, height: -8)
 
         /// Максимальное число, которое бейдж показывает целиком, 99. Больше — показывается «99+».
@@ -281,32 +342,21 @@ enum ComponentConstants {
         /// - Decrease: заголовок перестанет читаться как заголовок экрана.
         static let titleFontSize: CGFloat = 24
 
+        /// Размер иконки «Поделиться» справа в `TopBarDescriptionView`, 20 pt.
+        ///
+        /// - Important: Подобран визуально под `backIconSize`; меняй вместе.
+        static let shareIconSize: CGFloat = 20
+
         /// Высота `MainTopBar`, 56 pt.
         ///
         /// - Increase: панель сдвинет каталог вниз.
-        /// - Decrease: меньше 44 pt — кнопки колокольчика и корзины обрежутся.
+        /// - Decrease: меньше 44 pt — кнопка колокольчика обрежется.
         static let mainHeight: CGFloat = 56
-
-        /// Расстояние между кнопками колокольчика и корзины, 16 pt.
-        ///
-        /// - Increase: кнопки разойдутся и могут налезть на вордмарк по центру.
-        /// - Decrease: кнопки слипнутся, легко промахнуться.
-        static let actionsSpacing: CGFloat = 16
 
         /// Размер рамки вордмарка по центру `MainTopBar`, 160 × 40 pt (картинка вписывается с сохранением пропорций).
         ///
-        /// - Increase: вордмарк может налезть на кнопки справа на узких экранах.
+        /// - Increase: вордмарк может налезть на колокольчик справа на узких экранах.
         /// - Decrease: бренд станет плохо читаться.
         static let wordmarkSize = CGSize(width: 160, height: 40)
-
-        /// Размер SF Symbol иконки корзины, 26 pt.
-        ///
-        /// - Important: Подобран визуально под `Bell.iconSize`; меняй вместе.
-        static let cartIconFontSize: CGFloat = 26
-
-        /// Размер зоны нажатия кнопки корзины, 36 × 44 pt.
-        ///
-        /// - Decrease: высота меньше 44 pt — в кнопку станет трудно попасть.
-        static let cartButtonSize = CGSize(width: 36, height: 44)
     }
 }

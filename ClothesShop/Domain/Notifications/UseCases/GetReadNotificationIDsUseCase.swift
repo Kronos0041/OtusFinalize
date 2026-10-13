@@ -3,5 +3,5 @@ struct GetReadNotificationIDsUseCase {
 
     init(repository: NotificationsRepositoryProtocol) { self.repository = repository }
 
-    func execute() -> Set<String> { repository.readNotificationIDs() }
+    func getReadNotificationIDs() -> Set<String> { repository.readNotificationIDs() }
 }

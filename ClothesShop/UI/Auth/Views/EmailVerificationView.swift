@@ -1,58 +1,42 @@
 import SwiftUI
 
-/// Новый аккаунт уже создан в Firebase Auth, но каталог откроется только после проверки адреса.
+/// Аккаунт создан, ждём подтверждения почты по ссылке из письма.
+/// «Назад» выходит из аккаунта и возвращает к вводу email.
 struct EmailVerificationView: View {
-    @Environment(AuthViewModel.self) private var auth
-    let email: String
+    @State private var viewModel: EmailVerificationViewModel
+
+    init(viewModel: @autoclosure () -> EmailVerificationViewModel) {
+        _viewModel = State(wrappedValue: viewModel())
+    }
 
     var body: some View {
-        ZStack {
-            BlurredWallpaperBackground()
+        AuthStepLayout(
+            title: SwiftGen.Auth.Verification.title,
+            subtitle: Text(SwiftGen.Auth.Verification.instructions(viewModel.email)),
+            onBack: viewModel.signOut
+        ) {
+            AuthCapsuleButton(title: SwiftGen.Auth.Verification.resend, action: viewModel.resendVerificationEmail)
+                .disabled(viewModel.isSubmitting)
+        } bottom: {
+            VStack(alignment: .leading, spacing: 20) {
+                OpenMailButton(email: viewModel.email)
 
-            VStack(spacing: 20) {
-                Image(systemName: "envelope.badge")
-                    .font(.system(size: 52))
-
-                Text(SwiftGen.Auth.Verification.title)
-                    .font(.system(size: 32, design: .serif))
-                    .bold()
-
-                Text(SwiftGen.Auth.Verification.instructions(email))
-                    .multilineTextAlignment(.center)
-
-                if !auth.verificationMessage.isEmpty {
-                    Text(auth.verificationMessage)
-                        .font(.footnote)
-                        .multilineTextAlignment(.center)
+                Button(action: viewModel.refreshEmailVerification) {
+                    ButtonView(model: .emailConfirmed, state: .activeBlack, isLoading: viewModel.isSubmitting)
                 }
-
-                if auth.isSubmitting {
-                    ProgressView()
-                }
-
-                Button(SwiftGen.Auth.Verification.check, action: auth.refreshEmailVerification)
-                    .buttonStyle(.borderedProminent)
-                    .disabled(auth.isSubmitting)
-
-                Button(SwiftGen.Auth.Verification.resend, action: auth.resendVerificationEmail)
-                    .disabled(auth.isSubmitting)
-
-                Button(SwiftGen.Auth.signOut, action: auth.signOut)
-                    .disabled(auth.isSubmitting)
+                .disabled(viewModel.isSubmitting)
             }
-            .padding(24)
         }
+        .toast(viewModel.toast, dismiss: viewModel.dismissToast)
     }
 }
 
 #if DEBUG
 struct EmailVerificationView_Previews: PreviewProvider {
     static var previews: some View {
-        let email = PreviewData.profile.email
-        return EmailVerificationView(email: email)
-            .environment(
-                AppDIContainer.preview(authSession: .awaitingEmailVerification(email)).makeAuthViewModel()
-            )
+        let email = "alex@example.com"
+        EmailVerificationView(viewModel: AppDIContainer.mock(authSession: .awaitingEmailVerification(email))
+            .makeEmailVerificationViewModel(email: email, onVerified: {}))
             .previewThemes()
     }
 }

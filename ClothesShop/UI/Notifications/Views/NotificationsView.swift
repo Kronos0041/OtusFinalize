@@ -8,35 +8,35 @@
 import SwiftUI
 
 struct NotificationsView: View {
-    let notifications: NotificationsViewModel
-    @Environment(\.dismiss) private var dismiss
+    let notificationsViewModel: NotificationsViewModel
+    @Environment(Router<CatalogRoute>.self) private var router
 
     var body: some View {
         VStack(spacing: 0) {
             TopBarDescriptionView(
                 title: SwiftGen.Notifications.title,
-                onBack: { dismiss() },
+                onBack: { router.pop() },
                 frame: (width: getWidth() - 20, height: 50)
             )
 
             ViewModeView(
-                notifications.mode,
+                notificationsViewModel.mode,
                 emptyTitle: SwiftGen.Notifications.empty,
-                retry: { notifications.reload() }
+                retry: { notificationsViewModel.reload() }
             ) { items in
                 List(items) { item in
                     Button {
-                        notifications.markRead(item)
+                        notificationsViewModel.markRead(item)
                     } label: {
-                        NotificationRowView(item: item, isUnread: notifications.isUnread(item))
+                        NotificationRowView(item: item, isUnread: notificationsViewModel.isUnread(item))
                     }
                     .buttonStyle(.plain)
                 }
-                .refreshable { await notifications.refresh() }
+                .refreshable { await notificationsViewModel.refresh() }
             }
         }
         .toolbar(.hidden, for: .navigationBar)
-        .onAppear { notifications.reload() }
+        .onAppear { notificationsViewModel.reload() }
     }
 }
 
@@ -44,14 +44,17 @@ struct NotificationsView: View {
 struct NotificationsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NotificationsView(notifications: AppDIContainer.preview(readNotificationIDs: ["favorites"])
+            NotificationsView(notificationsViewModel: AppDIContainer.mock(readNotificationIDs: ["favorites"])
                 .makeNotificationsViewModel())
+                .environment(Router<CatalogRoute>())
                 .previewThemes("Список")
-            NotificationsView(notifications: AppDIContainer.preview(notifications: .success([]))
+            NotificationsView(notificationsViewModel: AppDIContainer.mock(notifications: .success([]))
                 .makeNotificationsViewModel())
+                .environment(Router<CatalogRoute>())
                 .previewThemes("Пусто")
-            NotificationsView(notifications: AppDIContainer.preview(isConnected: false)
+            NotificationsView(notificationsViewModel: AppDIContainer.mock(isConnected: false)
                 .makeNotificationsViewModel())
+                .environment(Router<CatalogRoute>())
                 .previewThemes("Нет сети")
         }
     }

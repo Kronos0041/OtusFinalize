@@ -3,7 +3,7 @@ struct MarkNotificationReadUseCase {
 
     init(repository: NotificationsRepositoryProtocol) { self.repository = repository }
 
-    func execute(notificationID: String, currentIDs: Set<String>) -> Set<String> {
+    func markRead(notificationID: String, currentIDs: Set<String>) -> Set<String> {
         var result = currentIDs
         result.insert(notificationID)
         repository.saveReadNotificationIDs(result)

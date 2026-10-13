@@ -58,6 +58,8 @@ struct CartSwipeDeleteRow<Content: View>: View {
         .clipped()
         .contentShape(Rectangle())
         .simultaneousGesture(swipeGesture)
+        // Свайп и спрятанная кнопка VoiceOver недоступны: удаление — через меню действий строки.
+        .accessibilityAction(named: Text(SwiftGen.Cart.delete)) { remove() }
     }
 
     private var swipeGesture: some Gesture {

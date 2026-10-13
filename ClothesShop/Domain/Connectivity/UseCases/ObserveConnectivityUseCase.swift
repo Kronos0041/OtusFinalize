@@ -7,7 +7,7 @@ struct ObserveConnectivityUseCase {
 
     var isConnected: Bool { repository.isConnected }
 
-    func execute() -> AsyncStream<Bool> {
+    func observeConnectivity() -> AsyncStream<Bool> {
         repository.updates()
     }
 }

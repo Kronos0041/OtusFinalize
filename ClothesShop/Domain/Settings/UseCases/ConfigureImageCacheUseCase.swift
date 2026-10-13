@@ -6,7 +6,7 @@ struct ConfigureImageCacheUseCase {
         self.repository = repository
     }
 
-    func execute(settings: StoreSettings) {
+    func configureImageCache(settings: StoreSettings) {
         repository.updateCapacity(
             memoryCapacityMB: settings.imageMemoryCacheCapacityMB,
             diskCapacityMB: settings.imageDiskCacheCapacityMB

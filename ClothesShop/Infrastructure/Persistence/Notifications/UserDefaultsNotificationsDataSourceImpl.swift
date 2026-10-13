@@ -1,6 +1,6 @@
 import Foundation
 
-final class UserDefaultsNotificationReadStateDataSourceImpl: NotificationReadStateDataSourceProtocol {
+final class UserDefaultsNotificationsDataSourceImpl: NotificationsLocalDataSourceProtocol {
     private let defaults: UserDefaults
     private let key = "notifications.seenIds"
 

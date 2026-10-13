@@ -193,6 +193,78 @@ function card(s, x, y, w, h, num, head, body) {
   s.addNotes("Тот же путь на мобильной версии сайта: размер, добавление в корзину, корзина и первый шаг оформления. Это ориентир для UX нашего приложения.");
 }
 
+// 3f ─ Принципы люксовых интернет-магазинов
+{
+  const s = slide("Как продают люкс онлайн: что мы взяли");
+  label(s, "Приложение повторяет смысл и стиль магазинов люксовых брендов: покупателю важны вид товара, цена и описание", 0.5, 1.0, 9, { size: 13, color: INK, h: 0.45 });
+  const cols = [
+    ["Вид товара",
+     "Покупатель не может потрогать вещь, поэтому фото заменяет примерку в бутике. Нужны крупные снимки и увеличение до деталей: швы, фактура, фурнитура",
+     "Крупное фото в карточке, просмотр на весь экран с увеличением щипком и двойным тапом, как в «Фото»"],
+    ["Цена",
+     "Цена видна сразу и не меняется по ходу покупки. Люкс не прячет цену за лишними шагами",
+     "Цена в рублях на карточке каталога и на экране товара; итог корзины считается сразу"],
+    ["Описание",
+     "Короткая строка для каталога и подробный текст на странице товара. Минимализм и «воздух» вокруг товара повышают его воспринимаемую ценность",
+     "Краткое описание в сетке, полное и размеры на экране товара; белый фон, чёрная типографика, без лишних элементов"],
+  ];
+  cols.forEach((c, i) => {
+    const x = 0.5 + i * 3.05, w = 2.9;
+    box(s, x, 1.55, w, 1.85, { fill: MIST });
+    s.addText(c[0], { x: x + 0.18, y: 1.62, w: w - 0.36, h: 0.42, fontFace: HEAD, fontSize: 16, bold: true, color: INK, margin: 0, valign: "middle", isTextBox: true });
+    s.addText(c[1], { x: x + 0.18, y: 2.05, w: w - 0.36, h: 1.3, fontFace: BODY, fontSize: 11, color: GREY, margin: 0, valign: "top", isTextBox: true, fit: "shrink" });
+    box(s, x, 3.5, w, 1.3, { fill: INK });
+    label(s, "В CLOTHESSHOP", x + 0.18, 3.56, w - 0.36, { size: 10, bold: true, color: GOLD, h: 0.25 });
+    s.addText(c[2], { x: x + 0.18, y: 3.82, w: w - 0.36, h: 0.95, fontFace: BODY, fontSize: 11, color: "E8E2D6", margin: 0, valign: "top", isTextBox: true, fit: "shrink" });
+  });
+  label(s, "Источники: Baymard Institute (бенчмарк люксовых магазинов 2021, исследование увеличения фото), Blue Acorn iCi, scandiweb, Nick Kolenda", 0.5, 4.95, 9, { size: 9 });
+  s.addNotes("По исследованиям, в люксе покупатель онлайн ориентируется прежде всего на изображения: дорогую вещь хочется рассмотреть, как в бутике. Baymard отмечает, что недостаточное увеличение фото — причина отказа от покупки. Поэтому в приложении сделан полноэкранный просмотр с масштабированием, цена видна сразу, а описание разделено на короткое и подробное. Визуальный стиль — минимализм с большим количеством свободного места, как у Montblanc, Chanel и The Row.");
+}
+
+// 3g ─ Приложения Montblanc в App Store: отзывы
+{
+  const s = slide("Приложения Montblanc в App Store");
+  label(s, "Магазина среди них нет. Средняя оценка по всем странам и что пишут в отзывах", 0.5, 0.95, 9, { size: 13, color: INK, h: 0.35 });
+  const apps = [
+    ["Hub", "блокнот Augmented Paper", "2,96", "165"],
+    ["Sound", "наушники", "1,95", "129"],
+    ["Digital Paper", "цифровой блокнот", "2,8", "10"],
+    ["Summit", "смарт-часы", "2,0", "5"],
+  ];
+  apps.forEach((a, i) => {
+    const y = 1.4 + i * 0.68;
+    box(s, 0.5, y, 3.0, 0.58, { fill: MIST });
+    s.addText(a[0], { x: 0.65, y: y + 0.04, w: 1.9, h: 0.28, fontFace: HEAD, fontSize: 13, bold: true, color: INK, margin: 0, valign: "middle", isTextBox: true });
+    s.addText(a[1], { x: 0.65, y: y + 0.3, w: 1.9, h: 0.24, fontFace: BODY, fontSize: 10, color: GREY, margin: 0, valign: "middle", isTextBox: true });
+    s.addText("★ " + a[2], { x: 2.5, y: y + 0.04, w: 0.9, h: 0.28, fontFace: HEAD, fontSize: 14, bold: true, color: GOLD, align: "right", margin: 0, valign: "middle", isTextBox: true });
+    s.addText(a[3] + " оц.", { x: 2.5, y: y + 0.3, w: 0.9, h: 0.24, fontFace: BODY, fontSize: 10, color: GREY, align: "right", margin: 0, valign: "middle", isTextBox: true });
+  });
+  const cols = [
+    ["Нравится", MIST, INK, GREY, [
+      "Сами устройства и их дизайн",
+      "Идея связки бумаги и цифры (Hub)",
+      "Базовые функции, когда всё подключилось",
+    ]],
+    ["Не нравится", INK, GOLD, "E8E2D6", [
+      "Часы и наушники не подключаются к iPhone",
+      "Выкидывает из аккаунта, код сброса не приходит",
+      "Синхронизация по 30+ минут",
+      "Редкие обновления, нет справки",
+      "Нет Strava, HealthKit, локализации",
+    ]],
+  ];
+  cols.forEach((c, i) => {
+    const x = 3.7 + i * 2.95, w = 2.8;
+    box(s, x, 1.4, w, 2.62, { fill: c[1] });
+    s.addText(c[0], { x: x + 0.15, y: 1.48, w: w - 0.3, h: 0.34, fontFace: HEAD, fontSize: 15, bold: true, color: c[2], margin: 0, valign: "middle", isTextBox: true });
+    s.addText(c[4].map((t, j) => ({ text: t, options: { bullet: true, breakLine: j < c[4].length - 1 } })),
+      { x: x + 0.15, y: 1.88, w: w - 0.3, h: 2.08, fontFace: BODY, fontSize: 11, color: c[3], margin: 0, valign: "top", paraSpaceAfter: 4, isTextBox: true, fit: "shrink" });
+  });
+  box(s, 0.5, 4.2, 9, 0.62, { fill: GOLD, text: "Вывод: цифровым продуктам бренда не хватает надёжного входа, стабильного подключения и регулярной поддержки. ClothesShop закрывает эти потребности", size: 12, bold: true });
+  label(s, "Источник: App Store, 4 приложения Montblanc International GmbH, 27 стран, 39 отзывов с текстом (2016–2026), данные на 13.10.2026", 0.5, 4.95, 9, { size: 9 });
+  s.addNotes("Собрал отзывы обо всех приложениях Montblanc в App Store. Приложения для покупок у бренда нет: есть приложения для блокнота, наушников и часов. Оценки низкие, от 1,95 до 2,96. Хвалят сами устройства, а ругают приложения: часы Summit не подключаются к iPhone (это большинство отзывов), Digital Paper выкидывает из аккаунта при каждом запуске, синхронизация идёт по полчаса, обновлений мало. Для нашего приложения отсюда требования: надёжный вход и сохранение сессии, стабильная работа и регулярные обновления.");
+}
+
 // 4 ─ Проблема
 {
   const s = slide("Какую проблему решаем");
@@ -238,12 +310,32 @@ function card(s, x, y, w, h, num, head, body) {
   s.addNotes("Здесь удобно показать живую демонстрацию в симуляторе. Покупка — демо-оформление: платёжная интеграция в объём диплома не входит.");
 }
 
+// 5a ─ Доступность
+{
+  const s = slide("Доступность и удобство");
+  const b = (text, last) => ({ text, options: { bullet: true, breakLine: !last } });
+  card(s, 0.5, 1.15, 4.4, 3.85, 1, "VoiceOver", [
+    b("Подписи и роли у кнопок, заголовков, выбранного размера и категории"),
+    b("Карточка товара читается одной фразой, лайк — отдельное действие в роторе"),
+    b("Удаление из корзины без свайпа, фото закрывается жестом «Z»"),
+    b("Всплывающие сообщения и счётчик уведомлений озвучиваются", true),
+  ]);
+  card(s, 5.1, 1.15, 4.4, 2.3, 2, "Уменьшение движения", [
+    b("На заставке логотип не вращается"),
+    b("Остаётся плавное растворение — безопасная анимация по HIG"),
+    { text: "accessibilityReduceMotion", options: { fontFace: "Courier New", fontSize: 12, color: INK, paraSpaceBefore: 4 } },
+  ]);
+  card(s, 5.1, 3.6, 4.4, 1.4, 3, "Поделиться",
+    "Товаром и фото — через системное меню (ShareLink)");
+  s.addNotes("Приложением должны пользоваться и незрячие покупатели, и люди с вестибулярными нарушениями. VoiceOver: у элементов есть подписи и роли (кнопка, заголовок, выбрано), карточка товара озвучивается целиком, а лайк вынесен в действие ротора; удаление из корзины и закрытие фото доступны без жестов, которые VoiceOver перехватывает; тосты озвучиваются через announcement. «Уменьшение движения» — системная настройка в Универсальном доступе: Apple советует убирать вращение и масштабирование, оставляя растворение. На заставке логотип делает оборот на 360°, поэтому при включённой настройке вращение отключается, а растворение остаётся. Поделиться: с карточки товара отправляются название, цена, описание и ссылка на фото, из полноэкранного просмотра — само изображение; используется системный ShareLink, поэтому доступны все приложения и AirDrop.");
+}
+
 // 6 ─ Clean Architecture
 {
   const s = slide("Архитектура: Clean Architecture");
   const cols = [
     ["UI", "SwiftUI Views, компоненты, DesignSystem, навигация", INK, PAPER],
-    ["Presentation", "ViewModel, UI-модели, ViewMode, Router, валидаторы", "3A332A", PAPER],
+    ["Presentation", "ViewModel, UI-модели, ViewMode, Router (push / pop), валидаторы", "3A332A", PAPER],
     ["Domain", "Entities, UseCases, протоколы репозиториев", GOLD, INK],
     ["Data", "Репозитории, DTO, Mapper, протоколы DataSource", MIST, INK],
     ["Infrastructure", "Firebase, UserDefaults, URLCache, NWPathMonitor", MIST, INK],
@@ -304,18 +396,18 @@ function card(s, x, y, w, h, num, head, body) {
 {
   const s = slide("Dependency Injection");
   box(s, 0.5, 1.2, 2.9, 0.85, { fill: GOLD, text: "live()\nFirebase · UserDefaults", size: 12, bold: true });
-  box(s, 0.5, 2.25, 2.9, 0.85, { fill: MIST, text: "preview()\nPreviewRepositories (моки)", size: 12, bold: true });
+  box(s, 0.5, 2.25, 2.9, 0.85, { fill: MIST, text: "mock()\nMock…Repository + MockResponse", size: 12, bold: true });
   arrow(s, 3.45, 1.62, 3.85, 1.95); arrow(s, 3.45, 2.67, 3.85, 2.35);
   box(s, 3.9, 1.2, 2.6, 1.9, { fill: INK, color: PAPER, text: "AppDIContainer\ninit(repositories:)\n\ncomposition root", size: 14, bold: true });
   arrow(s, 6.55, 2.15, 6.95, 2.15);
   box(s, 7.0, 1.2, 2.5, 1.9, { fill: MIST, text: "make…ViewModel()\nUseCase(repository:)\n→ ViewModel", size: 13, bold: true });
-  code(s, 0.5, 3.4, 4.7, 1.45, "struct Repositories {\n  let auth: AuthRepositoryProtocol\n  let catalog: CatalogRepositoryProtocol\n  let cart: CartRepositoryProtocol\n  …  // всего 9 протоколов\n}", 11);
+  code(s, 0.5, 3.4, 4.7, 1.45, "struct AppRepositories {\n  let auth: AuthRepositoryProtocol\n  let catalog: CatalogRepositoryProtocol\n  let cart: CartRepositoryProtocol\n  …  // всего 9 протоколов\n}", 11);
   s.addText([
     { text: "Зависимости передаются через init", options: { bullet: true, breakLine: true } },
     { text: "ViewModel видит только UseCase и протоколы", options: { bullet: true, breakLine: true } },
     { text: "Превью и тесты подставляют моки без сети", options: { bullet: true } },
   ], { x: 5.5, y: 3.4, w: 4.0, h: 1.45, fontFace: BODY, fontSize: 14, color: GREY, valign: "top", margin: 0, paraSpaceAfter: 6, isTextBox: true });
-  s.addNotes("Контейнер — composition root. Для боевого режима он собирается из Firebase-реализаций, для превью — из моков. ViewModel создаются фабричными методами контейнера.");
+  s.addNotes("Контейнер — composition root. Для боевого режима он собирается из Firebase-реализаций, для превью — из mock-репозиториев (AppDIContainer.mock). ViewModel создаются фабричными методами контейнера.");
 }
 
 // 9 ─ DTO
@@ -370,7 +462,7 @@ function card(s, x, y, w, h, num, head, body) {
     s.addText(e[1], { x: 3.4, y: e[2] + 0.4, w: 5.9, h: 0.5, fontFace: BODY, fontSize: 12, color: GREY, margin: 0, valign: "top", isTextBox: true });
     arrow(s, 2.75, e[2] + 0.47, 3.15, e[2] + 0.47);
   });
-  box(s, 0.5, 4.4, 9, 0.5, { fill: GOLD, text: "При входе каталог, корзина и настройки загружаются параллельно (async let в LoadStorefrontUseCase)", size: 12, bold: true });
+  box(s, 0.5, 4.4, 9, 0.5, { fill: GOLD, text: "При входе каталог, корзина и настройки загружаются параллельно (async let в GetShopDataUseCase → ShopData)", size: 12, bold: true });
   s.addNotes("Весь Firebase-код сосредоточен в Infrastructure. Ошибки SDK преобразуются в доменные ошибки (ErrorMapper), поэтому ViewModel не знает про Firebase.");
 }
 
@@ -490,16 +582,17 @@ function card(s, x, y, w, h, num, head, body) {
     ["Реальный сервер", "Собственный сервер или существующий бэкенд Montblanc: новая реализация DataSource вместо Firebase"],
     ["Оплата и заказы", "Настоящее оформление заказа и оплата вместо демо-режима"],
     ["Аналитика в Firebase", "Просмотры товаров, лайки и добавления в корзину для бизнес-аналитики бренда"],
+    ["Заказ под контролем", "Точное наличие, статус заказа с push-уведомлениями и связь с поддержкой из приложения"],
   ];
   items.forEach((it, i) => {
-    const y = 1.2 + i * 1.2;
-    box(s, 0.5, y, 9, 1.05, { fill: MIST });
-    s.addShape(pres.ShapeType.ellipse, { x: 0.75, y: y + 0.3, w: 0.45, h: 0.45, fill: { color: INK }, line: { type: "none" } });
-    s.addText(String(i + 1), { x: 0.75, y: y + 0.3, w: 0.45, h: 0.45, fontFace: HEAD, fontSize: 16, bold: true, color: GOLD, align: "center", valign: "middle", margin: 0, isTextBox: true });
-    s.addText(it[0], { x: 1.45, y, w: 2.9, h: 1.05, fontFace: HEAD, fontSize: 17, bold: true, color: INK, margin: 0, valign: "middle", isTextBox: true });
-    s.addText(it[1], { x: 4.5, y, w: 4.8, h: 1.05, fontFace: BODY, fontSize: 14, color: GREY, margin: 0, valign: "middle", isTextBox: true });
+    const y = 1.15 + i * 0.95, h = 0.85;
+    box(s, 0.5, y, 9, h, { fill: MIST });
+    s.addShape(pres.ShapeType.ellipse, { x: 0.75, y: y + 0.2, w: 0.45, h: 0.45, fill: { color: INK }, line: { type: "none" } });
+    s.addText(String(i + 1), { x: 0.75, y: y + 0.2, w: 0.45, h: 0.45, fontFace: HEAD, fontSize: 16, bold: true, color: GOLD, align: "center", valign: "middle", margin: 0, isTextBox: true });
+    s.addText(it[0], { x: 1.45, y, w: 2.9, h, fontFace: HEAD, fontSize: 17, bold: true, color: INK, margin: 0, valign: "middle", isTextBox: true });
+    s.addText(it[1], { x: 4.5, y, w: 4.8, h, fontFace: BODY, fontSize: 13, color: GREY, margin: 0, valign: "middle", isTextBox: true, fit: "shrink" });
   });
-  s.addNotes("Что будет после сделки. Сервер: новая реализация DataSource, остальные слои не меняются. Оплата и заказы: настоящий checkout вместо демо. Аналитика: события просмотров, лайков и добавления в корзину в Firebase Analytics для бизнес-аналитики бренда.");
+  s.addNotes("Что будет после сделки. Сервер: новая реализация DataSource, остальные слои не меняются. Оплата и заказы: настоящий checkout вместо демо. Аналитика: события просмотров, лайков и добавления в корзину в Firebase Analytics для бизнес-аналитики бренда. Заказ под контролем: у Montblanc нет приложения для покупок (в App Store только приложения для часов, наушников и цифрового блокнота), а сайт на Trustpilot оценён в 1,5 из 5 — покупатели жалуются на неточное наличие, задержки заказов без объяснений и молчащую поддержку. Приложение закрывает именно эти боли.");
 }
 
 // 16 ─ Спасибо

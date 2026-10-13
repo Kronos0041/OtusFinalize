@@ -7,23 +7,31 @@
 
 import SwiftUI
 
-struct TopBarDescriptionView: View {
+/// Шапка экрана: «назад» слева, заголовок по центру, необязательное действие справа.
+struct TopBarDescriptionView<Trailing: View>: View {
     let title: String
     let onBack: () -> Void
     let frame: (width: CGFloat, height: CGFloat)
+    @ViewBuilder var trailing: () -> Trailing
 
     var body: some View {
         ZStack {
             HStack {
-                Image(systemName: "arrow.left")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: ComponentConstants.TopBar.backIconSize, height: ComponentConstants.TopBar.backIconSize)
-                    .padding()
-                    .foregroundColor(Color.appBlack)
-                    .accessibilityLabel(Text(SwiftGen.Common.back))
-                    .onTapGesture(perform: onBack)
+                // Кнопка, а не `onTapGesture`: VoiceOver объявляет её как кнопку.
+                Button(action: onBack) {
+                    Image(systemName: "arrow.left")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: ComponentConstants.TopBar.backIconSize, height: ComponentConstants.TopBar.backIconSize)
+                        .padding()
+                        .foregroundColor(Color.appBlack)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text(SwiftGen.Common.back))
                 Spacer()
+                trailing()
+                    .padding(.trailing)
             }
 
             Text(title)
@@ -32,6 +40,12 @@ struct TopBarDescriptionView: View {
                 .foregroundColor(Color.appBlack)
         }
         .frame(width: frame.width, height: frame.height)
+    }
+}
+
+extension TopBarDescriptionView where Trailing == EmptyView {
+    init(title: String, onBack: @escaping () -> Void, frame: (width: CGFloat, height: CGFloat)) {
+        self.init(title: title, onBack: onBack, frame: frame) { EmptyView() }
     }
 }
 

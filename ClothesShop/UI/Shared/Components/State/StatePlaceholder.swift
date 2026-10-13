@@ -12,6 +12,7 @@ struct StatePlaceholder: View {
             Image(systemName: systemImage)
                 .font(.system(size: ComponentConstants.StatePlaceholder.iconSize))
                 .foregroundColor(.appGray)
+                .accessibilityHidden(true)
             Text(title).font(.headline).multilineTextAlignment(.center)
             if let message {
                 message.font(.footnote).foregroundColor(.appGray).multilineTextAlignment(.center)

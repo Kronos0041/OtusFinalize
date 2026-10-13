@@ -8,7 +8,7 @@ struct GetProfileUseCase {
     /// Профиль из локальной сессии, без запроса к серверу.
     var currentProfile: UserProfile { repository.currentProfile }
 
-    func execute() async throws -> UserProfile {
+    func getProfile() async throws -> UserProfile {
         try await repository.refreshProfile()
     }
 }

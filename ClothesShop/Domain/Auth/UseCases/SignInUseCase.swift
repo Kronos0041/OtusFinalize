@@ -5,7 +5,7 @@ struct SignInUseCase {
         self.repository = repository
     }
 
-    func execute(email: String, password: String) async throws {
+    func signIn(email: String, password: String) async throws {
         try await repository.signIn(email: email, password: password)
     }
 }

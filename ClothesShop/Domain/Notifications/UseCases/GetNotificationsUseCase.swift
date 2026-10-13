@@ -5,7 +5,7 @@ struct GetNotificationsUseCase {
         self.repository = repository
     }
 
-    func execute() async throws -> [Notification] {
+    func getNotifications() async throws -> [Notification] {
         try await repository.fetchNotifications()
     }
 }

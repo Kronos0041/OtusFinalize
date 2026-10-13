@@ -3,7 +3,7 @@ struct ToggleFavoriteUseCase {
 
     init(repository: FavoritesRepositoryProtocol) { self.repository = repository }
 
-    func execute(productID: String, ownerID: String, currentIDs: Set<String>) -> Set<String> {
+    func toggleFavorite(productID: String, ownerID: String, currentIDs: Set<String>) -> Set<String> {
         var result = currentIDs
         if result.contains(productID) { result.remove(productID) } else { result.insert(productID) }
         repository.saveFavoriteProductIDs(result, ownerID: ownerID)

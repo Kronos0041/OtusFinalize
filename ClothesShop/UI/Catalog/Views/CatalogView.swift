@@ -9,36 +9,37 @@ import SwiftUI
 
 /// Вкладка «Товары»: шапка с колокольчиком и каталог.
 struct CatalogView: View {
-    @Environment(CatalogViewModel.self) private var products
+    @Environment(CatalogViewModel.self) private var catalogViewModel
     /// Владеет ViewModel уведомлений `MainTabView`; здесь только наблюдение.
-    let notifications: NotificationsViewModel
-    let openCart: () -> Void
+    let notificationsViewModel: NotificationsViewModel
     @State private var router = Router<CatalogRoute>()
+
+    private var topBar: MainTopBar {
+        MainTopBar(
+            notificationCount: notificationsViewModel.unreadCount,
+            clickBell: { router.push(.notifications) }
+        )
+    }
 
     var body: some View {
         NavigationStack(path: Binding(get: { router.path }, set: router.updatePath)) {
-            VStack(spacing: 15) {
-                MainTopBar(
-                    notificationCount: notifications.unreadCount,
-                    clickBell: { router.push(.notifications) },
-                    clickCart: openCart
-                )
-
-                ViewModeView(
-                    products.mode,
-                    emptyTitle: SwiftGen.Catalog.empty,
-                    retry: { products.reload() }
-                ) { _ in
-                    CatalogSectionTabsView()
-                }
+            // С товарами панель входит в шапку, которая уезжает при прокрутке,
+            // а над загрузкой и ошибкой стоит отдельно.
+            ViewModeView(
+                catalogViewModel.mode,
+                emptyTitle: SwiftGen.Catalog.empty,
+                retry: { catalogViewModel.reload() },
+                placeholderHeader: { topBar }
+            ) { _ in
+                CatalogContentView(topBar: topBar)
             }
             .frame(width: getWidth())
             .toolbar(.hidden, for: .navigationBar)
-            .catalogDestinations(notifications: notifications)
+            .catalogDestinations(notificationsViewModel: notificationsViewModel)
         }
         .environment(router)
         .onAppear {
-            notifications.reload()
+            notificationsViewModel.reload()
         }
     }
 }
@@ -47,24 +48,21 @@ struct CatalogView: View {
 struct CatalogView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            content(AppDIContainer.preview(favoriteIDs: [PreviewData.watch.id]))
+            content(AppDIContainer.mock(favoriteIDs: [PreviewData.watch.id]))
                 .previewThemes("Каталог")
-            content(AppDIContainer.preview(catalog: .loading))
+            content(AppDIContainer.mock(catalog: .loading))
                 .previewThemes("Загрузка")
-            content(AppDIContainer.preview(catalog: .success(PreviewData.emptyCatalog)))
+            content(AppDIContainer.mock(catalog: .success(PreviewData.emptyCatalog)))
                 .previewThemes("Пусто")
-            content(AppDIContainer.preview(isConnected: false))
+            content(AppDIContainer.mock(isConnected: false))
                 .previewThemes("Нет сети")
-            content(AppDIContainer.preview(catalog: .failure(PreviewError("Сервер недоступен"))))
+            content(AppDIContainer.mock(catalog: .failure(MockError("Сервер недоступен"))))
                 .previewThemes("Ошибка")
         }
     }
 
     private static func content(_ container: AppDIContainer) -> some View {
-        CatalogView(
-            notifications: container.makeNotificationsViewModel(),
-            openCart: {}
-        )
+        CatalogView(notificationsViewModel: container.makeNotificationsViewModel())
             .environment(container.makeLoadedCatalogViewModel())
             .environment(container.makeLoadedCartViewModel())
     }

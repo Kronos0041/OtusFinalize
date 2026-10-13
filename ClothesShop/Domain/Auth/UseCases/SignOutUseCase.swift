@@ -5,7 +5,7 @@ struct SignOutUseCase {
         self.repository = repository
     }
 
-    func execute() throws {
+    func signOut() throws {
         try repository.signOut()
     }
 }

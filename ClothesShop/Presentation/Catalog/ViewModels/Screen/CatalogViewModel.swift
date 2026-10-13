@@ -39,6 +39,7 @@ final class CatalogViewModel {
     private let searchProductsUseCase: SearchProductsUseCase
     private let getFavoritesUseCase: GetFavoritesUseCase
     private let toggleFavoriteUseCase: ToggleFavoriteUseCase
+    private let clearFavoritesUseCase: ClearFavoritesUseCase
     private let connectivityUseCase: ObserveConnectivityUseCase
     private let ownerID: String?
     @ObservationIgnored private var catalog: Catalog?
@@ -49,6 +50,7 @@ final class CatalogViewModel {
          searchProductsUseCase: SearchProductsUseCase,
          getFavoritesUseCase: GetFavoritesUseCase,
          toggleFavoriteUseCase: ToggleFavoriteUseCase,
+         clearFavoritesUseCase: ClearFavoritesUseCase,
          connectivityUseCase: ObserveConnectivityUseCase,
          ownerID: String?,
          automaticallyReloads: Bool = true) {
@@ -56,11 +58,12 @@ final class CatalogViewModel {
         self.searchProductsUseCase = searchProductsUseCase
         self.getFavoritesUseCase = getFavoritesUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
+        self.clearFavoritesUseCase = clearFavoritesUseCase
         self.connectivityUseCase = connectivityUseCase
         self.ownerID = ownerID
-        favoriteProductIDs = ownerID.map(getFavoritesUseCase.execute) ?? []
+        favoriteProductIDs = ownerID.map(getFavoritesUseCase.getFavoriteIDs) ?? []
         if automaticallyReloads {
-            connectivityTask = Task { [weak self, updates = connectivityUseCase.execute()] in
+            connectivityTask = Task { [weak self, updates = connectivityUseCase.observeConnectivity()] in
                 for await connected in updates where connected {
                     self?.reloadAfterReconnect()
                 }
@@ -100,7 +103,7 @@ final class CatalogViewModel {
         requestInFlight = true
         defer { requestInFlight = false }
         do {
-            applyCatalog(.success(try await getCatalogUseCase.execute()))
+            applyCatalog(.success(try await getCatalogUseCase.getCatalog()))
         } catch {
             applyCatalog(.failure(error))
         }
@@ -154,11 +157,16 @@ final class CatalogViewModel {
 
     func toggleFavorite(_ product: CatalogItemUIModel) {
         guard let ownerID else { return }
-        favoriteProductIDs = toggleFavoriteUseCase.execute(
+        favoriteProductIDs = toggleFavoriteUseCase.toggleFavorite(
             productID: product.id,
             ownerID: ownerID,
             currentIDs: favoriteProductIDs
         )
+    }
+
+    func clearFavorites() {
+        guard let ownerID else { return }
+        favoriteProductIDs = clearFavoritesUseCase.clearFavorites(ownerID: ownerID)
     }
 
     /// Фильтрует товары внутри разделов, сохраняя сами разделы: индексы вкладок не сдвигаются.
@@ -167,7 +175,7 @@ final class CatalogViewModel {
             filteredSections = sections
             return
         }
-        let matchingIDs = Set(searchProductsUseCase.execute(products: catalog.products, query: searchText).map(\.id))
+        let matchingIDs = Set(searchProductsUseCase.searchProducts(in: catalog.products, query: searchText).map(\.id))
         filteredSections = sections.map { section in
             section.withProducts(section.products.filter { matchingIDs.contains($0.id) })
         }

@@ -50,7 +50,7 @@ struct ProfileContentView: View {
 struct ProfileContentView_Previews: PreviewProvider {
     static var previews: some View {
         ProfileContentView(
-            viewModel: AppDIContainer.preview().makeLoadedProfileViewModel(),
+            viewModel: AppDIContainer.mock().makeLoadedProfileViewModel(),
             selectChange: { _ in }
         )
             .previewThemes()

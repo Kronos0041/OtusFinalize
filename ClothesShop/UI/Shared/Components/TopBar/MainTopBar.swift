@@ -10,7 +10,6 @@ import SwiftUI
 struct MainTopBar: View {
     let notificationCount: Int
     let clickBell: () -> Void
-    let clickCart: () -> Void
 
     var body: some View {
         ZStack {
@@ -21,7 +20,7 @@ struct MainTopBar: View {
                 .frame(width: ComponentConstants.TopBar.wordmarkSize.width, height: ComponentConstants.TopBar.wordmarkSize.height)
                 .accessibilityLabel(Text(verbatim: "Montblanc"))
 
-            HStack(spacing: ComponentConstants.TopBar.actionsSpacing) {
+            HStack {
                 Spacer()
 
                 Button(action: clickBell) {
@@ -29,24 +28,17 @@ struct MainTopBar: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text(SwiftGen.Notifications.title))
-
-                Button(action: clickCart) {
-                    Image(systemName: "bag")
-                        .font(.system(size: ComponentConstants.TopBar.cartIconFontSize, weight: .regular))
-                        .frame(width: ComponentConstants.TopBar.cartButtonSize.width, height: ComponentConstants.TopBar.cartButtonSize.height)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text(SwiftGen.Cart.title))
+                .accessibilityValue(notificationCount > 0 ? SwiftGen.Notifications.unreadCount(notificationCount) : "")
             }
         }
         .foregroundColor(.appBlack)
-        .frame(width: getWidth() - AppLayout.sideInset, height: ComponentConstants.TopBar.mainHeight)
+        .frame(width: getWidth() - ComponentConstants.Layout.sideInset, height: ComponentConstants.TopBar.mainHeight)
     }
 }
 
 struct MainTopBar_Previews: PreviewProvider {
     static var previews: some View {
-        MainTopBar(notificationCount: 3, clickBell: {}, clickCart: {})
+        MainTopBar(notificationCount: 3, clickBell: {})
             .previewThemes()
     }
 }

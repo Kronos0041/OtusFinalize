@@ -5,7 +5,7 @@ struct RegisterUseCase {
         self.repository = repository
     }
 
-    func execute(email: String, password: String) async throws {
+    func register(email: String, password: String) async throws {
         try await repository.register(email: email, password: password)
     }
 }

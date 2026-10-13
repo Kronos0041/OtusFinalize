@@ -3,9 +3,11 @@ protocol AuthRemoteDataSourceProtocol {
     var session: AuthSession { get }
     var currentProfile: UserProfile { get }
 
+    func isEmailRegistered(_ email: String) async throws -> Bool
     func signIn(email: String, password: String) async throws
     func register(email: String, password: String) async throws
     func sendEmailVerification() async throws
+    func sendPasswordReset(email: String) async throws
     func refreshEmailVerification() async throws -> Bool
     func refreshProfile() async throws -> UserProfile
     func changePassword(currentPassword: String, newPassword: String) async throws

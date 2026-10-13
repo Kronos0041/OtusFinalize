@@ -13,6 +13,15 @@ final class FirebaseAuthDataSourceImpl: AuthRemoteDataSourceProtocol {
         return session(for: user)
     }
 
+    /// Работает, только если в Firebase Console выключена защита от перебора email
+    /// (Authentication → Settings → User actions → Email enumeration protection).
+    /// При включённой защите Firebase всегда возвращает пустой список, и приложение откроет регистрацию;
+    /// если email на самом деле занят, регистрация вернёт `emailAlreadyInUse` и экран переключится на вход.
+    func isEmailRegistered(_ email: String) async throws -> Bool {
+        let fetcher: SignInMethodsFetching = Auth.auth()
+        return try await mapped { try await !fetcher.fetchSignInMethods(forEmail: email).isEmpty }
+    }
+
     func signIn(email: String, password: String) async throws {
         try await mapped { _ = try await Auth.auth().signIn(withEmail: email, password: password) }
     }
@@ -29,6 +38,11 @@ final class FirebaseAuthDataSourceImpl: AuthRemoteDataSourceProtocol {
         let user = try requireUser()
         configureLanguage()
         try await mapped { try await user.sendEmailVerification() }
+    }
+
+    func sendPasswordReset(email: String) async throws {
+        configureLanguage()
+        try await mapped { try await Auth.auth().sendPasswordReset(withEmail: email) }
     }
 
     func refreshEmailVerification() async throws -> Bool {
@@ -108,3 +122,11 @@ final class FirebaseAuthDataSourceImpl: AuthRemoteDataSourceProtocol {
         Auth.auth().languageCode = Bundle.main.preferredLocalizations.first ?? "en"
     }
 }
+
+/// `fetchSignInMethods` помечен в Firebase как deprecated без замены. Вызов через протокол
+/// убирает предупреждение; ограничения метода описаны у `isEmailRegistered(_:)`.
+private protocol SignInMethodsFetching {
+    func fetchSignInMethods(forEmail email: String) async throws -> [String]
+}
+
+extension Auth: SignInMethodsFetching {}

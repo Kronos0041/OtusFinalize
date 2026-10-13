@@ -18,8 +18,8 @@ final class NotificationsViewModel {
          connectivityUseCase: ObserveConnectivityUseCase) {
         self.notificationsUseCases = notificationsUseCases
         self.connectivityUseCase = connectivityUseCase
-        readIDs = notificationsUseCases.readIDs.execute()
-        connectivityTask = Task { [weak self, updates = connectivityUseCase.execute()] in
+        readIDs = notificationsUseCases.readIDs.getReadNotificationIDs()
+        connectivityTask = Task { [weak self, updates = connectivityUseCase.observeConnectivity()] in
             for await connected in updates where connected {
                 self?.reloadAfterReconnect()
             }
@@ -45,7 +45,7 @@ final class NotificationsViewModel {
 
     func markRead(_ item: Notification) {
         guard isUnread(item) else { return }
-        readIDs = notificationsUseCases.markRead.execute(notificationID: item.id, currentIDs: readIDs)
+        readIDs = notificationsUseCases.markRead.markRead(notificationID: item.id, currentIDs: readIDs)
     }
 
     private func load() async {
@@ -58,7 +58,9 @@ final class NotificationsViewModel {
         requestInFlight = true
         defer { requestInFlight = false }
         do {
-            let items = try await notificationsUseCases.get.execute()
+            let items = try await notificationsUseCases.get.getNotifications()
+            // Id удалённых на сервере уведомлений больше не нужны.
+            readIDs = notificationsUseCases.removeStaleReadIDs.removeStaleIDs(currentIDs: readIDs, notifications: items)
             mode = .make(from: .success(items.sorted { $0.remoteID < $1.remoteID })) { $0.isEmpty }
         } catch {
             // Ошибка повторной загрузки не стирает уже показанный список.

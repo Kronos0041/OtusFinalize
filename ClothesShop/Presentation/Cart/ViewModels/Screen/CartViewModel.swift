@@ -86,13 +86,13 @@ final class CartViewModel {
         guard let ownerID else { return }
         if items.isEmpty { mode = .loading }
         do {
-            applySettings(.success(try await getSettingsUseCase.execute()))
+            applySettings(.success(try await getSettingsUseCase.getStoreSettings()))
         } catch {
             applySettings(.failure(error))
             return
         }
         do {
-            apply(.success(try await cartUseCases.get.execute(ownerID: ownerID)))
+            apply(.success(try await cartUseCases.get.getCart(ownerID: ownerID)))
         } catch {
             apply(.failure(error))
         }
@@ -162,7 +162,7 @@ final class CartViewModel {
         pendingItemIDs.formUnion(ids)
         defer { pendingItemIDs.subtract(ids) }
         do {
-            try await cartUseCases.clear.execute(ownerID: ownerID, itemIDs: ids)
+            try await cartUseCases.clear.clearCart(ownerID: ownerID, itemIDs: ids)
             items = []
             errorMessage = nil
             updateMode()
@@ -203,7 +203,7 @@ final class CartViewModel {
         defer { pendingItemIDs.remove(item.id) }
         let domainItem = CartItem(id: item.id, productID: product.id, size: item.size, quantity: quantity)
         do {
-            try await cartUseCases.add.execute(ownerID: ownerID, item: domainItem)
+            try await cartUseCases.add.addItem(ownerID: ownerID, item: domainItem)
             applySavedItem(item, product: product, quantity: quantity)
             errorMessage = nil
         } catch {
@@ -214,7 +214,7 @@ final class CartViewModel {
     private func performRemove(_ id: String, ownerID: String) async {
         defer { pendingItemIDs.remove(id) }
         do {
-            try await cartUseCases.remove.execute(ownerID: ownerID, itemID: id)
+            try await cartUseCases.remove.removeItem(ownerID: ownerID, itemID: id)
             items.removeAll { $0.id == id }
             errorMessage = nil
             updateMode()

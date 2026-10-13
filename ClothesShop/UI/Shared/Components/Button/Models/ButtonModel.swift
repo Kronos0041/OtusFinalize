@@ -1,13 +1,11 @@
 enum ButtonModel {
-    case back
-    case signIn
-    case registration
+    case continueAction
+    case emailConfirmed
 
     var title: String {
         switch self {
-        case .back: return SwiftGen.Common.back
-        case .signIn: return SwiftGen.Auth.authorization
-        case .registration: return SwiftGen.Auth.signUp
+        case .continueAction: return SwiftGen.Common.continue
+        case .emailConfirmed: return SwiftGen.Auth.Verification.check
         }
     }
 }

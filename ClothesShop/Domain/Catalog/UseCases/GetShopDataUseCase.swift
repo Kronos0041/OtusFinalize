@@ -1,6 +1,6 @@
 /// Стартовая загрузка магазина: каталог, корзина и настройки читаются параллельно.
 /// Ошибка одного запроса не отменяет остальные — каждый результат возвращается отдельно.
-struct LoadStorefrontUseCase {
+struct GetShopDataUseCase {
     private let getCatalogUseCase: GetCatalogUseCase
     private let getCartUseCase: GetCartUseCase
     private let getStoreSettingsUseCase: GetStoreSettingsUseCase
@@ -15,11 +15,11 @@ struct LoadStorefrontUseCase {
         self.getStoreSettingsUseCase = getStoreSettingsUseCase
     }
 
-    func execute(ownerID: String) async -> StorefrontLoadResult {
-        async let catalog = Self.result { try await getCatalogUseCase.execute() }
-        async let cart = Self.result { try await getCartUseCase.execute(ownerID: ownerID) }
-        async let settings = Self.result { try await getStoreSettingsUseCase.execute() }
-        return StorefrontLoadResult(
+    func getShopData(ownerID: String) async -> ShopData {
+        async let catalog = Self.result { try await getCatalogUseCase.getCatalog() }
+        async let cart = Self.result { try await getCartUseCase.getCart(ownerID: ownerID) }
+        async let settings = Self.result { try await getStoreSettingsUseCase.getStoreSettings() }
+        return ShopData(
             catalog: await catalog,
             cart: await cart,
             settings: await settings

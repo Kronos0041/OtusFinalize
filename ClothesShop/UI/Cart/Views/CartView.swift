@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CartView: View {
-    @Environment(CartViewModel.self) private var cart
+    @Environment(CartViewModel.self) private var cartViewModel
     let continueShopping: () -> Void
     /// Повтор загрузки корзины (вместе с каталогом, если его ещё нет).
     let reload: () -> Void
@@ -14,22 +14,22 @@ struct CartView: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 ViewModeView(
-                    cart.mode,
+                    cartViewModel.mode,
                     emptyTitle: SwiftGen.Cart.empty,
                     emptySystemImage: "bag",
                     emptyMessage: SwiftGen.Cart.emptyHint,
                     retry: reload
                 ) { _ in
                     CartItemsListView(
-                        items: cart.items,
-                        total: cart.total,
-                        maximumQuantity: cart.maximumQuantity,
-                        changeQuantity: cart.changeQuantity,
-                        remove: cart.remove
+                        items: cartViewModel.items,
+                        total: cartViewModel.total,
+                        maximumQuantity: cartViewModel.maximumQuantity,
+                        changeQuantity: cartViewModel.changeQuantity,
+                        remove: cartViewModel.remove
                     )
                 }
                 CartActionsView(
-                    isEmpty: cart.items.isEmpty,
+                    isEmpty: cartViewModel.items.isEmpty,
                     checkout: { showCheckout = true },
                     continueShopping: continueShopping
                 )
@@ -41,8 +41,8 @@ struct CartView: View {
         }
         .sheet(isPresented: $showCheckout, onDismiss: checkoutDismissed) {
             CartCheckoutView(
-                items: cart.items,
-                total: cart.total,
+                items: cartViewModel.items,
+                total: cartViewModel.total,
                 confirm: confirmCheckout,
                 cancel: { showCheckout = false }
             )
@@ -56,7 +56,7 @@ struct CartView: View {
 
     private func confirmCheckout() {
         Task {
-            guard await cart.clear() else { return }
+            guard await cartViewModel.clear() else { return }
             didCompleteCheckout = true
             showCheckout = false
         }
@@ -74,13 +74,13 @@ struct CartView: View {
 struct CartView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            content(AppDIContainer.preview())
+            content(AppDIContainer.mock())
                 .previewThemes("С товарами")
-            content(AppDIContainer.preview(cartItems: []))
+            content(AppDIContainer.mock(cartItems: []))
                 .previewThemes("Пустая")
-            content(AppDIContainer.preview(settings: .loading))
+            content(AppDIContainer.mock(settings: .loading))
                 .previewThemes("Загрузка")
-            content(AppDIContainer.preview(settings: .failure(PreviewError("Сервер недоступен"))))
+            content(AppDIContainer.mock(settings: .failure(MockError("Сервер недоступен"))))
                 .previewThemes("Ошибка")
         }
     }

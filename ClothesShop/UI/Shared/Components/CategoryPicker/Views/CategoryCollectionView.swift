@@ -9,10 +9,10 @@ import SwiftUI
 
 /// Горизонтальная лента категорий над каталогом.
 struct CategoryCollectionView: View {
-    @Environment(CatalogViewModel.self) private var products
+    @Environment(CatalogViewModel.self) private var catalogViewModel
 
     private var itemWidth: CGFloat {
-        let count = max(products.sections.count, 1)
+        let count = max(catalogViewModel.sections.count, 1)
         let availableWidth = getWidth() - ComponentConstants.Layout.contentHorizontalInset
         return max(ComponentConstants.CategoryPicker.minItemWidth, availableWidth / CGFloat(count))
     }
@@ -22,21 +22,23 @@ struct CategoryCollectionView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 0) {
                     // id — индекс раздела: по нему работает scrollTo(selected).
-                    ForEach(products.sections.indices, id: \.self) { index in
+                    ForEach(catalogViewModel.sections.indices, id: \.self) { index in
                         CategoryCollectionCellView(
-                            item: products.sections[index].category,
-                            isSelected: products.isSelected(index),
+                            item: catalogViewModel.sections[index].category,
+                            isSelected: catalogViewModel.isSelected(index),
                             width: itemWidth
                         ) {
                             withAnimation(.easeInOut(duration: ComponentConstants.Animation.categorySwitchDuration)) {
-                                products.selectCategory(at: index)
+                                catalogViewModel.selectCategory(at: index)
                             }
                         }
                         .id(index)
                     }
                 }
             }
-            .onChange(of: products.selectedCategoryIndex) { _, selected in
+            // Каталог пересоздаёт ленту при смене категории: выбранная сразу должна быть на виду.
+            .onAppear { scroll.scrollTo(catalogViewModel.selectedCategoryIndex, anchor: .center) }
+            .onChange(of: catalogViewModel.selectedCategoryIndex) { _, selected in
                 withAnimation(.easeInOut(duration: ComponentConstants.Animation.categorySwitchDuration)) {
                     scroll.scrollTo(selected, anchor: .center)
                 }
@@ -66,7 +68,7 @@ struct CategoryCollectionView_Previews: PreviewProvider {
     }
 
     private static func makeViewModel(_ catalog: Catalog, selected: Int) -> CatalogViewModel {
-        let viewModel = AppDIContainer.preview(catalog: .success(catalog)).makeLoadedCatalogViewModel()
+        let viewModel = AppDIContainer.mock(catalog: .success(catalog)).makeLoadedCatalogViewModel()
         viewModel.selectCategory(at: selected)
         return viewModel
     }

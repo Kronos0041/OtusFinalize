@@ -33,7 +33,7 @@ final class ProfileViewModel {
         self.connectivityUseCase = connectivityUseCase
         self.validator = validator
         user = profileUseCases.get.currentProfile
-        connectivityTask = Task { [weak self, updates = connectivityUseCase.execute()] in
+        connectivityTask = Task { [weak self, updates = connectivityUseCase.observeConnectivity()] in
             for await connected in updates where connected {
                 if case .noInternet = self?.mode { self?.loadProfile() }
             }
@@ -102,9 +102,9 @@ final class ProfileViewModel {
         do {
             switch change {
             case .password:
-                try await profileUseCases.changePassword.execute(currentPassword: currentPassword, newPassword: newPassword)
+                try await profileUseCases.changePassword.changePassword(currentPassword: currentPassword, newPassword: newPassword)
             case .email:
-                try await profileUseCases.changeEmail.execute(email: submittedEmail, currentPassword: currentPassword)
+                try await profileUseCases.changeEmail.changeEmail(to: submittedEmail, currentPassword: currentPassword)
             }
             resetForm()
             successMessage = change == .password
@@ -120,7 +120,7 @@ final class ProfileViewModel {
     func signOut() {
         guard !isSubmitting else { return }
         do {
-            try signOutUseCase.execute()
+            try signOutUseCase.signOut()
             resetForm()
             signOutError = nil
         } catch {
@@ -133,7 +133,7 @@ final class ProfileViewModel {
     private func performLoadProfile() async {
         defer { isRefreshing = false }
         do {
-            let profile = try await profileUseCases.get.execute()
+            let profile = try await profileUseCases.get.getProfile()
             user = profile
             profileError = nil
             mode = profile.email.isEmpty ? .empty : .content(profile)

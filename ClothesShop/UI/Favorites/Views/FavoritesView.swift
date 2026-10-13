@@ -1,16 +1,16 @@
 import SwiftUI
 
 struct FavoritesView: View {
-    @Environment(CatalogViewModel.self) private var products
+    @Environment(CatalogViewModel.self) private var catalogViewModel
     @State private var router = Router<CatalogRoute>()
 
     var body: some View {
         NavigationStack(path: Binding(get: { router.path }, set: router.updatePath)) {
             ViewModeView(
-                products.favoritesMode,
+                catalogViewModel.favoritesMode,
                 emptyTitle: SwiftGen.Favorites.empty,
                 emptySystemImage: "heart",
-                retry: { products.reload() }
+                retry: { catalogViewModel.reload() }
             ) { favorites in
                 let section = CatalogSectionUIModel(
                     id: "favorites",
@@ -21,6 +21,16 @@ struct FavoritesView: View {
             }
             .navigationTitle(SwiftGen.Favorites.title)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                // Кнопка есть, только когда очищать есть что.
+                if catalogViewModel.favoritesMode.content != nil {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(SwiftGen.Favorites.clear) {
+                            withAnimation { catalogViewModel.clearFavorites() }
+                        }
+                    }
+                }
+            }
             .catalogDestinations()
         }
         .environment(router)
@@ -31,9 +41,9 @@ struct FavoritesView: View {
 struct FavoritesView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            content(AppDIContainer.preview(favoriteIDs: Set(PreviewData.cartRecords.map(\.productID))))
+            content(AppDIContainer.mock(favoriteIDs: Set(PreviewData.cartRecords.map(\.productID))))
                 .previewThemes("Есть избранное")
-            content(AppDIContainer.preview())
+            content(AppDIContainer.mock())
                 .previewThemes("Пусто")
         }
     }

@@ -5,7 +5,7 @@ struct ChangeEmailUseCase {
         self.repository = repository
     }
 
-    func execute(email: String, currentPassword: String) async throws {
+    func changeEmail(to email: String, currentPassword: String) async throws {
         try await repository.changeEmail(to: email, currentPassword: currentPassword)
     }
 }
