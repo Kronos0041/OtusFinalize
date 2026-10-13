@@ -63,7 +63,7 @@ final class AppDIContainer {
             ),
             notifications: NotificationsRepositoryImpl(
                 remoteDataSource: FirestoreNotificationsDataSourceImpl(database: database),
-                readStateDataSource: UserDefaultsNotificationReadStateDataSourceImpl()
+                localDataSource: UserDefaultsNotificationsDataSourceImpl()
             ),
             connectivity: connectivityRepository,
             imageCache: imageCacheRepository

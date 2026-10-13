@@ -59,6 +59,8 @@ final class NotificationsViewModel {
         defer { requestInFlight = false }
         do {
             let items = try await notificationsUseCases.get.getNotifications()
+            // Id удалённых на сервере уведомлений больше не нужны.
+            readIDs = notificationsUseCases.removeStaleReadIDs.removeStaleIDs(currentIDs: readIDs, notifications: items)
             mode = .make(from: .success(items.sorted { $0.remoteID < $1.remoteID })) { $0.isEmpty }
         } catch {
             // Ошибка повторной загрузки не стирает уже показанный список.

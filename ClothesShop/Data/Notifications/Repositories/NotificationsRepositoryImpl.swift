@@ -1,11 +1,11 @@
 final class NotificationsRepositoryImpl: NotificationsRepositoryProtocol {
     private let remoteDataSource: NotificationsRemoteDataSourceProtocol
-    private let readStateDataSource: NotificationReadStateDataSourceProtocol
+    private let localDataSource: NotificationsLocalDataSourceProtocol
 
     init(remoteDataSource: NotificationsRemoteDataSourceProtocol,
-         readStateDataSource: NotificationReadStateDataSourceProtocol) {
+         localDataSource: NotificationsLocalDataSourceProtocol) {
         self.remoteDataSource = remoteDataSource
-        self.readStateDataSource = readStateDataSource
+        self.localDataSource = localDataSource
     }
 
     func fetchNotifications() async throws -> [Notification] {
@@ -13,10 +13,10 @@ final class NotificationsRepositoryImpl: NotificationsRepositoryProtocol {
     }
 
     func readNotificationIDs() -> Set<String> {
-        readStateDataSource.readNotificationIDs()
+        localDataSource.readNotificationIDs()
     }
 
     func saveReadNotificationIDs(_ ids: Set<String>) {
-        readStateDataSource.saveReadNotificationIDs(ids)
+        localDataSource.saveReadNotificationIDs(ids)
     }
 }
