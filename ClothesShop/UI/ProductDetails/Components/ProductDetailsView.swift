@@ -4,6 +4,7 @@ struct ProductDetailsView: View {
     let product: CatalogItemUIModel
     @Binding var selectedSize: String?
     let imageSize: CGFloat
+    @State private var isImageFullScreen = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -61,6 +62,8 @@ struct ProductDetailsView: View {
         RemoteImageView(url: product.imageURL, contentMode: .fit)
             .frame(maxWidth: .infinity)
             .background(Color.appGray.opacity(0.08))
+            .contentShape(Rectangle())
+            .onTapGesture { isImageFullScreen = true }
             .accessibilityLabel(Text(verbatim: product.title))
     }
 }

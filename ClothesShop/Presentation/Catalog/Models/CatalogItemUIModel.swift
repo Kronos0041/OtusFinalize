@@ -13,6 +13,14 @@ struct CatalogItemUIModel: Identifiable, Equatable, Codable {
 
     var formattedPrice: String { PriceFormatter.string(from: price) }
 
+    /// Текст для «Поделиться»: название, цена, краткое описание и ссылка на фото.
+    var shareText: String {
+        [title, formattedPrice, shortDescription, imageURL?.absoluteString]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n")
+    }
+
     init(product: Product) {
         id = product.id
         categoryID = product.categoryID

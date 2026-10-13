@@ -145,6 +145,41 @@ enum ComponentConstants {
         static let retryDelayMilliseconds = 250
     }
 
+    // MARK: - FullScreenImage
+
+    /// Просмотр картинки на весь экран (`FullScreenImageView`).
+    enum FullScreenImage {
+        /// Максимальное увеличение щипком, 4×.
+        ///
+        /// - Increase: можно приблизить сильнее, но картинка начнёт размываться.
+        /// - Decrease: при 1 увеличение отключится.
+        static let maxScale: CGFloat = 4
+
+        /// Увеличение по двойному тапу к месту тапа, 2.5×. Должно быть не больше `maxScale`.
+        static let doubleTapScale: CGFloat = 2.5
+
+        /// Насколько протянуть вниз, чтобы закрыть экран, 120 pt.
+        ///
+        /// - Increase: экран будет закрываться только длинным свайпом.
+        /// - Decrease: экран станет закрываться от случайного движения.
+        static let dismissDistance: CGFloat = 120
+
+        /// Скорость свайпа вниз, при которой экран закрывается даже коротким движением, 1000 pt/с.
+        ///
+        /// - Increase: быстрый короткий свайп перестанет закрывать экран.
+        /// - Decrease: экран станет закрываться от случайного рывка.
+        static let dismissVelocity: CGFloat = 1000
+
+        /// Диаметр круглых кнопок «Закрыть» и «Поделиться», 36 pt.
+        static let buttonSize: CGFloat = 36
+
+        /// Размер иконок в круглых кнопках, 15 pt.
+        static let buttonIconSize: CGFloat = 15
+
+        /// Затемнение подложки кнопок, 0.45. Кнопки должны читаться и на светлом, и на тёмном фото.
+        static let buttonBackgroundOpacity: Double = 0.45
+    }
+
     // MARK: - Search
 
     /// Поле поиска каталога (`SearchTextField`).
@@ -292,6 +327,11 @@ enum ComponentConstants {
         /// - Increase: длинные заголовки залезут под кнопку «назад».
         /// - Decrease: заголовок перестанет читаться как заголовок экрана.
         static let titleFontSize: CGFloat = 24
+
+        /// Размер иконки «Поделиться» справа в `TopBarDescriptionView`, 20 pt.
+        ///
+        /// - Important: Подобран визуально под `backIconSize`; меняй вместе.
+        static let shareIconSize: CGFloat = 20
 
         /// Высота `MainTopBar`, 56 pt.
         ///

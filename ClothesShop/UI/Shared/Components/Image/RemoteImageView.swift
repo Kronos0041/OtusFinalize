@@ -9,6 +9,8 @@ struct RemoteImageView: View {
     let url: URL?
     var contentMode: ContentMode = .fill
     var placeholderIconSize: CGFloat = ComponentConstants.RemoteImage.placeholderIconSize
+    /// Вызывается, когда картинка загружена (например, чтобы поделиться ею).
+    var onImageLoaded: ((UIImage) -> Void)? = nil
 
     @Environment(\.imageLoadMaxAttempts) private var maxAttempts
     @State private var image: UIImage?
@@ -54,7 +56,10 @@ struct RemoteImageView: View {
             didFail = false
         }
 
-        guard image == nil else { return }
+        if let image {
+            onImageLoaded?(image)
+            return
+        }
 
         didFail = false
         let attemptsCount = max(0, maxAttempts) + 1
@@ -73,6 +78,7 @@ struct RemoteImageView: View {
 
                 image = loadedImage
                 loadedURL = url
+                onImageLoaded?(loadedImage)
                 return
             } catch is CancellationError {
                 return

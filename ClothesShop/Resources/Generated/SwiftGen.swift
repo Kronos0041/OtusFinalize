@@ -151,6 +151,8 @@ internal enum SwiftGen {
     internal static let back = SwiftGen.tr("Localizable", "common.back", fallback: "Back")
     /// Cancel
     internal static let cancel = SwiftGen.tr("Localizable", "common.cancel", fallback: "Cancel")
+    /// Close
+    internal static let close = SwiftGen.tr("Localizable", "common.close", fallback: "Close")
     /// Email
     internal static let email = SwiftGen.tr("Localizable", "common.email", fallback: "Email")
     /// Nothing here yet
@@ -161,6 +163,8 @@ internal enum SwiftGen {
     internal static let retry = SwiftGen.tr("Localizable", "common.retry", fallback: "Try again")
     /// Search
     internal static let search = SwiftGen.tr("Localizable", "common.search", fallback: "Search")
+    /// Share
+    internal static let share = SwiftGen.tr("Localizable", "common.share", fallback: "Share")
   }
   internal enum Favorites {
     /// Add to favorites

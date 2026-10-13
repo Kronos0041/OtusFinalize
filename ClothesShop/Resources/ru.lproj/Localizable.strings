@@ -6,6 +6,8 @@
 "common.retry" = "Повторить";
 "common.search" = "Поиск";
 "common.empty" = "Пусто";
+"common.close" = "Закрыть";
+"common.share" = "Поделиться";
 "auth.signIn" = "Войти";
 "auth.authorization" = "Авторизация";
 "auth.signUp" = "Регистрация";

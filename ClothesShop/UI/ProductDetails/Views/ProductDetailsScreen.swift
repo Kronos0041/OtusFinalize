@@ -33,7 +33,16 @@ struct ProductDetailsScreen: View {
                     title: SwiftGen.Product.title,
                     onBack: { router.pop() },
                     frame: (width: geometry.size.width, height: 50)
-                )
+                ) {
+                    if let current {
+                        ShareLink(item: current.shareText, preview: SharePreview(current.title)) {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.system(size: ComponentConstants.TopBar.shareIconSize))
+                                .foregroundColor(.appBlack)
+                        }
+                        .accessibilityLabel(Text(SwiftGen.Common.share))
+                    }
+                }
 
                 ViewModeView(
                     mode,

@@ -21,6 +21,16 @@ struct FavoritesView: View {
             }
             .navigationTitle(SwiftGen.Favorites.title)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                // Кнопка есть, только когда очищать есть что.
+                if catalogViewModel.favoritesMode.content != nil {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(SwiftGen.Favorites.clear) {
+                            withAnimation { catalogViewModel.clearFavorites() }
+                        }
+                    }
+                }
+            }
             .catalogDestinations()
         }
         .environment(router)

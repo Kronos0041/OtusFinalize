@@ -6,6 +6,8 @@
 "common.retry" = "Try again";
 "common.search" = "Search";
 "common.empty" = "Nothing here yet";
+"common.close" = "Close";
+"common.share" = "Share";
 "auth.signIn" = "Sign in";
 "auth.authorization" = "Sign in";
 "auth.signUp" = "Sign up";
