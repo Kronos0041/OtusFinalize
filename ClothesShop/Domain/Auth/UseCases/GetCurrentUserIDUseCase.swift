@@ -6,7 +6,7 @@ struct GetCurrentUserIDUseCase {
         self.repository = repository
     }
 
-    func execute() -> String? {
+    func getCurrentUserID() -> String? {
         repository.currentUserID
     }
 }

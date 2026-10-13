@@ -133,7 +133,7 @@ final class AppDIContainer {
         return MainTabViewModel(
             catalog: catalog,
             cart: cart,
-            loadStorefrontUseCase: LoadStorefrontUseCase(
+            getShopDataUseCase: GetShopDataUseCase(
                 getCatalogUseCase: GetCatalogUseCase(repository: catalogRepository),
                 getCartUseCase: GetCartUseCase(repository: cartRepository),
                 getStoreSettingsUseCase: GetStoreSettingsUseCase(repository: settingsRepository)

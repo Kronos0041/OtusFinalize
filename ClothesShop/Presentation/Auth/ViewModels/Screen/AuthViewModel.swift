@@ -83,7 +83,7 @@ final class AuthViewModel {
 
     func observeSession() {
         guard observation == nil else { return }
-        observation = authUseCases.observeSession.execute { [weak self] in self?.setSession($0) }
+        observation = authUseCases.observeSession.observeSession { [weak self] in self?.setSession($0) }
     }
 
     func resendVerificationEmail() {
@@ -102,7 +102,7 @@ final class AuthViewModel {
 
     func signOut() {
         do {
-            try authUseCases.signOut.execute()
+            try authUseCases.signOut.signOut()
             setSession(.signedOut)
         } catch {
             verificationMessage = AuthErrorMessageMapper.message(for: error, verifyingCurrentPassword: false)
@@ -125,9 +125,9 @@ final class AuthViewModel {
         do {
             switch mode {
             case .signIn:
-                try await authUseCases.signIn.execute(email: email, password: password)
+                try await authUseCases.signIn.signIn(email: email, password: password)
             case .registration:
-                try await authUseCases.register.execute(email: email, password: password)
+                try await authUseCases.register.register(email: email, password: password)
             }
             setSession(authUseCases.observeSession.currentSession)
             if pendingEmail != nil {
@@ -148,7 +148,7 @@ final class AuthViewModel {
     private func performResendVerification() async {
         defer { isSubmitting = false }
         do {
-            try await authUseCases.resendVerification.execute()
+            try await authUseCases.resendVerification.resendVerificationEmail()
             verificationMessage = SwiftGen.Auth.Verification.resent
         } catch {
             verificationMessage = AuthErrorMessageMapper.message(for: error, verifyingCurrentPassword: false)
@@ -158,7 +158,7 @@ final class AuthViewModel {
     private func performRefreshVerification() async {
         defer { isSubmitting = false }
         do {
-            if try await authUseCases.verifyEmail.execute() {
+            if try await authUseCases.verifyEmail.verifyEmail() {
                 setSession(.verified)
             } else {
                 verificationMessage = SwiftGen.Auth.Verification.notConfirmed

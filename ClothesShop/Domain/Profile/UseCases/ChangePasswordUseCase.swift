@@ -5,7 +5,7 @@ struct ChangePasswordUseCase {
         self.repository = repository
     }
 
-    func execute(currentPassword: String, newPassword: String) async throws {
+    func changePassword(currentPassword: String, newPassword: String) async throws {
         try await repository.changePassword(currentPassword: currentPassword, newPassword: newPassword)
     }
 }

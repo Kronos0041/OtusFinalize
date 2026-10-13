@@ -5,7 +5,7 @@ struct AddCartItemUseCase {
         self.repository = repository
     }
 
-    func execute(ownerID: String, item: CartItem) async throws {
+    func addItem(ownerID: String, item: CartItem) async throws {
         try await repository.saveCartItem(ownerID: ownerID, item: item)
     }
 }

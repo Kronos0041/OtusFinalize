@@ -7,7 +7,7 @@ struct ObserveAuthSessionUseCase {
 
     var currentSession: AuthSession { repository.session }
 
-    func execute(_ handler: @escaping (AuthSession) -> Void) -> ObservationToken {
+    func observeSession(_ handler: @escaping (AuthSession) -> Void) -> ObservationToken {
         repository.observeSession(handler)
     }
 }

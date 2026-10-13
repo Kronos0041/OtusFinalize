@@ -5,7 +5,7 @@ struct ResendVerificationEmailUseCase {
         self.repository = repository
     }
 
-    func execute() async throws {
+    func resendVerificationEmail() async throws {
         try await repository.sendEmailVerification()
     }
 }

@@ -58,9 +58,9 @@ final class CatalogViewModel {
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
         self.connectivityUseCase = connectivityUseCase
         self.ownerID = ownerID
-        favoriteProductIDs = ownerID.map(getFavoritesUseCase.execute) ?? []
+        favoriteProductIDs = ownerID.map(getFavoritesUseCase.getFavoriteIDs) ?? []
         if automaticallyReloads {
-            connectivityTask = Task { [weak self, updates = connectivityUseCase.execute()] in
+            connectivityTask = Task { [weak self, updates = connectivityUseCase.observeConnectivity()] in
                 for await connected in updates where connected {
                     self?.reloadAfterReconnect()
                 }
@@ -100,7 +100,7 @@ final class CatalogViewModel {
         requestInFlight = true
         defer { requestInFlight = false }
         do {
-            applyCatalog(.success(try await getCatalogUseCase.execute()))
+            applyCatalog(.success(try await getCatalogUseCase.getCatalog()))
         } catch {
             applyCatalog(.failure(error))
         }
@@ -154,7 +154,7 @@ final class CatalogViewModel {
 
     func toggleFavorite(_ product: CatalogItemUIModel) {
         guard let ownerID else { return }
-        favoriteProductIDs = toggleFavoriteUseCase.execute(
+        favoriteProductIDs = toggleFavoriteUseCase.toggleFavorite(
             productID: product.id,
             ownerID: ownerID,
             currentIDs: favoriteProductIDs
@@ -167,7 +167,7 @@ final class CatalogViewModel {
             filteredSections = sections
             return
         }
-        let matchingIDs = Set(searchProductsUseCase.execute(products: catalog.products, query: searchText).map(\.id))
+        let matchingIDs = Set(searchProductsUseCase.searchProducts(in: catalog.products, query: searchText).map(\.id))
         filteredSections = sections.map { section in
             section.withProducts(section.products.filter { matchingIDs.contains($0.id) })
         }

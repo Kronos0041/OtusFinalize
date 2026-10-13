@@ -12,7 +12,7 @@ final class MainTabViewModel {
     let catalog: CatalogViewModel
     let cart: CartViewModel
 
-    private let loadStorefrontUseCase: LoadStorefrontUseCase
+    private let getShopDataUseCase: GetShopDataUseCase
     private let getCurrentUserIDUseCase: GetCurrentUserIDUseCase
     private let configureImageCacheUseCase: ConfigureImageCacheUseCase
     private let connectivityUseCase: ObserveConnectivityUseCase
@@ -21,13 +21,13 @@ final class MainTabViewModel {
 
     init(catalog: CatalogViewModel,
          cart: CartViewModel,
-         loadStorefrontUseCase: LoadStorefrontUseCase,
+         getShopDataUseCase: GetShopDataUseCase,
          getCurrentUserIDUseCase: GetCurrentUserIDUseCase,
          configureImageCacheUseCase: ConfigureImageCacheUseCase,
          connectivityUseCase: ObserveConnectivityUseCase) {
         self.catalog = catalog
         self.cart = cart
-        self.loadStorefrontUseCase = loadStorefrontUseCase
+        self.getShopDataUseCase = getShopDataUseCase
         self.getCurrentUserIDUseCase = getCurrentUserIDUseCase
         self.configureImageCacheUseCase = configureImageCacheUseCase
         self.connectivityUseCase = connectivityUseCase
@@ -36,7 +36,7 @@ final class MainTabViewModel {
         // (стартовое, pull-to-refresh, после восстановления сети) сразу попадает в неё.
         catalog.observeProductsUpdates { [weak cart] products in cart?.updateCatalog(products) }
 
-        connectivityTask = Task { [weak self, updates = connectivityUseCase.execute()] in
+        connectivityTask = Task { [weak self, updates = connectivityUseCase.observeConnectivity()] in
             for await connected in updates where connected {
                 self?.loadIfNeeded()
             }
@@ -49,7 +49,7 @@ final class MainTabViewModel {
 
     func loadIfNeeded() {
         guard !didStartInitialLoad, state != .loading,
-              let ownerID = getCurrentUserIDUseCase.execute() else { return }
+              let ownerID = getCurrentUserIDUseCase.getCurrentUserID() else { return }
         guard connectivityUseCase.isConnected else {
             catalog.applyCatalog(.failure(ConnectivityError.offline))
             cart.applySettings(.failure(ConnectivityError.offline))
@@ -57,7 +57,7 @@ final class MainTabViewModel {
         }
         didStartInitialLoad = true
         state = .loading
-        Task { [weak self] in await self?.loadStorefront(ownerID: ownerID) }
+        Task { [weak self] in await self?.loadShopData(ownerID: ownerID) }
     }
 
     /// Повтор загрузки корзины: если каталога ещё нет, сначала загружается он.
@@ -69,8 +69,8 @@ final class MainTabViewModel {
         }
     }
 
-    private func loadStorefront(ownerID: String) async {
-        let result = await loadStorefrontUseCase.execute(ownerID: ownerID)
+    private func loadShopData(ownerID: String) async {
+        let result = await getShopDataUseCase.getShopData(ownerID: ownerID)
         state = .loaded
         if case .failure = result.catalog { didStartInitialLoad = false }
         if case .failure = result.cart { didStartInitialLoad = false }
@@ -78,7 +78,7 @@ final class MainTabViewModel {
 
         if case .success(let settings) = result.settings {
             imageLoadMaxAttempts = settings.imageLoadMaxAttempts
-            configureImageCacheUseCase.execute(settings: settings)
+            configureImageCacheUseCase.configureImageCache(settings: settings)
         }
 
         catalog.applyCatalog(result.catalog)

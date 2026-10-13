@@ -14,7 +14,7 @@ struct GetStoreSettingsUseCase {
 
     /// Ошибка в лимите корзины прерывает загрузку: без него нельзя безопасно менять корзину.
     /// Некорректные настройки картинок заменяются значениями по умолчанию — они не критичны.
-    func execute() async throws -> StoreSettings {
+    func getStoreSettings() async throws -> StoreSettings {
         let settings = try await repository.fetchSettings()
         guard Self.allowedMaximumQuantity.contains(settings.maximumCartItemQuantity) else {
             throw CartSettingsError.invalidMaximumQuantity
