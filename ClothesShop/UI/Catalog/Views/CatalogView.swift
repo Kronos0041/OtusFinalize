@@ -9,9 +9,9 @@ import SwiftUI
 
 /// Вкладка «Товары»: шапка с колокольчиком и каталог.
 struct CatalogView: View {
-    @Environment(CatalogViewModel.self) private var products
+    @Environment(CatalogViewModel.self) private var catalogViewModel
     /// Владеет ViewModel уведомлений `MainTabView`; здесь только наблюдение.
-    let notifications: NotificationsViewModel
+    let notificationsViewModel: NotificationsViewModel
     let openCart: () -> Void
     @State private var router = Router<CatalogRoute>()
 
@@ -19,26 +19,26 @@ struct CatalogView: View {
         NavigationStack(path: Binding(get: { router.path }, set: router.updatePath)) {
             VStack(spacing: 15) {
                 MainTopBar(
-                    notificationCount: notifications.unreadCount,
+                    notificationCount: notificationsViewModel.unreadCount,
                     clickBell: { router.push(.notifications) },
                     clickCart: openCart
                 )
 
                 ViewModeView(
-                    products.mode,
+                    catalogViewModel.mode,
                     emptyTitle: SwiftGen.Catalog.empty,
-                    retry: { products.reload() }
+                    retry: { catalogViewModel.reload() }
                 ) { _ in
                     CatalogSectionTabsView()
                 }
             }
             .frame(width: getWidth())
             .toolbar(.hidden, for: .navigationBar)
-            .catalogDestinations(notifications: notifications)
+            .catalogDestinations(notificationsViewModel: notificationsViewModel)
         }
         .environment(router)
         .onAppear {
-            notifications.reload()
+            notificationsViewModel.reload()
         }
     }
 }
@@ -62,7 +62,7 @@ struct CatalogView_Previews: PreviewProvider {
 
     private static func content(_ container: AppDIContainer) -> some View {
         CatalogView(
-            notifications: container.makeNotificationsViewModel(),
+            notificationsViewModel: container.makeNotificationsViewModel(),
             openCart: {}
         )
             .environment(container.makeLoadedCatalogViewModel())

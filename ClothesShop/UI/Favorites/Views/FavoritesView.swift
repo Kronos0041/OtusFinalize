@@ -1,16 +1,16 @@
 import SwiftUI
 
 struct FavoritesView: View {
-    @Environment(CatalogViewModel.self) private var products
+    @Environment(CatalogViewModel.self) private var catalogViewModel
     @State private var router = Router<CatalogRoute>()
 
     var body: some View {
         NavigationStack(path: Binding(get: { router.path }, set: router.updatePath)) {
             ViewModeView(
-                products.favoritesMode,
+                catalogViewModel.favoritesMode,
                 emptyTitle: SwiftGen.Favorites.empty,
                 emptySystemImage: "heart",
-                retry: { products.reload() }
+                retry: { catalogViewModel.reload() }
             ) { favorites in
                 let section = CatalogSectionUIModel(
                     id: "favorites",

@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Поиск и переключатель категорий, которые прокручиваются вместе с каталогом.
 struct CatalogHeaderView: View {
-    @Environment(CatalogViewModel.self) private var products
+    @Environment(CatalogViewModel.self) private var catalogViewModel
 
     var body: some View {
         VStack(spacing: 15) {
@@ -10,8 +10,8 @@ struct CatalogHeaderView: View {
                 frame: (getWidth() - AppLayout.sideInset, 50),
                 placeholder: SwiftGen.Common.search,
                 text: Binding(
-                    get: { products.searchText },
-                    set: { products.updateSearchText($0) }
+                    get: { catalogViewModel.searchText },
+                    set: { catalogViewModel.updateSearchText($0) }
                 )
             )
 

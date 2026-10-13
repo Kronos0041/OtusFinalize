@@ -115,11 +115,11 @@ final class AppDIContainer {
     }
 
     func makeMainTabViewModel() -> MainTabViewModel {
-        let catalog = makeCatalogViewModel(automaticallyReloads: false)
-        let cart = makeCartViewModel()
+        let catalogViewModel = makeCatalogViewModel(automaticallyReloads: false)
+        let cartViewModel = makeCartViewModel()
         return MainTabViewModel(
-            catalog: catalog,
-            cart: cart,
+            catalogViewModel: catalogViewModel,
+            cartViewModel: cartViewModel,
             getShopDataUseCase: GetShopDataUseCase(
                 getCatalogUseCase: GetCatalogUseCase(repository: catalogRepository),
                 getCartUseCase: GetCartUseCase(repository: cartRepository),

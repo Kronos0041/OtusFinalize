@@ -10,8 +10,8 @@ import SwiftUI
 /// Карточка товара с описанием, размерами и ценой.
 /// Свайп вниз перезагружает каталог из Firestore; экран сразу показывает свежие данные товара.
 struct ProductDetailsScreen: View {
-    @Environment(CatalogViewModel.self) private var products
-    @Environment(CartViewModel.self) private var cart
+    @Environment(CatalogViewModel.self) private var catalogViewModel
+    @Environment(CartViewModel.self) private var cartViewModel
     @Environment(Router<CatalogRoute>.self) private var router
     @State private var selectedSize: String?
     let productID: String
@@ -21,10 +21,10 @@ struct ProductDetailsScreen: View {
         _selectedSize = State(initialValue: selectedSize)
     }
 
-    private var mode: ViewMode<CatalogItemUIModel> { products.productMode(id: productID) }
+    private var mode: ViewMode<CatalogItemUIModel> { catalogViewModel.productMode(id: productID) }
 
     /// Актуальная версия товара после обновления каталога.
-    private var current: CatalogItemUIModel? { products.product(id: productID) }
+    private var current: CatalogItemUIModel? { catalogViewModel.product(id: productID) }
 
     var body: some View {
         GeometryReader { geometry in
@@ -38,7 +38,7 @@ struct ProductDetailsScreen: View {
                 ViewModeView(
                     mode,
                     emptyTitle: SwiftGen.Common.empty,
-                    retry: { products.reload() }
+                    retry: { catalogViewModel.reload() }
                 ) { loadedProduct in
                     List {
                         ProductDetailsView(
@@ -52,18 +52,18 @@ struct ProductDetailsScreen: View {
                             .listRowBackground(Color.appWhite)
                     }
                     .listStyle(.plain)
-                    .refreshable { await products.refresh() }
+                    .refreshable { await catalogViewModel.refresh() }
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 if let current {
                     ProductPurchaseBar(
                         width: geometry.size.width,
-                        isInCart: cart.item(productID: current.id, size: selectedSize) != nil,
-                        canModifyCart: cart.canToggle(current, size: selectedSize),
-                        isLiked: products.isFavorite(current),
-                        toggleCart: { cart.toggle(current, size: selectedSize) },
-                        toggleLike: { products.toggleFavorite(current) }
+                        isInCart: cartViewModel.item(productID: current.id, size: selectedSize) != nil,
+                        canModifyCart: cartViewModel.canToggle(current, size: selectedSize),
+                        isLiked: catalogViewModel.isFavorite(current),
+                        toggleCart: { cartViewModel.toggle(current, size: selectedSize) },
+                        toggleLike: { catalogViewModel.toggleFavorite(current) }
                     )
                 }
             }
@@ -71,7 +71,7 @@ struct ProductDetailsScreen: View {
             .foregroundColor(.appBlack)
         }
         .toolbar(.hidden, for: .navigationBar)
-        .onAppear { products.loadIfNeeded() }
+        .onAppear { catalogViewModel.loadIfNeeded() }
         .onChange(of: current?.sizes ?? []) { _, sizes in
             if let selectedSize, !sizes.contains(selectedSize) { self.selectedSize = nil }
         }

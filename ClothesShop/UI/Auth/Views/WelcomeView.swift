@@ -10,7 +10,7 @@ import SwiftUI
 /// Стартовый экран: логотип и выбор «вход / регистрация».
 /// Если пользователь уже авторизован, сразу открывается `MainTabView`.
 struct WelcomeView: View {
-    private let auth: AuthViewModel
+    private let authViewModel: AuthViewModel
     private let container: AppDIContainer
 
     @State private var logoRotation: Double = 0
@@ -19,19 +19,19 @@ struct WelcomeView: View {
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     init(viewModel: AuthViewModel, container: AppDIContainer) {
-        auth = viewModel
+        authViewModel = viewModel
         self.container = container
     }
 
     var body: some View {
         Group {
-            if auth.isSignedIn {
+            if authViewModel.isSignedIn {
                 MainTabView(container: container)
-            } else if let email = auth.pendingEmail {
+            } else if let email = authViewModel.pendingEmail {
                 EmailVerificationView(email: email)
-                    .environment(auth)
+                    .environment(authViewModel)
             } else {
-                NavigationStack(path: Binding(get: { auth.path }, set: auth.updatePath)) {
+                NavigationStack(path: Binding(get: { authViewModel.path }, set: authViewModel.updatePath)) {
                     ZStack {
                         BlurredWallpaperBackground()
 
@@ -52,10 +52,10 @@ struct WelcomeView: View {
                         }
                     }
                 }
-                .environment(auth)
+                .environment(authViewModel)
             }
         }
-        .onAppear(perform: auth.observeSession)
+        .onAppear(perform: authViewModel.observeSession)
     }
 
     private var logo: some View {
@@ -82,7 +82,7 @@ struct WelcomeView: View {
 
     private func openAuthButton(mode: AuthMode, model: ButtonModel, state: ButtonState) -> some View {
         Button {
-            auth.openAuthForm(mode: mode)
+            authViewModel.openAuthForm(mode: mode)
         } label: {
             ButtonView(model: model, state: state)
         }

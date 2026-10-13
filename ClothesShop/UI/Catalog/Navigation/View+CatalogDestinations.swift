@@ -1,7 +1,7 @@
 import SwiftUI
 
 extension View {
-    func catalogDestinations(notifications: NotificationsViewModel? = nil) -> some View {
-        modifier(CatalogDestinations(notifications: notifications))
+    func catalogDestinations(notificationsViewModel: NotificationsViewModel? = nil) -> some View {
+        modifier(CatalogDestinations(notificationsViewModel: notificationsViewModel))
     }
 }

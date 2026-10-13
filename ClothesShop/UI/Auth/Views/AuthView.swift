@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Экран входа / регистрации. Вся логика — в `AuthViewModel`, здесь только разметка.
 struct AuthView: View {
-    @Environment(AuthViewModel.self) private var auth
+    @Environment(AuthViewModel.self) private var authViewModel
     @Environment(\.dismiss) private var dismiss
     let mode: AuthMode
 
@@ -25,17 +25,17 @@ struct AuthView: View {
 
                 VStack(spacing: 10) {
                     errorBanner
-                    AuthFieldsView(auth: auth, mode: mode, width: fieldsWidth)
+                    AuthFieldsView(authViewModel: authViewModel, mode: mode, width: fieldsWidth)
                 }
 
                 Button {
-                    auth.submit(mode: mode)
+                    authViewModel.submit(mode: mode)
                 } label: {
                     ButtonView(model: mode == .signIn ? .signIn : .registration, state: .activeBlack)
                 }
-                .disabled(auth.isSubmitting)
+                .disabled(authViewModel.isSubmitting)
 
-                if auth.isSubmitting {
+                if authViewModel.isSubmitting {
                     ProgressView()
                 }
 
@@ -46,7 +46,7 @@ struct AuthView: View {
                 }
             }
         }
-        .animation(.easeInOut(duration: 1), value: auth.banner.isVisible)
+        .animation(.easeInOut(duration: 1), value: authViewModel.banner.isVisible)
         .toolbar(.hidden, for: .navigationBar)
     }
 
@@ -54,15 +54,15 @@ struct AuthView: View {
 
     private var errorBanner: some View {
         Group {
-            if auth.banner.isVisible {
-                Text(auth.banner.message)
+            if authViewModel.banner.isVisible {
+                Text(authViewModel.banner.message)
                     .font(.system(size: 16, design: .serif))
                     .foregroundColor(.white)
                     .padding()
                     .frame(width: fieldsWidth)
                     .background(Color.appRed.opacity(0.6))
                     .cornerRadius(10)
-                    .onTapGesture { auth.dismissBanner() }
+                    .onTapGesture { authViewModel.dismissBanner() }
             }
         }
     }

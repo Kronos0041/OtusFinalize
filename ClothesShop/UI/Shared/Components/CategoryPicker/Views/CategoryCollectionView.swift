@@ -9,10 +9,10 @@ import SwiftUI
 
 /// Горизонтальная лента категорий над каталогом.
 struct CategoryCollectionView: View {
-    @Environment(CatalogViewModel.self) private var products
+    @Environment(CatalogViewModel.self) private var catalogViewModel
 
     private var itemWidth: CGFloat {
-        let count = max(products.sections.count, 1)
+        let count = max(catalogViewModel.sections.count, 1)
         let availableWidth = getWidth() - ComponentConstants.Layout.contentHorizontalInset
         return max(ComponentConstants.CategoryPicker.minItemWidth, availableWidth / CGFloat(count))
     }
@@ -22,21 +22,21 @@ struct CategoryCollectionView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 0) {
                     // id — индекс раздела: по нему работает scrollTo(selected).
-                    ForEach(products.sections.indices, id: \.self) { index in
+                    ForEach(catalogViewModel.sections.indices, id: \.self) { index in
                         CategoryCollectionCellView(
-                            item: products.sections[index].category,
-                            isSelected: products.isSelected(index),
+                            item: catalogViewModel.sections[index].category,
+                            isSelected: catalogViewModel.isSelected(index),
                             width: itemWidth
                         ) {
                             withAnimation(.easeInOut(duration: ComponentConstants.Animation.categorySwitchDuration)) {
-                                products.selectCategory(at: index)
+                                catalogViewModel.selectCategory(at: index)
                             }
                         }
                         .id(index)
                     }
                 }
             }
-            .onChange(of: products.selectedCategoryIndex) { _, selected in
+            .onChange(of: catalogViewModel.selectedCategoryIndex) { _, selected in
                 withAnimation(.easeInOut(duration: ComponentConstants.Animation.categorySwitchDuration)) {
                     scroll.scrollTo(selected, anchor: .center)
                 }

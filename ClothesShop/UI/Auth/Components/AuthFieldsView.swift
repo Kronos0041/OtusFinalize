@@ -1,25 +1,25 @@
 import SwiftUI
 
 struct AuthFieldsView: View {
-    let auth: AuthViewModel
+    let authViewModel: AuthViewModel
     let mode: AuthMode
     let width: CGFloat
 
     var body: some View {
         VStack(spacing: 15) {
-            TextField(SwiftGen.Common.email, text: Binding(get: { auth.email }, set: auth.updateEmail), onEditingChanged: { isEditing in
-                auth.emailEditingChanged(isEditing: isEditing)
+            TextField(SwiftGen.Common.email, text: Binding(get: { authViewModel.email }, set: authViewModel.updateEmail), onEditingChanged: { isEditing in
+                authViewModel.emailEditingChanged(isEditing: isEditing)
             })
             .keyboardType(.emailAddress)
             .textContentType(.emailAddress)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
 
-            SecureField(SwiftGen.Auth.password, text: Binding(get: { auth.password }, set: auth.updatePassword))
+            SecureField(SwiftGen.Auth.password, text: Binding(get: { authViewModel.password }, set: authViewModel.updatePassword))
                 .textContentType(mode == .registration ? .newPassword : .password)
 
             if mode == .registration {
-                SecureField(SwiftGen.Auth.repeatPassword, text: Binding(get: { auth.repeatPassword }, set: auth.updateRepeatPassword))
+                SecureField(SwiftGen.Auth.repeatPassword, text: Binding(get: { authViewModel.repeatPassword }, set: authViewModel.updateRepeatPassword))
                     .textContentType(.newPassword)
             }
         }
@@ -35,10 +35,10 @@ struct AuthFieldsView_Previews: PreviewProvider {
     static var previews: some View {
         let container = AppDIContainer.mock(authSession: .signedOut)
         return Group {
-            AuthFieldsView(auth: container.makeAuthViewModel(), mode: .signIn, width: 340)
+            AuthFieldsView(authViewModel: container.makeAuthViewModel(), mode: .signIn, width: 340)
                 .previewLayout(.sizeThatFits)
                 .previewThemes("Вход")
-            AuthFieldsView(auth: container.makeAuthViewModel(), mode: .registration, width: 340)
+            AuthFieldsView(authViewModel: container.makeAuthViewModel(), mode: .registration, width: 340)
                 .previewLayout(.sizeThatFits)
                 .previewThemes("Регистрация")
         }

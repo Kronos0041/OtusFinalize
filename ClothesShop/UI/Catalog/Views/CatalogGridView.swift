@@ -15,7 +15,7 @@ struct CatalogGridView: View {
     var emptyMessage = SwiftGen.Favorites.instructions
     var header: CatalogHeaderView? = nil
 
-    @Environment(CatalogViewModel.self) private var products
+    @Environment(CatalogViewModel.self) private var catalogViewModel
     @Environment(Router<CatalogRoute>.self) private var router
 
     private let itemSpacing: CGFloat = 12
@@ -51,9 +51,9 @@ struct CatalogGridView: View {
                         ForEach(section.products) { product in
                             CatalogItemView(
                                 item: product,
-                                isLiked: products.isFavorite(product),
+                                isLiked: catalogViewModel.isFavorite(product),
                                 width: cellWidth,
-                                topLike: { products.toggleFavorite(product) },
+                                topLike: { catalogViewModel.toggleFavorite(product) },
                                 topDescription: { router.push(.productDetails(productID: product.id)) }
                             )
                         }
@@ -61,7 +61,7 @@ struct CatalogGridView: View {
                     .padding(.top, 10)
                 }
             }
-            .refreshable { await products.refresh() }
+            .refreshable { await catalogViewModel.refresh() }
             .allowsHitTesting(header != nil || !section.products.isEmpty)
         }
         .frame(width: gridWidth)

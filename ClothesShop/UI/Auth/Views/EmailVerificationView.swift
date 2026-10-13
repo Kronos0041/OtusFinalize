@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Новый аккаунт уже создан в Firebase Auth, но каталог откроется только после проверки адреса.
 struct EmailVerificationView: View {
-    @Environment(AuthViewModel.self) private var auth
+    @Environment(AuthViewModel.self) private var authViewModel
     let email: String
 
     var body: some View {
@@ -20,25 +20,25 @@ struct EmailVerificationView: View {
                 Text(SwiftGen.Auth.Verification.instructions(email))
                     .multilineTextAlignment(.center)
 
-                if !auth.verificationMessage.isEmpty {
-                    Text(auth.verificationMessage)
+                if !authViewModel.verificationMessage.isEmpty {
+                    Text(authViewModel.verificationMessage)
                         .font(.footnote)
                         .multilineTextAlignment(.center)
                 }
 
-                if auth.isSubmitting {
+                if authViewModel.isSubmitting {
                     ProgressView()
                 }
 
-                Button(SwiftGen.Auth.Verification.check, action: auth.refreshEmailVerification)
+                Button(SwiftGen.Auth.Verification.check, action: authViewModel.refreshEmailVerification)
                     .buttonStyle(.borderedProminent)
-                    .disabled(auth.isSubmitting)
+                    .disabled(authViewModel.isSubmitting)
 
-                Button(SwiftGen.Auth.Verification.resend, action: auth.resendVerificationEmail)
-                    .disabled(auth.isSubmitting)
+                Button(SwiftGen.Auth.Verification.resend, action: authViewModel.resendVerificationEmail)
+                    .disabled(authViewModel.isSubmitting)
 
-                Button(SwiftGen.Auth.signOut, action: auth.signOut)
-                    .disabled(auth.isSubmitting)
+                Button(SwiftGen.Auth.signOut, action: authViewModel.signOut)
+                    .disabled(authViewModel.isSubmitting)
             }
             .padding(24)
         }

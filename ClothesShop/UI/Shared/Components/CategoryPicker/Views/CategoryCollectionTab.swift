@@ -9,18 +9,18 @@ import SwiftUI
 
 /// Листаемые страницы каталога — по одной на категорию.
 struct CategoryCollectionTab: View {
-    @Environment(CatalogViewModel.self) private var products
+    @Environment(CatalogViewModel.self) private var catalogViewModel
 
     var body: some View {
-        let sections = products.filteredSections
+        let sections = catalogViewModel.filteredSections
         TabView(selection: Binding(
-            get: { products.selectedCategoryIndex },
-            set: { products.selectCategory(at: $0) }
+            get: { catalogViewModel.selectedCategoryIndex },
+            set: { catalogViewModel.selectCategory(at: $0) }
         )) {
             ForEach(sections.indices, id: \.self) { index in
                 CatalogGridView(
                     section: sections[index],
-                    emptyTitle: products.isSearching ? SwiftGen.Catalog.Search.empty : nil,
+                    emptyTitle: catalogViewModel.isSearching ? SwiftGen.Catalog.Search.empty : nil,
                     emptySystemImage: "magnifyingglass",
                     emptyMessage: SwiftGen.Catalog.Search.changeQuery,
                     header: CatalogHeaderView()
