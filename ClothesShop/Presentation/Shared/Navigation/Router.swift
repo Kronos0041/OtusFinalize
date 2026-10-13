@@ -12,6 +12,12 @@ final class Router<Route: Hashable> {
         path.append(route)
     }
 
+    /// Возврат на предыдущий экран (кнопка «Назад» в собственной шапке экрана).
+    func pop() {
+        guard !path.isEmpty else { return }
+        path.removeLast()
+    }
+
     /// Стек меняет `NavigationStack` (кнопка «Назад», свайп).
     func updatePath(_ path: [Route]) {
         self.path = path

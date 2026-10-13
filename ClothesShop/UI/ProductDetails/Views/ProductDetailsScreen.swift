@@ -12,7 +12,7 @@ import SwiftUI
 struct ProductDetailsScreen: View {
     @Environment(CatalogViewModel.self) private var products
     @Environment(CartViewModel.self) private var cart
-    @Environment(\.dismiss) private var dismiss
+    @Environment(Router<CatalogRoute>.self) private var router
     @State private var selectedSize: String?
     let productID: String
 
@@ -31,7 +31,7 @@ struct ProductDetailsScreen: View {
             VStack(spacing: 0) {
                 TopBarDescriptionView(
                     title: SwiftGen.Product.title,
-                    onBack: { dismiss() },
+                    onBack: { router.pop() },
                     frame: (width: geometry.size.width, height: 50)
                 )
 
@@ -119,6 +119,7 @@ struct ProductDetailsScreen_Previews: PreviewProvider {
         ProductDetailsScreen(productID: productID, selectedSize: size)
             .environment(container.makeLoadedCatalogViewModel())
             .environment(container.makeLoadedCartViewModel())
+            .environment(Router<CatalogRoute>())
     }
 }
 #endif

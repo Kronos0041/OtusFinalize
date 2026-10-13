@@ -9,13 +9,13 @@ import SwiftUI
 
 struct NotificationsView: View {
     let notifications: NotificationsViewModel
-    @Environment(\.dismiss) private var dismiss
+    @Environment(Router<CatalogRoute>.self) private var router
 
     var body: some View {
         VStack(spacing: 0) {
             TopBarDescriptionView(
                 title: SwiftGen.Notifications.title,
-                onBack: { dismiss() },
+                onBack: { router.pop() },
                 frame: (width: getWidth() - 20, height: 50)
             )
 
@@ -46,12 +46,15 @@ struct NotificationsView_Previews: PreviewProvider {
         Group {
             NotificationsView(notifications: AppDIContainer.preview(readNotificationIDs: ["favorites"])
                 .makeNotificationsViewModel())
+                .environment(Router<CatalogRoute>())
                 .previewThemes("Список")
             NotificationsView(notifications: AppDIContainer.preview(notifications: .success([]))
                 .makeNotificationsViewModel())
+                .environment(Router<CatalogRoute>())
                 .previewThemes("Пусто")
             NotificationsView(notifications: AppDIContainer.preview(isConnected: false)
                 .makeNotificationsViewModel())
+                .environment(Router<CatalogRoute>())
                 .previewThemes("Нет сети")
         }
     }
