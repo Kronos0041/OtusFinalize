@@ -66,7 +66,7 @@ struct CategoryCollectionView_Previews: PreviewProvider {
     }
 
     private static func makeViewModel(_ catalog: Catalog, selected: Int) -> CatalogViewModel {
-        let viewModel = AppDIContainer.preview(catalog: .success(catalog)).makeLoadedCatalogViewModel()
+        let viewModel = AppDIContainer.mock(catalog: .success(catalog)).makeLoadedCatalogViewModel()
         viewModel.selectCategory(at: selected)
         return viewModel
     }

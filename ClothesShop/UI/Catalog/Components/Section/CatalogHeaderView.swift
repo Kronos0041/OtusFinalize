@@ -27,7 +27,7 @@ struct CatalogHeaderView: View {
 struct CatalogHeaderView_Previews: PreviewProvider {
     static var previews: some View {
         CatalogHeaderView()
-            .environment(AppDIContainer.preview().makeLoadedCatalogViewModel())
+            .environment(AppDIContainer.mock().makeLoadedCatalogViewModel())
             .previewLayout(.sizeThatFits)
             .previewThemes()
     }

@@ -44,15 +44,15 @@ struct NotificationsView: View {
 struct NotificationsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NotificationsView(notifications: AppDIContainer.preview(readNotificationIDs: ["favorites"])
+            NotificationsView(notifications: AppDIContainer.mock(readNotificationIDs: ["favorites"])
                 .makeNotificationsViewModel())
                 .environment(Router<CatalogRoute>())
                 .previewThemes("Список")
-            NotificationsView(notifications: AppDIContainer.preview(notifications: .success([]))
+            NotificationsView(notifications: AppDIContainer.mock(notifications: .success([]))
                 .makeNotificationsViewModel())
                 .environment(Router<CatalogRoute>())
                 .previewThemes("Пусто")
-            NotificationsView(notifications: AppDIContainer.preview(isConnected: false)
+            NotificationsView(notifications: AppDIContainer.mock(isConnected: false)
                 .makeNotificationsViewModel())
                 .environment(Router<CatalogRoute>())
                 .previewThemes("Нет сети")

@@ -37,7 +37,7 @@ struct CategoryCollectionTab: View {
 struct CategoryCollectionTab_Previews: PreviewProvider {
     static var previews: some View {
         CategoryCollectionTab()
-            .environment(AppDIContainer.preview().makeLoadedCatalogViewModel())
+            .environment(AppDIContainer.mock().makeLoadedCatalogViewModel())
             .environment(Router<CatalogRoute>())
             .previewThemes()
     }

@@ -92,7 +92,7 @@ struct WelcomeView: View {
 #if DEBUG
 struct WelcomeView_Previews: PreviewProvider {
     static var previews: some View {
-        let container = AppDIContainer.preview(authSession: .signedOut)
+        let container = AppDIContainer.mock(authSession: .signedOut)
         return WelcomeView(viewModel: container.makeAuthViewModel(), container: container)
             .previewThemes()
     }

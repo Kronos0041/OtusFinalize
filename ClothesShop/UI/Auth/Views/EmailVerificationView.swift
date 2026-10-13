@@ -51,7 +51,7 @@ struct EmailVerificationView_Previews: PreviewProvider {
         let email = PreviewData.profile.email
         return EmailVerificationView(email: email)
             .environment(
-                AppDIContainer.preview(authSession: .awaitingEmailVerification(email)).makeAuthViewModel()
+                AppDIContainer.mock(authSession: .awaitingEmailVerification(email)).makeAuthViewModel()
             )
             .previewThemes()
     }

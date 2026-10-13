@@ -33,7 +33,7 @@ struct AuthFieldsView: View {
 #if DEBUG
 struct AuthFieldsView_Previews: PreviewProvider {
     static var previews: some View {
-        let container = AppDIContainer.preview(authSession: .signedOut)
+        let container = AppDIContainer.mock(authSession: .signedOut)
         return Group {
             AuthFieldsView(auth: container.makeAuthViewModel(), mode: .signIn, width: 340)
                 .previewLayout(.sizeThatFits)

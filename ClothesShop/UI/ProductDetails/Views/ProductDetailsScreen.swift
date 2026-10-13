@@ -82,30 +82,30 @@ struct ProductDetailsScreen: View {
 struct ProductDetailsScreen_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            screen(PreviewData.watch.id, size: "M", .preview(cartItems: []))
+            screen(PreviewData.watch.id, size: "M", .mock(cartItems: []))
                 .previewThemes("Размер выбран")
-            screen(PreviewData.watch.id, .preview(cartItems: []))
+            screen(PreviewData.watch.id, .mock(cartItems: []))
                 .previewThemes("Размер не выбран")
-            screen(PreviewData.glasses.id, .preview(cartItems: []))
+            screen(PreviewData.glasses.id, .mock(cartItems: []))
                 .previewThemes("Без размеров")
             screen(
                 PreviewData.longContent.id,
                 size: "XL",
-                .preview(catalog: .success(Catalog(
+                .mock(catalog: .success(Catalog(
                     categories: PreviewData.categories,
                     products: [PreviewData.longContent]
                 )), cartItems: [])
             )
                 .previewThemes("Длинные тексты")
-            screen(PreviewData.watch.id, .preview(catalog: .loading, cartItems: []))
+            screen(PreviewData.watch.id, .mock(catalog: .loading, cartItems: []))
                 .previewThemes("Загрузка")
-            screen("missing", .preview(cartItems: []))
+            screen("missing", .mock(cartItems: []))
                 .previewThemes("Товар не найден")
-            screen(PreviewData.watch.id, .preview(isConnected: false, cartItems: []))
+            screen(PreviewData.watch.id, .mock(isConnected: false, cartItems: []))
                 .previewThemes("Нет сети")
             screen(
                 PreviewData.watch.id,
-                .preview(catalog: .failure(PreviewError("Сервер недоступен")), cartItems: [])
+                .mock(catalog: .failure(MockError("Сервер недоступен")), cartItems: [])
             )
                 .previewThemes("Ошибка")
         }

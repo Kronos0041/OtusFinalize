@@ -69,9 +69,9 @@ struct ProfileView: View {
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ProfileView(viewModel: AppDIContainer.preview().makeProfileViewModel())
+            ProfileView(viewModel: AppDIContainer.mock().makeProfileViewModel())
                 .previewThemes("Профиль")
-            ProfileView(viewModel: AppDIContainer.preview(isConnected: false).makeProfileViewModel())
+            ProfileView(viewModel: AppDIContainer.mock(isConnected: false).makeProfileViewModel())
                 .previewThemes("Нет сети")
         }
     }

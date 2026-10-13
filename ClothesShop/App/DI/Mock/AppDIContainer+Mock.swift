@@ -1,40 +1,40 @@
 #if DEBUG
 import Foundation
 
-/// Контейнер для SwiftUI Preview.
+/// Mock-контейнер для SwiftUI Preview.
 ///
-/// Фабрики ViewModel те же, что в приложении, но репозитории — fake в памяти, без Firebase и сети.
+/// Фабрики ViewModel те же, что в приложении, но репозитории — mock в памяти, без Firebase и сети.
 /// Состояние экрана (контент, пусто, нет сети, ошибка, загрузка) задаётся ответами репозиториев,
 /// поэтому в ViewModel нет кода для превью.
 ///
-///     let container = AppDIContainer.preview(catalog: .failure(PreviewError("Сервер недоступен")))
+///     let container = AppDIContainer.mock(catalog: .failure(MockError("Сервер недоступен")))
 ///     CatalogView(...)
 ///         .environment(container.makeLoadedCatalogViewModel())
 extension AppDIContainer {
-    static func preview(
+    static func mock(
         authSession: AuthSession = .verified,
         isConnected: Bool = true,
-        catalog: PreviewResponse<Catalog> = .success(PreviewData.catalog),
+        catalog: MockResponse<Catalog> = .success(PreviewData.catalog),
         favoriteIDs: Set<String> = [],
         cartItems: [CartItem] = PreviewData.cartRecords,
-        settings: PreviewResponse<StoreSettings> = .success(.default),
-        notifications: PreviewResponse<[Notification]> = .success(PreviewData.notifications),
+        settings: MockResponse<StoreSettings> = .success(.default),
+        notifications: MockResponse<[Notification]> = .success(PreviewData.notifications),
         readNotificationIDs: Set<String> = [],
-        profile: PreviewResponse<UserProfile> = .success(PreviewData.profile)
+        profile: MockResponse<UserProfile> = .success(PreviewData.profile)
     ) -> AppDIContainer {
-        AppDIContainer(repositories: Repositories(
-            auth: PreviewAuthRepository(session: authSession),
-            profile: PreviewProfileRepository(response: profile),
-            catalog: PreviewCatalogRepository(response: catalog),
-            cart: PreviewCartRepository(items: cartItems),
-            settings: PreviewStoreSettingsRepository(response: settings),
-            favorites: PreviewFavoritesRepository(ids: favoriteIDs),
-            notifications: PreviewNotificationsRepository(
+        AppDIContainer(repositories: AppRepositories(
+            auth: MockAuthRepository(session: authSession),
+            profile: MockProfileRepository(response: profile),
+            catalog: MockCatalogRepository(response: catalog),
+            cart: MockCartRepository(items: cartItems),
+            settings: MockStoreSettingsRepository(response: settings),
+            favorites: MockFavoritesRepository(ids: favoriteIDs),
+            notifications: MockNotificationsRepository(
                 response: notifications,
                 readIDs: readNotificationIDs
             ),
-            connectivity: PreviewConnectivityRepository(isConnected: isConnected),
-            imageCache: PreviewImageCacheRepository()
+            connectivity: MockConnectivityRepository(isConnected: isConnected),
+            imageCache: MockImageCacheRepository()
         ))
     }
 

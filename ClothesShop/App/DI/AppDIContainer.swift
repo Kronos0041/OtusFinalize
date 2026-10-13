@@ -6,19 +6,6 @@ import FirebaseFirestore
 final class AppDIContainer {
     static let shared = AppDIContainer.live()
 
-    /// Реализации Domain-репозиториев, из которых контейнер собирает use case и ViewModel.
-    struct Repositories {
-        let auth: AuthRepositoryProtocol
-        let profile: ProfileRepositoryProtocol
-        let catalog: CatalogRepositoryProtocol
-        let cart: CartRepositoryProtocol
-        let settings: StoreSettingsRepositoryProtocol
-        let favorites: FavoritesRepositoryProtocol
-        let notifications: NotificationsRepositoryProtocol
-        let connectivity: ConnectivityRepositoryProtocol
-        let imageCache: ImageCacheRepositoryProtocol
-    }
-
     private let authRepository: AuthRepositoryProtocol
     private let profileRepository: ProfileRepositoryProtocol
     private let catalogRepository: CatalogRepositoryProtocol
@@ -29,7 +16,7 @@ final class AppDIContainer {
     private let connectivityRepository: ConnectivityRepositoryProtocol
     private let imageCacheRepository: ImageCacheRepositoryProtocol
 
-    init(repositories: Repositories) {
+    init(repositories: AppRepositories) {
         authRepository = repositories.auth
         profileRepository = repositories.profile
         catalogRepository = repositories.catalog
@@ -59,7 +46,7 @@ final class AppDIContainer {
         )
         let database = firestore ?? Firestore.firestore()
 
-        return AppDIContainer(repositories: Repositories(
+        return AppDIContainer(repositories: AppRepositories(
             auth: AuthRepositoryImpl(remoteDataSource: authRemoteDataSource),
             profile: ProfileRepositoryImpl(remoteDataSource: authRemoteDataSource),
             catalog: CatalogRepositoryImpl(

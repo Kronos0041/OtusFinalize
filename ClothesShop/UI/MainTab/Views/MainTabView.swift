@@ -91,10 +91,10 @@ struct MainTabView: View {
 }
 
 #if DEBUG
-/// Данные из fake-репозиториев, без запросов к Firebase.
+/// Данные из mock-репозиториев, без запросов к Firebase.
 struct MainTabView_Previews: PreviewProvider {
     static var previews: some View {
-        MainTabView(container: .preview())
+        MainTabView(container: .mock())
             .previewThemes()
     }
 }

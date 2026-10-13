@@ -47,15 +47,15 @@ struct CatalogView: View {
 struct CatalogView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            content(AppDIContainer.preview(favoriteIDs: [PreviewData.watch.id]))
+            content(AppDIContainer.mock(favoriteIDs: [PreviewData.watch.id]))
                 .previewThemes("Каталог")
-            content(AppDIContainer.preview(catalog: .loading))
+            content(AppDIContainer.mock(catalog: .loading))
                 .previewThemes("Загрузка")
-            content(AppDIContainer.preview(catalog: .success(PreviewData.emptyCatalog)))
+            content(AppDIContainer.mock(catalog: .success(PreviewData.emptyCatalog)))
                 .previewThemes("Пусто")
-            content(AppDIContainer.preview(isConnected: false))
+            content(AppDIContainer.mock(isConnected: false))
                 .previewThemes("Нет сети")
-            content(AppDIContainer.preview(catalog: .failure(PreviewError("Сервер недоступен"))))
+            content(AppDIContainer.mock(catalog: .failure(MockError("Сервер недоступен"))))
                 .previewThemes("Ошибка")
         }
     }

@@ -18,7 +18,7 @@ struct CatalogSectionTabsView: View {
 struct CatalogSectionTabsView_Previews: PreviewProvider {
     static var previews: some View {
         CatalogSectionTabsView()
-            .environment(AppDIContainer.preview().makeLoadedCatalogViewModel())
+            .environment(AppDIContainer.mock().makeLoadedCatalogViewModel())
             .environment(Router<CatalogRoute>())
             .previewThemes()
     }

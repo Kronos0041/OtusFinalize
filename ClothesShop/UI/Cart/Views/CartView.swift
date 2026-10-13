@@ -74,13 +74,13 @@ struct CartView: View {
 struct CartView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            content(AppDIContainer.preview())
+            content(AppDIContainer.mock())
                 .previewThemes("С товарами")
-            content(AppDIContainer.preview(cartItems: []))
+            content(AppDIContainer.mock(cartItems: []))
                 .previewThemes("Пустая")
-            content(AppDIContainer.preview(settings: .loading))
+            content(AppDIContainer.mock(settings: .loading))
                 .previewThemes("Загрузка")
-            content(AppDIContainer.preview(settings: .failure(PreviewError("Сервер недоступен"))))
+            content(AppDIContainer.mock(settings: .failure(MockError("Сервер недоступен"))))
                 .previewThemes("Ошибка")
         }
     }

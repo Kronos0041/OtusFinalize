@@ -89,7 +89,7 @@ struct AccountChangeView: View {
 #if DEBUG
 struct AccountChangeView_Previews: PreviewProvider {
     static var previews: some View {
-        let viewModel = AppDIContainer.preview().makeLoadedProfileViewModel()
+        let viewModel = AppDIContainer.mock().makeLoadedProfileViewModel()
         return Group {
             AccountChangeView(change: .password, viewModel: viewModel, close: {})
                 .previewThemes("Смена пароля")

@@ -31,9 +31,9 @@ struct FavoritesView: View {
 struct FavoritesView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            content(AppDIContainer.preview(favoriteIDs: Set(PreviewData.cartRecords.map(\.productID))))
+            content(AppDIContainer.mock(favoriteIDs: Set(PreviewData.cartRecords.map(\.productID))))
                 .previewThemes("Есть избранное")
-            content(AppDIContainer.preview())
+            content(AppDIContainer.mock())
                 .previewThemes("Пусто")
         }
     }

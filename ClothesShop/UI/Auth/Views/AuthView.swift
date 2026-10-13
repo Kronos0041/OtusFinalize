@@ -77,7 +77,7 @@ struct AuthView_Previews: PreviewProvider {
             AuthView(mode: .registration)
                 .previewThemes("Регистрация")
         }
-        .environment(AppDIContainer.preview(authSession: .signedOut).makeAuthViewModel())
+        .environment(AppDIContainer.mock(authSession: .signedOut).makeAuthViewModel())
     }
 }
 #endif

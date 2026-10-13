@@ -71,7 +71,7 @@ struct CatalogGridView: View {
 #if DEBUG
 struct CatalogGridView_Previews: PreviewProvider {
     static var previews: some View {
-        let container = AppDIContainer.preview(favoriteIDs: [PreviewData.watch.id])
+        let container = AppDIContainer.mock(favoriteIDs: [PreviewData.watch.id])
         let section = CatalogSectionUIModel(
             id: "preview",
             category: .init(id: "preview", title: "Пример"),

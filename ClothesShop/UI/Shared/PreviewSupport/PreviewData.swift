@@ -3,8 +3,8 @@ import Foundation
 
 /// Тестовые данные для SwiftUI Preview.
 ///
-/// Domain-сущности (`catalog`, `cartRecords`, `notifications`, `profile`) отдаются fake-репозиториям
-/// через `AppDIContainer.preview(...)`. Готовые элементы (`catalogItems`, `cartItems`, `product…`) —
+/// Domain-сущности (`catalog`, `cartRecords`, `notifications`, `profile`) отдаются mock-репозиториям
+/// через `AppDIContainer.mock(...)`. Готовые элементы (`catalogItems`, `cartItems`, `product…`) —
 /// для превью компонентов, которые принимают данные напрямую, без ViewModel.
 enum PreviewData {
     static let ownerID = "preview-user"

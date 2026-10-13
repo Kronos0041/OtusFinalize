@@ -22,7 +22,7 @@ struct UserProfileCell: View {
 struct UserProfileCell_Previews: PreviewProvider {
     static var previews: some View {
         UserProfileCell()
-            .environment(AppDIContainer.preview().makeLoadedProfileViewModel())
+            .environment(AppDIContainer.mock().makeLoadedProfileViewModel())
             .previewThemes()
     }
 }
