@@ -85,6 +85,7 @@ final class AppDIContainer {
             searchProductsUseCase: SearchProductsUseCase(),
             getFavoritesUseCase: GetFavoritesUseCase(repository: favoritesRepository),
             toggleFavoriteUseCase: ToggleFavoriteUseCase(repository: favoritesRepository),
+            clearFavoritesUseCase: ClearFavoritesUseCase(repository: favoritesRepository),
             connectivityUseCase: ObserveConnectivityUseCase(repository: connectivityRepository),
             ownerID: ownerID ?? authRepository.currentUserID,
             automaticallyReloads: automaticallyReloads

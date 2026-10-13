@@ -65,6 +65,7 @@
 "favorites.instructions" = "Нажмите на сердечко у товара, чтобы добавить его сюда.";
 "favorites.add" = "Добавить в избранное";
 "favorites.remove" = "Убрать из избранного";
+"favorites.clear" = "Очистить";
 "profile.title" = "Профиль";
 "profile.settings" = "Настройки аккаунта";
 "profile.changePassword" = "Смена пароля";

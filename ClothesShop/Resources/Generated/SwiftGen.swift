@@ -165,6 +165,8 @@ internal enum SwiftGen {
   internal enum Favorites {
     /// Add to favorites
     internal static let add = SwiftGen.tr("Localizable", "favorites.add", fallback: "Add to favorites")
+    /// Clear
+    internal static let clear = SwiftGen.tr("Localizable", "favorites.clear", fallback: "Clear")
     /// No favorites yet
     internal static let empty = SwiftGen.tr("Localizable", "favorites.empty", fallback: "No favorites yet")
     /// Tap the heart on a product to add it here.

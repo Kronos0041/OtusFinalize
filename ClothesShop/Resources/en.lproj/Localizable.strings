@@ -65,6 +65,7 @@
 "favorites.instructions" = "Tap the heart on a product to add it here.";
 "favorites.add" = "Add to favorites";
 "favorites.remove" = "Remove from favorites";
+"favorites.clear" = "Clear";
 "profile.title" = "Profile";
 "profile.settings" = "Account settings";
 "profile.changePassword" = "Change password";

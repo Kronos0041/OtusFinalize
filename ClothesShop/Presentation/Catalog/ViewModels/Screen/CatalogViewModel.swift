@@ -39,6 +39,7 @@ final class CatalogViewModel {
     private let searchProductsUseCase: SearchProductsUseCase
     private let getFavoritesUseCase: GetFavoritesUseCase
     private let toggleFavoriteUseCase: ToggleFavoriteUseCase
+    private let clearFavoritesUseCase: ClearFavoritesUseCase
     private let connectivityUseCase: ObserveConnectivityUseCase
     private let ownerID: String?
     @ObservationIgnored private var catalog: Catalog?
@@ -49,6 +50,7 @@ final class CatalogViewModel {
          searchProductsUseCase: SearchProductsUseCase,
          getFavoritesUseCase: GetFavoritesUseCase,
          toggleFavoriteUseCase: ToggleFavoriteUseCase,
+         clearFavoritesUseCase: ClearFavoritesUseCase,
          connectivityUseCase: ObserveConnectivityUseCase,
          ownerID: String?,
          automaticallyReloads: Bool = true) {
@@ -56,6 +58,7 @@ final class CatalogViewModel {
         self.searchProductsUseCase = searchProductsUseCase
         self.getFavoritesUseCase = getFavoritesUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
+        self.clearFavoritesUseCase = clearFavoritesUseCase
         self.connectivityUseCase = connectivityUseCase
         self.ownerID = ownerID
         favoriteProductIDs = ownerID.map(getFavoritesUseCase.getFavoriteIDs) ?? []
@@ -159,6 +162,11 @@ final class CatalogViewModel {
             ownerID: ownerID,
             currentIDs: favoriteProductIDs
         )
+    }
+
+    func clearFavorites() {
+        guard let ownerID else { return }
+        favoriteProductIDs = clearFavoritesUseCase.clearFavorites(ownerID: ownerID)
     }
 
     /// Фильтрует товары внутри разделов, сохраняя сами разделы: индексы вкладок не сдвигаются.
