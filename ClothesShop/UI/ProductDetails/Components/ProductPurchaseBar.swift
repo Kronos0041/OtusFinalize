@@ -8,15 +8,20 @@ struct ProductPurchaseBar: View {
     let toggleCart: () -> Void
     let toggleLike: () -> Void
 
+    /// Кнопка избранного чуть выше кнопки «Добавить», чтобы сердце было крупным и в него легко попасть.
+    private let likeSize = ComponentConstants.Layout.buttonHeight + 6
+    private let spacing: CGFloat = 12
+    private let horizontalPadding: CGFloat = 20
+
     var body: some View {
         VStack(spacing: 0) {
             Divider()
-            HStack(spacing: 12) {
+            HStack(spacing: spacing) {
                 Button(action: toggleCart) {
                     Label(isInCart ? SwiftGen.Cart.added : SwiftGen.Common.add,
                           systemImage: isInCart ? "bag.badge.minus" : "bag.badge.plus")
                         .font(.system(size: 18, weight: .bold))
-                        .frame(width: max(0, width - 104), height: ComponentConstants.Layout.buttonHeight)
+                        .frame(width: max(0, width - horizontalPadding * 2 - spacing - likeSize), height: ComponentConstants.Layout.buttonHeight)
                         .foregroundColor(.appWhite)
                         .background(canModifyCart ? Color.appBlack : Color.appGray)
                         .cornerRadius(10)
@@ -24,20 +29,9 @@ struct ProductPurchaseBar: View {
                 .buttonStyle(.plain)
                 .disabled(!canModifyCart)
 
-                Button(action: toggleLike) {
-                    Image(systemName: isLiked ? "heart.fill" : "heart")
-                        .font(.system(size: 22))
-                        .foregroundColor(isLiked ? .appRed : .appBlack)
-                        .frame(width: 52, height: ComponentConstants.Layout.buttonHeight)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.appGray.opacity(0.3), lineWidth: 1)
-                        )
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(isLiked ? SwiftGen.Favorites.remove : SwiftGen.Favorites.add)
+                LikeButton(isLiked: isLiked, size: likeSize, action: toggleLike)
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, horizontalPadding)
             .padding(.vertical, 12)
         }
         .background(Color.appWhite)

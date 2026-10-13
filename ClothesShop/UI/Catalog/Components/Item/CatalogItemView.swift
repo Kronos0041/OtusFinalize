@@ -68,15 +68,8 @@ struct CatalogItemView: View {
     }
 
     private var likeButton: some View {
-        Button(action: topLike) {
-            Image(systemName: isLiked ? "heart.fill" : "heart")
-                .font(.system(size: 22, weight: .regular))
-                .foregroundColor(isLiked ? .appRed : .appBlack)
-                .frame(width: 44, height: 44)
-        }
-        .buttonStyle(.plain)
-        .padding(4)
-        .accessibilityLabel(isLiked ? Text(SwiftGen.Favorites.remove) : Text(SwiftGen.Favorites.add))
+        LikeButton(isLiked: isLiked, action: topLike)
+            .padding(8)
     }
 }
 
