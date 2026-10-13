@@ -24,6 +24,18 @@ enum ComponentConstants {
         /// - Decrease: контент прижмётся к краям экрана; при 0 карточки упрутся в края.
         /// - Important: Должна совпадать для ленты и сетки, иначе их края разъедутся.
         static let contentHorizontalInset: CGFloat = 20
+
+        /// Суммарный горизонтальный отступ полей ввода, кнопок и верхней панели от краёв экрана, 40 pt.
+        ///
+        /// Используется в `ButtonView`, `AuthView`, `CatalogHeaderView` и `MainTopBar`: ширина — `getWidth() - sideInset`.
+        /// - Increase: поля и кнопки станут уже.
+        /// - Decrease: поля и кнопки прижмутся к краям экрана.
+        static let sideInset: CGFloat = 40
+
+        /// Высота основных кнопок (`ButtonView`, кнопка «Добавить» на экране товара), 50 pt.
+        ///
+        /// - Decrease: меньше 44 pt — в кнопку станет трудно попасть.
+        static let buttonHeight: CGFloat = 50
     }
 
     // MARK: - Animation
@@ -158,7 +170,7 @@ enum ComponentConstants {
 
     // MARK: - Button
 
-    /// Основная кнопка на всю ширину (`ButtonView`). Размеры кнопки задаёт `AppLayout.fullWidthButton`.
+    /// Основная кнопка на всю ширину (`ButtonView`). Размеры задают `Layout.sideInset` и `Layout.buttonHeight`.
     enum Button {
         /// Размер шрифта заголовка кнопки, 18 pt.
         ///

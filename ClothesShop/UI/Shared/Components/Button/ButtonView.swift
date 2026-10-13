@@ -22,7 +22,10 @@ struct ButtonView: View {
                 .foregroundColor(style.foregroundColor)
             Spacer()
         }
-        .frame(width: AppLayout.fullWidthButton.width, height: AppLayout.fullWidthButton.height)
+        .frame(
+            width: getWidth() - ComponentConstants.Layout.sideInset,
+            height: ComponentConstants.Layout.buttonHeight
+        )
         .background(style.background)
         .cornerRadius(ComponentConstants.Button.cornerRadius)
     }

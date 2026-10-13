@@ -7,7 +7,7 @@ struct CatalogHeaderView: View {
     var body: some View {
         VStack(spacing: 15) {
             SearchTextField(
-                frame: (getWidth() - AppLayout.sideInset, 50),
+                frame: (getWidth() - ComponentConstants.Layout.sideInset, 50),
                 placeholder: SwiftGen.Common.search,
                 text: Binding(
                     get: { catalogViewModel.searchText },

@@ -13,7 +13,7 @@ struct AuthView: View {
     @Environment(\.dismiss) private var dismiss
     let mode: AuthMode
 
-    private var fieldsWidth: CGFloat { getWidth() - AppLayout.sideInset }
+    private var fieldsWidth: CGFloat { getWidth() - ComponentConstants.Layout.sideInset }
 
     var body: some View {
         ZStack {

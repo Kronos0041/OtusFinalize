@@ -13,5 +13,5 @@ extension View {
         }
     }
 
-    func getWidth() -> CGFloat { AppLayout.screenWidth }
+    func getWidth() -> CGFloat { UIScreen.main.bounds.width }
 }

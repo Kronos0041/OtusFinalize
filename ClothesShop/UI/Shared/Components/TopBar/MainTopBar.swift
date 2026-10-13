@@ -40,7 +40,7 @@ struct MainTopBar: View {
             }
         }
         .foregroundColor(.appBlack)
-        .frame(width: getWidth() - AppLayout.sideInset, height: ComponentConstants.TopBar.mainHeight)
+        .frame(width: getWidth() - ComponentConstants.Layout.sideInset, height: ComponentConstants.TopBar.mainHeight)
     }
 }
 

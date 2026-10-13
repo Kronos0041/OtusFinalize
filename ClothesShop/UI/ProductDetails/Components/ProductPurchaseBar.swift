@@ -16,7 +16,7 @@ struct ProductPurchaseBar: View {
                     Label(isInCart ? SwiftGen.Cart.added : SwiftGen.Common.add,
                           systemImage: isInCart ? "bag.badge.minus" : "bag.badge.plus")
                         .font(.system(size: 18, weight: .bold))
-                        .frame(width: max(0, width - 104), height: AppLayout.buttonHeight)
+                        .frame(width: max(0, width - 104), height: ComponentConstants.Layout.buttonHeight)
                         .foregroundColor(.appWhite)
                         .background(canModifyCart ? Color.appBlack : Color.appGray)
                         .cornerRadius(10)
@@ -28,7 +28,7 @@ struct ProductPurchaseBar: View {
                     Image(systemName: isLiked ? "heart.fill" : "heart")
                         .font(.system(size: 22))
                         .foregroundColor(isLiked ? .appRed : .appBlack)
-                        .frame(width: 52, height: AppLayout.buttonHeight)
+                        .frame(width: 52, height: ComponentConstants.Layout.buttonHeight)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.appGray.opacity(0.3), lineWidth: 1)
