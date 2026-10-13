@@ -59,12 +59,19 @@ struct CatalogItemView: View {
         .foregroundColor(.appBlack)
         .contentShape(Rectangle())
         .onTapGesture(perform: topDescription)
+        // VoiceOver читает карточку одним элементом-кнопкой: название, цена, описание.
+        // Лайк доступен из меню действий (свайп вверх/вниз), иначе до сердца в карточке не добраться.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: [item.title, item.formattedPrice, item.shortDescription].joined(separator: ", ")))
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction(.default, topDescription)
+        .accessibilityAction(named: isLiked ? SwiftGen.Favorites.remove : SwiftGen.Favorites.add, topLike)
     }
 
     private var productImage: some View {
         // .fill: картинка товара вертикальная, с .fit по бокам остаются пустые поля.
         RemoteImageView(url: item.imageURL, contentMode: .fill)
-            .accessibilityLabel(Text(item.title))
+            .accessibilityHidden(true)
     }
 
     private var likeButton: some View {

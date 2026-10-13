@@ -65,6 +65,10 @@ struct ProductDetailsView: View {
             .contentShape(Rectangle())
             .onTapGesture { isImageFullScreen = true }
             .accessibilityLabel(Text(verbatim: product.title))
+            .accessibilityAddTraits(.isButton)
+            .fullScreenCover(isPresented: $isImageFullScreen) {
+                FullScreenImageView(url: product.imageURL, title: product.title)
+            }
     }
 }
 

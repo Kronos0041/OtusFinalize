@@ -20,6 +20,7 @@ struct SearchTextField: View {
                 .resizable()
                 .frame(width: ComponentConstants.Search.iconSize, height: ComponentConstants.Search.iconSize)
                 .foregroundColor(Color.appBlack)
+                .accessibilityHidden(true)
             TextField(placeholder, text: $text)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()

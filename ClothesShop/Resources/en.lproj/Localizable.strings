@@ -94,6 +94,7 @@
 "notifications.title" = "Notifications";
 "notifications.empty" = "No notifications yet";
 "notifications.markRead" = "Tap to mark as read";
+"notifications.unreadCount" = "Unread: %lld";
 "network.offline" = "No internet connection";
 "network.reconnect" = "Data will load automatically once you're back online.";
 "network.loadFailed" = "Couldn't load data";

@@ -94,6 +94,7 @@
 "notifications.title" = "Уведомления";
 "notifications.empty" = "Уведомлений пока нет";
 "notifications.markRead" = "Нажмите, чтобы отметить прочитанным";
+"notifications.unreadCount" = "Непрочитанных: %lld";
 "network.offline" = "Нет подключения к интернету";
 "network.reconnect" = "Данные загрузятся автоматически, когда появится сеть.";
 "network.loadFailed" = "Не удалось загрузить данные";

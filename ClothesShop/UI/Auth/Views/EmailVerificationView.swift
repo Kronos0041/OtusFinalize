@@ -12,6 +12,7 @@ struct EmailVerificationView: View {
             VStack(spacing: 20) {
                 Image(systemName: "envelope.badge")
                     .font(.system(size: 52))
+                    .accessibilityHidden(true)
 
                 Text(SwiftGen.Auth.Verification.title)
                     .font(.system(size: 32, design: .serif))

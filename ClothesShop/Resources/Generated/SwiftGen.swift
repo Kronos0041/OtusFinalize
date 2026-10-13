@@ -211,6 +211,10 @@ internal enum SwiftGen {
     internal static let markRead = SwiftGen.tr("Localizable", "notifications.markRead", fallback: "Tap to mark as read")
     /// Notifications
     internal static let title = SwiftGen.tr("Localizable", "notifications.title", fallback: "Notifications")
+    /// Unread: %lld
+    internal static func unreadCount(_ p1: Int) -> String {
+      return SwiftGen.tr("Localizable", "notifications.unreadCount", p1, fallback: "Unread: %lld")
+    }
   }
   internal enum Product {
     /// Price

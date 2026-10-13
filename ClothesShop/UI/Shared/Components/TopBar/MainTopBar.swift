@@ -28,6 +28,7 @@ struct MainTopBar: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text(SwiftGen.Notifications.title))
+                .accessibilityValue(notificationCount > 0 ? SwiftGen.Notifications.unreadCount(notificationCount) : "")
             }
         }
         .foregroundColor(.appBlack)

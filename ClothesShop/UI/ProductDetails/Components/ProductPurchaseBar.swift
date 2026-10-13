@@ -28,6 +28,7 @@ struct ProductPurchaseBar: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(!canModifyCart)
+                .accessibilityHint(canModifyCart ? "" : SwiftGen.Cart.chooseSize)
 
                 LikeButton(isLiked: isLiked, size: likeSize, action: toggleLike)
             }
