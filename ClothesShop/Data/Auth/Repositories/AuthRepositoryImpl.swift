@@ -8,6 +8,10 @@ final class AuthRepositoryImpl: AuthRepositoryProtocol {
     var currentUserID: String? { remoteDataSource.currentUserID }
     var session: AuthSession { remoteDataSource.session }
 
+    func isEmailRegistered(_ email: String) async throws -> Bool {
+        try await remoteDataSource.isEmailRegistered(email)
+    }
+
     func signIn(email: String, password: String) async throws {
         try await remoteDataSource.signIn(email: email, password: password)
     }
@@ -18,6 +22,10 @@ final class AuthRepositoryImpl: AuthRepositoryProtocol {
 
     func sendEmailVerification() async throws {
         try await remoteDataSource.sendEmailVerification()
+    }
+
+    func sendPasswordReset(email: String) async throws {
+        try await remoteDataSource.sendPasswordReset(email: email)
     }
 
     func refreshEmailVerification() async throws -> Bool {

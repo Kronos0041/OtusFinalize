@@ -1,18 +1,15 @@
-/// Все операции аутентификации в одном месте: `AuthViewModel` зависит от одного объекта вместо шести.
+/// Операции формы входа и регистрации: `AuthViewModel` зависит от одного объекта, а не от каждого use case.
+/// Сессией и подтверждением почты занимаются `SessionViewModel` и `EmailVerificationViewModel`.
 struct AuthUseCases {
+    let checkEmail: CheckEmailRegisteredUseCase
     let signIn: SignInUseCase
     let register: RegisterUseCase
-    let observeSession: ObserveAuthSessionUseCase
-    let resendVerification: ResendVerificationEmailUseCase
-    let verifyEmail: VerifyEmailUseCase
-    let signOut: SignOutUseCase
+    let resetPassword: SendPasswordResetUseCase
 
     init(repository: AuthRepositoryProtocol) {
+        checkEmail = CheckEmailRegisteredUseCase(repository: repository)
         signIn = SignInUseCase(repository: repository)
         register = RegisterUseCase(repository: repository)
-        observeSession = ObserveAuthSessionUseCase(repository: repository)
-        resendVerification = ResendVerificationEmailUseCase(repository: repository)
-        verifyEmail = VerifyEmailUseCase(repository: repository)
-        signOut = SignOutUseCase(repository: repository)
+        resetPassword = SendPasswordResetUseCase(repository: repository)
     }
 }

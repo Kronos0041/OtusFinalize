@@ -70,9 +70,23 @@ final class AppDIContainer {
         ))
     }
 
+    func makeSessionViewModel() -> SessionViewModel {
+        SessionViewModel(observeSessionUseCase: ObserveAuthSessionUseCase(repository: authRepository))
+    }
+
     func makeAuthViewModel() -> AuthViewModel {
         AuthViewModel(
             authUseCases: AuthUseCases(repository: authRepository)
+        )
+    }
+
+    func makeEmailVerificationViewModel(email: String, onVerified: @escaping () -> Void) -> EmailVerificationViewModel {
+        EmailVerificationViewModel(
+            email: email,
+            resendUseCase: ResendVerificationEmailUseCase(repository: authRepository),
+            verifyEmailUseCase: VerifyEmailUseCase(repository: authRepository),
+            signOutUseCase: SignOutUseCase(repository: authRepository),
+            onVerified: onVerified
         )
     }
 

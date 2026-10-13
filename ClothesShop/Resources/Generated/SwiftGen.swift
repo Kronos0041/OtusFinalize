@@ -11,18 +11,26 @@ import Foundation
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 internal enum SwiftGen {
   internal enum Auth {
-    /// Sign in
-    internal static let authorization = SwiftGen.tr("Localizable", "auth.authorization", fallback: "Sign in")
+    /// An account with this email already exists. Enter your password.
+    internal static let accountExists = SwiftGen.tr("Localizable", "auth.accountExists", fallback: "An account with this email already exists. Enter your password.")
+    /// or
+    internal static let or = SwiftGen.tr("Localizable", "auth.or", fallback: "or")
     /// Password
     internal static let password = SwiftGen.tr("Localizable", "auth.password", fallback: "Password")
     /// Repeat password
     internal static let repeatPassword = SwiftGen.tr("Localizable", "auth.repeatPassword", fallback: "Repeat password")
-    /// Sign in
-    internal static let signIn = SwiftGen.tr("Localizable", "auth.signIn", fallback: "Sign in")
-    /// Sign out
-    internal static let signOut = SwiftGen.tr("Localizable", "auth.signOut", fallback: "Sign out")
-    /// Sign up
-    internal static let signUp = SwiftGen.tr("Localizable", "auth.signUp", fallback: "Sign up")
+    internal enum CreatePassword {
+      /// You'll use it to sign in to the app.
+      internal static let subtitle = SwiftGen.tr("Localizable", "auth.createPassword.subtitle", fallback: "You'll use it to sign in to the app.")
+      /// Create a password
+      internal static let title = SwiftGen.tr("Localizable", "auth.createPassword.title", fallback: "Create a password")
+    }
+    internal enum Email {
+      /// Enter your email and we'll check whether you have an account.
+      internal static let subtitle = SwiftGen.tr("Localizable", "auth.email.subtitle", fallback: "Enter your email and we'll check whether you have an account.")
+      /// Sign in or sign up
+      internal static let title = SwiftGen.tr("Localizable", "auth.email.title", fallback: "Sign in or sign up")
+    }
     internal enum Error {
       /// This account has been disabled.
       internal static let accountDisabled = SwiftGen.tr("Localizable", "auth.error.accountDisabled", fallback: "This account has been disabled.")
@@ -34,8 +42,6 @@ internal enum SwiftGen {
       internal static let invalidEmail = SwiftGen.tr("Localizable", "auth.error.invalidEmail", fallback: "Invalid email")
       /// Passwords don't match
       internal static let passwordMismatch = SwiftGen.tr("Localizable", "auth.error.passwordMismatch", fallback: "Passwords don't match")
-      /// Enter your password
-      internal static let passwordRequired = SwiftGen.tr("Localizable", "auth.error.passwordRequired", fallback: "Enter your password")
       /// Password must be at least %lld characters long
       internal static func passwordTooShort(_ p1: Int) -> String {
         return SwiftGen.tr("Localizable", "auth.error.passwordTooShort", p1, fallback: "Password must be at least %lld characters long")
@@ -53,29 +59,49 @@ internal enum SwiftGen {
       /// Incorrect current password.
       internal static let wrongPassword = SwiftGen.tr("Localizable", "auth.error.wrongPassword", fallback: "Incorrect current password.")
     }
+    internal enum Password {
+      /// Forgot password
+      internal static let forgot = SwiftGen.tr("Localizable", "auth.password.forgot", fallback: "Forgot password")
+      /// Hide password
+      internal static let hide = SwiftGen.tr("Localizable", "auth.password.hide", fallback: "Hide password")
+      /// We sent a password reset email to %@. Please also check your spam folder.
+      internal static func resetSent(_ p1: Any) -> String {
+        return SwiftGen.tr("Localizable", "auth.password.resetSent", String(describing: p1), fallback: "We sent a password reset email to %@. Please also check your spam folder.")
+      }
+      /// Show password
+      internal static let show = SwiftGen.tr("Localizable", "auth.password.show", fallback: "Show password")
+      /// Enter your password
+      internal static let title = SwiftGen.tr("Localizable", "auth.password.title", fallback: "Enter your password")
+    }
+    internal enum Social {
+      /// Continue with %@
+      internal static func continueWith(_ p1: Any) -> String {
+        return SwiftGen.tr("Localizable", "auth.social.continueWith", String(describing: p1), fallback: "Continue with %@")
+      }
+      /// Sign in with %@ is coming soon
+      internal static func inDevelopment(_ p1: Any) -> String {
+        return SwiftGen.tr("Localizable", "auth.social.inDevelopment", String(describing: p1), fallback: "Sign in with %@ is coming soon")
+      }
+    }
     internal enum Verification {
       /// I've confirmed my email
       internal static let check = SwiftGen.tr("Localizable", "auth.verification.check", fallback: "I've confirmed my email")
-      /// We sent an email to %@. Open the link in it, then come back here.
+      /// Follow the link in the email sent to %@. If you can't find it, check your spam folder.
       internal static func instructions(_ p1: Any) -> String {
-        return SwiftGen.tr("Localizable", "auth.verification.instructions", String(describing: p1), fallback: "We sent an email to %@. Open the link in it, then come back here.")
+        return SwiftGen.tr("Localizable", "auth.verification.instructions", String(describing: p1), fallback: "Follow the link in the email sent to %@. If you can't find it, check your spam folder.")
       }
       /// Your email isn't confirmed yet. Open the link from the email and try again.
       internal static let notConfirmed = SwiftGen.tr("Localizable", "auth.verification.notConfirmed", fallback: "Your email isn't confirmed yet. Open the link from the email and try again.")
-      /// Confirm your address using the link in the email. Resend it if needed.
-      internal static let `required` = SwiftGen.tr("Localizable", "auth.verification.required", fallback: "Confirm your address using the link in the email. Resend it if needed.")
+      /// Open Gmail
+      internal static let openGmail = SwiftGen.tr("Localizable", "auth.verification.openGmail", fallback: "Open Gmail")
+      /// Open Mail
+      internal static let openMail = SwiftGen.tr("Localizable", "auth.verification.openMail", fallback: "Open Mail")
       /// Resend email
       internal static let resend = SwiftGen.tr("Localizable", "auth.verification.resend", fallback: "Resend email")
       /// Email sent again. Please also check your spam folder.
       internal static let resent = SwiftGen.tr("Localizable", "auth.verification.resent", fallback: "Email sent again. Please also check your spam folder.")
-      /// Couldn't send the email: %@
-      internal static func sendFailed(_ p1: Any) -> String {
-        return SwiftGen.tr("Localizable", "auth.verification.sendFailed", String(describing: p1), fallback: "Couldn't send the email: %@")
-      }
-      /// Email sent. Confirm your address using the link in it.
-      internal static let sent = SwiftGen.tr("Localizable", "auth.verification.sent", fallback: "Email sent. Confirm your address using the link in it.")
-      /// Confirm your email
-      internal static let title = SwiftGen.tr("Localizable", "auth.verification.title", fallback: "Confirm your email")
+      /// We sent a confirmation email
+      internal static let title = SwiftGen.tr("Localizable", "auth.verification.title", fallback: "We sent a confirmation email")
     }
   }
   internal enum Cart {
@@ -153,6 +179,8 @@ internal enum SwiftGen {
     internal static let cancel = SwiftGen.tr("Localizable", "common.cancel", fallback: "Cancel")
     /// Close
     internal static let close = SwiftGen.tr("Localizable", "common.close", fallback: "Close")
+    /// Continue
+    internal static let `continue` = SwiftGen.tr("Localizable", "common.continue", fallback: "Continue")
     /// Email
     internal static let email = SwiftGen.tr("Localizable", "common.email", fallback: "Email")
     /// Nothing here yet
@@ -269,10 +297,6 @@ internal enum SwiftGen {
       /// Your new password must differ from your current password
       internal static let samePassword = SwiftGen.tr("Localizable", "profile.error.samePassword", fallback: "Your new password must differ from your current password")
     }
-  }
-  internal enum Welcome {
-    /// Old money style
-    internal static let subtitle = SwiftGen.tr("Localizable", "welcome.subtitle", fallback: "Old money style")
   }
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length

@@ -50,6 +50,20 @@ enum ComponentConstants {
         static let categorySwitchDuration: Double = 0.2
     }
 
+    // MARK: - Splash
+
+    /// Заставка при запуске (`SplashView`).
+    enum Splash {
+        /// Длительность одного оборота логотипа, 1 с. По окончании заставка закрывается.
+        ///
+        /// - Increase: запуск станет дольше.
+        /// - Decrease: оборот станет резким, логотип не успеют рассмотреть.
+        static let rotationDuration: Double = 1.5
+
+        /// Длительность растворения заставки при переходе к приложению, 0.3 с.
+        static let fadeDuration: Double = 0.5
+    }
+
     // MARK: - CategoryPicker
 
     /// Лента категорий над каталогом (`CategoryCollectionView`, `CategoryCollectionCellView`).

@@ -1,29 +1,29 @@
 import Foundation
 import Observation
 
+/// Форма входа и регистрации по шагам: email → пароль или новый пароль.
+/// Создаётся заново при каждом показе входа и уничтожается вместе с ним: введённые данные не переживают
+/// вход и выход. Саму сессию после входа или регистрации обновляет подписка в `SessionViewModel`.
 @MainActor
 @Observable
 final class AuthViewModel {
     private(set) var email = ""
     private(set) var password = ""
     private(set) var repeatPassword = ""
-    private(set) var banner = AuthBanner.hidden
     private(set) var isSubmitting = false
-    private(set) var session: AuthSession
-    private(set) var verificationMessage = ""
-    /// Стек экранов авторизации. Сбрасывается при смене сессии.
+    /// Короткое уведомление: ошибка или результат действия.
+    private(set) var toast: ToastMessage?
+    /// Стек экранов после ввода email.
     private(set) var path: [AuthRoute] = []
 
-    var isSignedIn: Bool { session == .verified }
+    var canContinueWithEmail: Bool { !trimmedEmail.isEmpty && !isSubmitting }
+    var canSignIn: Bool { !password.isEmpty && !isSubmitting }
+    var canRegister: Bool { !password.isEmpty && !repeatPassword.isEmpty && !isSubmitting }
 
-    var pendingEmail: String? {
-        guard case .awaitingEmailVerification(let email) = session else { return nil }
-        return email
-    }
+    private var trimmedEmail: String { email.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     private let authUseCases: AuthUseCases
     private let validator: AuthInputValidator
-    @ObservationIgnored private var observation: ObservationToken?
 
     init(
         authUseCases: AuthUseCases,
@@ -31,7 +31,6 @@ final class AuthViewModel {
     ) {
         self.authUseCases = authUseCases
         self.validator = validator
-        session = authUseCases.observeSession.currentSession
     }
 
     // MARK: - Ввод
@@ -48,8 +47,8 @@ final class AuthViewModel {
         self.repeatPassword = repeatPassword
     }
 
-    func dismissBanner() {
-        banner = banner.dismissed
+    func dismissToast() {
+        toast = nil
     }
 
     /// Стек экранов меняет `NavigationStack` (кнопка «Назад», свайп).
@@ -59,126 +58,74 @@ final class AuthViewModel {
 
     // MARK: - Сценарии
 
-    func openAuthForm(mode: AuthMode) {
-        banner = .hidden
-        path = [.form(mode)]
-    }
-
-    func submit(mode: AuthMode) {
-        guard !isSubmitting else { return }
-        email = email.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let message = validator.validationMessage(
-            email: email,
-            password: password,
-            repeatPassword: repeatPassword,
-            mode: mode
-        ) {
-            banner = .error(message)
+    /// Шаг 1: проверяем email и открываем ввод пароля или создание нового.
+    func continueWithEmail() {
+        guard canContinueWithEmail else { return }
+        email = trimmedEmail
+        guard validator.isValidEmail(email) else {
+            toast = .error(SwiftGen.Auth.Error.invalidEmail)
             return
         }
-        banner = .hidden
-        isSubmitting = true
-        Task { [weak self] in await self?.performSubmit(mode: mode) }
-    }
-
-    func observeSession() {
-        guard observation == nil else { return }
-        observation = authUseCases.observeSession.observeSession { [weak self] in self?.setSession($0) }
-    }
-
-    func resendVerificationEmail() {
-        guard !isSubmitting else { return }
-        isSubmitting = true
-        verificationMessage = ""
-        Task { [weak self] in await self?.performResendVerification() }
-    }
-
-    func refreshEmailVerification() {
-        guard !isSubmitting else { return }
-        isSubmitting = true
-        verificationMessage = ""
-        Task { [weak self] in await self?.performRefreshVerification() }
-    }
-
-    func signOut() {
-        do {
-            try authUseCases.signOut.signOut()
-            setSession(.signedOut)
-        } catch {
-            verificationMessage = AuthErrorMessageMapper.message(for: error, verifyingCurrentPassword: false)
+        run { viewModel in
+            let isRegistered = try await viewModel.authUseCases.checkEmail.isEmailRegistered(viewModel.email)
+            viewModel.password = ""
+            viewModel.repeatPassword = ""
+            viewModel.path = [isRegistered ? .password : .createPassword]
         }
     }
 
-    func emailEditingChanged(isEditing: Bool) {
-        guard !email.isEmpty else {
-            dismissBanner()
+    func signIn() {
+        guard canSignIn else { return }
+        run { viewModel in
+            try await viewModel.authUseCases.signIn.signIn(email: viewModel.email, password: viewModel.password)
+        }
+    }
+
+    func register() {
+        guard canRegister else { return }
+        if let message = validator.newPasswordMessage(password: password, repeatPassword: repeatPassword) {
+            toast = .error(message)
             return
         }
-        guard !isEditing else { return }
-        banner = validator.isValidEmail(email) ? .hidden : .error(SwiftGen.Auth.Error.invalidEmail)
-    }
-
-    // MARK: - Асинхронные сценарии
-
-    private func performSubmit(mode: AuthMode) async {
-        defer { isSubmitting = false }
-        do {
-            switch mode {
-            case .signIn:
-                try await authUseCases.signIn.signIn(email: email, password: password)
-            case .registration:
-                try await authUseCases.register.register(email: email, password: password)
-            }
-            setSession(authUseCases.observeSession.currentSession)
-            if pendingEmail != nil {
-                verificationMessage = mode == .registration
-                    ? SwiftGen.Auth.Verification.sent
-                    : SwiftGen.Auth.Verification.required
-            }
-        } catch {
-            let message = AuthErrorMessageMapper.message(for: error, verifyingCurrentPassword: false)
-            if pendingEmail != nil {
-                verificationMessage = SwiftGen.Auth.Verification.sendFailed(message)
-            } else {
-                banner = .error(message)
+        run { viewModel in
+            do {
+                try await viewModel.authUseCases.register.register(email: viewModel.email, password: viewModel.password)
+            } catch AuthRepositoryError.emailAlreadyInUse {
+                // Проверка email могла не узнать аккаунт (защита от перебора в Firebase): переходим ко входу.
+                viewModel.password = ""
+                viewModel.repeatPassword = ""
+                viewModel.path = [.password]
+                viewModel.toast = .info(SwiftGen.Auth.accountExists)
             }
         }
     }
 
-    private func performResendVerification() async {
-        defer { isSubmitting = false }
-        do {
-            try await authUseCases.resendVerification.resendVerificationEmail()
-            verificationMessage = SwiftGen.Auth.Verification.resent
-        } catch {
-            verificationMessage = AuthErrorMessageMapper.message(for: error, verifyingCurrentPassword: false)
+    func resetPassword() {
+        run { viewModel in
+            try await viewModel.authUseCases.resetPassword.sendPasswordReset(email: viewModel.email)
+            viewModel.toast = .success(SwiftGen.Auth.Password.resetSent(viewModel.email))
         }
     }
 
-    private func performRefreshVerification() async {
-        defer { isSubmitting = false }
-        do {
-            if try await authUseCases.verifyEmail.verifyEmail() {
-                setSession(.verified)
-            } else {
-                verificationMessage = SwiftGen.Auth.Verification.notConfirmed
+    func signIn(with provider: SocialSignInProvider) {
+        toast = .info(SwiftGen.Auth.Social.inDevelopment(provider.name))
+    }
+
+    // MARK: - Вспомогательное
+
+    /// Запускает запрос: блокирует повторные нажатия, ошибку показывает уведомлением.
+    private func run(_ operation: @escaping (AuthViewModel) async throws -> Void) {
+        guard !isSubmitting else { return }
+        isSubmitting = true
+        toast = nil
+        Task { [weak self] in
+            guard let self else { return }
+            defer { self.isSubmitting = false }
+            do {
+                try await operation(self)
+            } catch {
+                self.toast = .error(AuthErrorMessageMapper.message(for: error, verifyingCurrentPassword: false))
             }
-        } catch {
-            verificationMessage = AuthErrorMessageMapper.message(for: error, verifyingCurrentPassword: false)
-        }
-    }
-
-    private func setSession(_ newSession: AuthSession) {
-        session = newSession
-        switch newSession {
-        case .signedOut:
-            verificationMessage = ""
-            path = []
-        case .awaitingEmailVerification, .verified:
-            path = []
-            password = ""
-            repeatPassword = ""
-            banner = .hidden
         }
     }
 }

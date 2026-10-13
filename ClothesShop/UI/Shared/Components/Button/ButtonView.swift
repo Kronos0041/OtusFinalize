@@ -10,16 +10,23 @@ import SwiftUI
 struct ButtonView: View {
     let model: ButtonModel
     let state: ButtonState
+    /// Вместо заголовка — индикатор загрузки, пока идёт запрос.
+    var isLoading = false
 
     private var style: ButtonAppearance { state.style }
 
     var body: some View {
         HStack {
             Spacer()
-            Text(model.title)
-                .bold()
-                .font(.system(size: ComponentConstants.Button.fontSize))
-                .foregroundColor(style.foregroundColor)
+            if isLoading {
+                ProgressView()
+                    .tint(style.foregroundColor)
+            } else {
+                Text(model.title)
+                    .bold()
+                    .font(.system(size: ComponentConstants.Button.fontSize))
+                    .foregroundColor(style.foregroundColor)
+            }
             Spacer()
         }
         .frame(
@@ -34,10 +41,10 @@ struct ButtonView: View {
 struct ButtonView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ButtonView(model: .signIn, state: .activeBlack)
+            ButtonView(model: .continueAction, state: .activeBlack)
                 .previewLayout(.sizeThatFits)
                 .previewThemes("Чёрная")
-            ButtonView(model: .back, state: .activeWhite)
+            ButtonView(model: .continueAction, state: .activeWhite)
                 .previewLayout(.sizeThatFits)
                 .previewThemes("Белая")
         }
