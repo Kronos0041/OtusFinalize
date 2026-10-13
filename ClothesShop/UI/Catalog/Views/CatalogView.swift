@@ -12,25 +12,26 @@ struct CatalogView: View {
     @Environment(CatalogViewModel.self) private var catalogViewModel
     /// Владеет ViewModel уведомлений `MainTabView`; здесь только наблюдение.
     let notificationsViewModel: NotificationsViewModel
-    let openCart: () -> Void
     @State private var router = Router<CatalogRoute>()
+
+    private var topBar: MainTopBar {
+        MainTopBar(
+            notificationCount: notificationsViewModel.unreadCount,
+            clickBell: { router.push(.notifications) }
+        )
+    }
 
     var body: some View {
         NavigationStack(path: Binding(get: { router.path }, set: router.updatePath)) {
-            VStack(spacing: 15) {
-                MainTopBar(
-                    notificationCount: notificationsViewModel.unreadCount,
-                    clickBell: { router.push(.notifications) },
-                    clickCart: openCart
-                )
-
-                ViewModeView(
-                    catalogViewModel.mode,
-                    emptyTitle: SwiftGen.Catalog.empty,
-                    retry: { catalogViewModel.reload() }
-                ) { _ in
-                    CatalogSectionTabsView()
-                }
+            // С товарами панель входит в шапку, которая уезжает при прокрутке,
+            // а над загрузкой и ошибкой стоит отдельно.
+            ViewModeView(
+                catalogViewModel.mode,
+                emptyTitle: SwiftGen.Catalog.empty,
+                retry: { catalogViewModel.reload() },
+                placeholderHeader: { topBar }
+            ) { _ in
+                CatalogContentView(topBar: topBar)
             }
             .frame(width: getWidth())
             .toolbar(.hidden, for: .navigationBar)
@@ -61,10 +62,7 @@ struct CatalogView_Previews: PreviewProvider {
     }
 
     private static func content(_ container: AppDIContainer) -> some View {
-        CatalogView(
-            notificationsViewModel: container.makeNotificationsViewModel(),
-            openCart: {}
-        )
+        CatalogView(notificationsViewModel: container.makeNotificationsViewModel())
             .environment(container.makeLoadedCatalogViewModel())
             .environment(container.makeLoadedCartViewModel())
     }

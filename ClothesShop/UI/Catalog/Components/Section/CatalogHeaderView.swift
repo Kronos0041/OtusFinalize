@@ -1,11 +1,14 @@
 import SwiftUI
 
-/// Поиск и переключатель категорий, которые прокручиваются вместе с каталогом.
+/// Верхняя часть каталога: панель и поиск. Прокручивается вместе с товарами.
 struct CatalogHeaderView: View {
     @Environment(CatalogViewModel.self) private var catalogViewModel
+    let topBar: MainTopBar
 
     var body: some View {
-        VStack(spacing: 15) {
+        VStack(spacing: 16) {
+            topBar
+
             SearchTextField(
                 frame: (getWidth() - ComponentConstants.Layout.sideInset, 50),
                 placeholder: SwiftGen.Common.search,
@@ -14,19 +17,15 @@ struct CatalogHeaderView: View {
                     set: { catalogViewModel.updateSearchText($0) }
                 )
             )
-
-            CategoryCollectionView()
         }
-        .padding(.top, 15)
-
-        Divider()
+        .padding(.bottom, 15)
     }
 }
 
 #if DEBUG
 struct CatalogHeaderView_Previews: PreviewProvider {
     static var previews: some View {
-        CatalogHeaderView()
+        CatalogHeaderView(topBar: MainTopBar(notificationCount: 3, clickBell: {}))
             .environment(AppDIContainer.mock().makeLoadedCatalogViewModel())
             .previewLayout(.sizeThatFits)
             .previewThemes()

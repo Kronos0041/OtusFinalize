@@ -7,29 +7,14 @@
 
 import SwiftUI
 
-/// Сетка товаров одного раздела.
+/// Прокручиваемая сетка товаров одного раздела с заглушкой для пустого списка.
 struct CatalogGridView: View {
     let section: CatalogSectionUIModel
     var emptyTitle: String? = nil
     var emptySystemImage = "heart"
     var emptyMessage = SwiftGen.Favorites.instructions
-    var header: CatalogHeaderView? = nil
 
     @Environment(CatalogViewModel.self) private var catalogViewModel
-    @Environment(Router<CatalogRoute>.self) private var router
-
-    private let itemSpacing: CGFloat = 12
-
-    private var gridWidth: CGFloat { getWidth() - ComponentConstants.Layout.contentHorizontalInset }
-
-    private var columns: [GridItem] {
-        [GridItem(.flexible(), spacing: itemSpacing, alignment: .top),
-         GridItem(.flexible(), spacing: itemSpacing, alignment: .top)]
-    }
-
-    private var cellWidth: CGFloat {
-        (gridWidth - itemSpacing) / 2
-    }
 
     var body: some View {
         ZStack {
@@ -42,29 +27,12 @@ struct CatalogGridView: View {
             }
 
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 0) {
-                    if let header {
-                        header
-                    }
-
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 24) {
-                        ForEach(section.products) { product in
-                            CatalogItemView(
-                                item: product,
-                                isLiked: catalogViewModel.isFavorite(product),
-                                width: cellWidth,
-                                topLike: { catalogViewModel.toggleFavorite(product) },
-                                topDescription: { router.push(.productDetails(productID: product.id)) }
-                            )
-                        }
-                    }
+                CatalogProductsGrid(items: section.products)
                     .padding(.top, 10)
-                }
             }
             .refreshable { await catalogViewModel.refresh() }
-            .allowsHitTesting(header != nil || !section.products.isEmpty)
+            .allowsHitTesting(!section.products.isEmpty)
         }
-        .frame(width: gridWidth)
     }
 }
 

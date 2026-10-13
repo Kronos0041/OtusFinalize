@@ -13,12 +13,16 @@ import SwiftUI
 ///     ViewModeView(viewModel.mode, emptyTitle: "Каталог пока пуст", retry: { viewModel.reload() }) { sections in
 ///         CatalogView(sections: sections)
 ///     }
-struct ViewModeView<Value, Content: View>: View {
+///
+/// `placeholderHeader` показывается только над заглушками (загрузка, пусто, нет сети, ошибка).
+/// Нужен, когда контент сам встраивает шапку, например в прокручиваемый список.
+struct ViewModeView<Value, Content: View, PlaceholderHeader: View>: View {
     private let mode: ViewMode<Value>
     private let emptyTitle: String
     private let emptySystemImage: String
     private let emptyMessage: String?
     private let retry: (() -> Void)?
+    private let placeholderHeader: PlaceholderHeader
     private let content: (Value) -> Content
 
     init(
@@ -27,6 +31,7 @@ struct ViewModeView<Value, Content: View>: View {
         emptySystemImage: String = "tray",
         emptyMessage: String? = nil,
         retry: (() -> Void)? = nil,
+        @ViewBuilder placeholderHeader: () -> PlaceholderHeader,
         @ViewBuilder content: @escaping (Value) -> Content
     ) {
         self.mode = mode
@@ -34,16 +39,27 @@ struct ViewModeView<Value, Content: View>: View {
         self.emptySystemImage = emptySystemImage
         self.emptyMessage = emptyMessage
         self.retry = retry
+        self.placeholderHeader = placeholderHeader()
         self.content = content
     }
 
     var body: some View {
+        if case .content(let value) = mode {
+            content(value)
+        } else {
+            VStack(spacing: 15) {
+                placeholderHeader
+                placeholder
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var placeholder: some View {
         switch mode {
-        case .loading:
+        case .loading, .content:
             ProgressView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-        case .content(let value):
-            content(value)
         case .empty:
             StatePlaceholder(
                 systemImage: emptySystemImage,
@@ -66,6 +82,27 @@ struct ViewModeView<Value, Content: View>: View {
                 retry: retry
             )
         }
+    }
+}
+
+extension ViewModeView where PlaceholderHeader == EmptyView {
+    init(
+        _ mode: ViewMode<Value>,
+        emptyTitle: String = SwiftGen.Common.empty,
+        emptySystemImage: String = "tray",
+        emptyMessage: String? = nil,
+        retry: (() -> Void)? = nil,
+        @ViewBuilder content: @escaping (Value) -> Content
+    ) {
+        self.init(
+            mode,
+            emptyTitle: emptyTitle,
+            emptySystemImage: emptySystemImage,
+            emptyMessage: emptyMessage,
+            retry: retry,
+            placeholderHeader: { EmptyView() },
+            content: content
+        )
     }
 }
 

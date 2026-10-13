@@ -36,6 +36,8 @@ struct CategoryCollectionView: View {
                     }
                 }
             }
+            // Каталог пересоздаёт ленту при смене категории: выбранная сразу должна быть на виду.
+            .onAppear { scroll.scrollTo(catalogViewModel.selectedCategoryIndex, anchor: .center) }
             .onChange(of: catalogViewModel.selectedCategoryIndex) { _, selected in
                 withAnimation(.easeInOut(duration: ComponentConstants.Animation.categorySwitchDuration)) {
                     scroll.scrollTo(selected, anchor: .center)
