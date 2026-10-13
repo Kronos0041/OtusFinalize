@@ -243,7 +243,7 @@ function card(s, x, y, w, h, num, head, body) {
   const s = slide("Архитектура: Clean Architecture");
   const cols = [
     ["UI", "SwiftUI Views, компоненты, DesignSystem, навигация", INK, PAPER],
-    ["Presentation", "ViewModel, UI-модели, ViewMode, Router, валидаторы", "3A332A", PAPER],
+    ["Presentation", "ViewModel, UI-модели, ViewMode, Router (push / pop), валидаторы", "3A332A", PAPER],
     ["Domain", "Entities, UseCases, протоколы репозиториев", GOLD, INK],
     ["Data", "Репозитории, DTO, Mapper, протоколы DataSource", MIST, INK],
     ["Infrastructure", "Firebase, UserDefaults, URLCache, NWPathMonitor", MIST, INK],
@@ -304,18 +304,18 @@ function card(s, x, y, w, h, num, head, body) {
 {
   const s = slide("Dependency Injection");
   box(s, 0.5, 1.2, 2.9, 0.85, { fill: GOLD, text: "live()\nFirebase · UserDefaults", size: 12, bold: true });
-  box(s, 0.5, 2.25, 2.9, 0.85, { fill: MIST, text: "preview()\nPreviewRepositories (моки)", size: 12, bold: true });
+  box(s, 0.5, 2.25, 2.9, 0.85, { fill: MIST, text: "mock()\nMock…Repository + MockResponse", size: 12, bold: true });
   arrow(s, 3.45, 1.62, 3.85, 1.95); arrow(s, 3.45, 2.67, 3.85, 2.35);
   box(s, 3.9, 1.2, 2.6, 1.9, { fill: INK, color: PAPER, text: "AppDIContainer\ninit(repositories:)\n\ncomposition root", size: 14, bold: true });
   arrow(s, 6.55, 2.15, 6.95, 2.15);
   box(s, 7.0, 1.2, 2.5, 1.9, { fill: MIST, text: "make…ViewModel()\nUseCase(repository:)\n→ ViewModel", size: 13, bold: true });
-  code(s, 0.5, 3.4, 4.7, 1.45, "struct Repositories {\n  let auth: AuthRepositoryProtocol\n  let catalog: CatalogRepositoryProtocol\n  let cart: CartRepositoryProtocol\n  …  // всего 9 протоколов\n}", 11);
+  code(s, 0.5, 3.4, 4.7, 1.45, "struct AppRepositories {\n  let auth: AuthRepositoryProtocol\n  let catalog: CatalogRepositoryProtocol\n  let cart: CartRepositoryProtocol\n  …  // всего 9 протоколов\n}", 11);
   s.addText([
     { text: "Зависимости передаются через init", options: { bullet: true, breakLine: true } },
     { text: "ViewModel видит только UseCase и протоколы", options: { bullet: true, breakLine: true } },
     { text: "Превью и тесты подставляют моки без сети", options: { bullet: true } },
   ], { x: 5.5, y: 3.4, w: 4.0, h: 1.45, fontFace: BODY, fontSize: 14, color: GREY, valign: "top", margin: 0, paraSpaceAfter: 6, isTextBox: true });
-  s.addNotes("Контейнер — composition root. Для боевого режима он собирается из Firebase-реализаций, для превью — из моков. ViewModel создаются фабричными методами контейнера.");
+  s.addNotes("Контейнер — composition root. Для боевого режима он собирается из Firebase-реализаций, для превью — из mock-репозиториев (AppDIContainer.mock). ViewModel создаются фабричными методами контейнера.");
 }
 
 // 9 ─ DTO
@@ -370,7 +370,7 @@ function card(s, x, y, w, h, num, head, body) {
     s.addText(e[1], { x: 3.4, y: e[2] + 0.4, w: 5.9, h: 0.5, fontFace: BODY, fontSize: 12, color: GREY, margin: 0, valign: "top", isTextBox: true });
     arrow(s, 2.75, e[2] + 0.47, 3.15, e[2] + 0.47);
   });
-  box(s, 0.5, 4.4, 9, 0.5, { fill: GOLD, text: "При входе каталог, корзина и настройки загружаются параллельно (async let в LoadStorefrontUseCase)", size: 12, bold: true });
+  box(s, 0.5, 4.4, 9, 0.5, { fill: GOLD, text: "При входе каталог, корзина и настройки загружаются параллельно (async let в GetShopDataUseCase → ShopData)", size: 12, bold: true });
   s.addNotes("Весь Firebase-код сосредоточен в Infrastructure. Ошибки SDK преобразуются в доменные ошибки (ErrorMapper), поэтому ViewModel не знает про Firebase.");
 }
 
